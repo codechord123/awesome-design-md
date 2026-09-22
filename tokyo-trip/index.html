@@ -299,6 +299,22 @@ ol.timeline::before{content:"";position:absolute;left:61.5px;top:10px;bottom:10p
 .btn.key:hover{background:var(--ginkgo);filter:brightness(1.06)}
 .btn.key .ki{opacity:1}
 
+/* 공항 경로 */
+.aroute{padding:var(--s4) 0}
+.aroute + .aroute{border-top:1px solid var(--line)}
+.aroute:first-child{padding-top:0}
+.rname{margin:0;font-size:17px;font-weight:600;letter-spacing:-.01em;line-height:1.3}
+.rbest{display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:var(--r-tag);
+  background:var(--ginkgo);color:var(--ginkgo-ink);font-size:11px;font-weight:600}
+.rmeta{display:flex;flex-wrap:wrap;gap:0;margin:5px 0 0;font-size:13px;color:var(--muted)}
+.rmeta span{padding:0 10px;border-left:1px solid var(--line);line-height:1.5;white-space:nowrap}
+.rmeta span:first-child{padding-left:0;border-left:0}
+.rmeta b{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--ink)}
+.aroute .note{margin-top:7px;font-size:14px}
+.alertline{margin:0 0 var(--s4);padding:12px 14px;border-radius:14px;
+  border:1px solid var(--ginkgo);background:var(--surface);
+  background:color-mix(in srgb,var(--ginkgo) 10%,var(--surface));font-size:14px;line-height:1.55}
+
 /* 추천 목록 */
 ol.reclist{list-style:none;margin:0;padding:0;display:grid;gap:var(--s3)}
 .rec .card{border-radius:var(--r-card)}
@@ -451,6 +467,12 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
       <li>모리오카 서점은 13시에 엽니다. 일요일 비행기가 이르면 토요일 저녁으로 옮기세요.</li>
       <li>토요일이 가장 깁니다. 지치면 선택 표시가 붙은 곳부터 빼세요. 날짜 화면의 &ldquo;선택 일정 접기&rdquo;로 한 번에 숨길 수 있어요.</li>
     </ul>
+  </section>
+
+  <section class="block" aria-labelledby="tr-h">
+    <h2 id="tr-h">도쿄에서 움직이기</h2>
+    <p class="sub">교통카드와 패스, 막차. 2026년 9월에 확인했습니다.</p>
+    <div id="transit"></div>
   </section>
 
   <section class="block" aria-labelledby="off-h">
@@ -694,9 +716,47 @@ const CHECKS = [
 ];
 
 const AIRPORTS = {
-  hnd:{n:"하네다", mins:45, q:"羽田空港"},
-  nrt:{n:"나리타", mins:80, q:"成田空港"}
+  hnd:{n:"하네다", mins:45, q:"羽田空港", last:"게이큐 공항선이 제3터미널 기준 24:13까지 다닙니다.",
+    routes:[
+      {n:"게이큐 공항선", best:true, d:"시나가와 약 13분", fare:"330엔 (IC 327엔)",
+       note:"도에이 아사쿠사선과 직통이라 신바시까지 갈아타지 않습니다. 신바시에서 긴자선으로 아카사카 방면. 제3터미널 기준 05:26~24:13 운행."},
+      {n:"도쿄 모노레일", d:"하마마쓰초 13~19분", fare:"520엔",
+       note:"하마마쓰초에서 JR 야마노테선이나 오에도선으로 갈아탑니다."},
+      {n:"심야 정액 택시", d:"", fare:"7,600엔",
+       note:"하네다에서 지요다구까지 정액 요금입니다. 2026년 4월 20일부터 바뀐 금액이에요."}
+    ]},
+  nrt:{n:"나리타", mins:80, q:"成田空港", last:"스카이라이너 막차가 23:20입니다.",
+    routes:[
+      {n:"게이세이 스카이라이너", best:true, d:"닛포리 36분 · 게이세이우에노 41분", fare:"2,580엔",
+       note:"가장 빠르고 막차가 23:20으로 가장 늦습니다. 우에노에서 긴자선을 타면 아카사카 방면까지 갈아타지 않아요."},
+      {n:"나리타 익스프레스 (N'EX)", d:"도쿄역 약 53분", fare:"3,070엔 (왕복 5,000엔)",
+       note:"전 좌석 지정석입니다. 막차가 스카이라이너보다 이르니 밤 도착이면 시간표를 먼저 보세요. 도쿄역에서 마루노우치선으로 아카사카 방면."},
+      {n:"에어포트 버스 TYO-NRT", d:"약 1시간", fare:"1,500엔",
+       note:"가장 쌉니다. 도쿄역·긴자 방면으로 갑니다."},
+      {n:"리무진 버스", d:"약 1시간 30분", fare:"",
+       note:"숙소 앞에 서는 노선이 있으면 짐 들고 갈아탈 일이 없습니다. 노선표를 확인해 보세요."}
+    ]}
 };
+
+// 도쿄 안에서 움직이는 데 필요한 것. 전부 2026년 9월 22일 검색으로 확인했다.
+const TRANSIT = [
+  {t:"교통카드부터", body:[
+    "스이카·파스모 무기명 카드는 2023년에 판매가 멈췄다가 2025년 3월부터 모든 역에서 다시 팝니다.",
+    "아이폰 8 이상이면 출발 전에 애플 지갑에 스이카를 넣어두세요. 공항에서 줄 설 일이 없습니다. 한국에서 산 갤럭시는 일본 내수용이 아니면 안 됩니다.",
+    "카드를 원하시면 보증금 없는 웰컴 스이카가 있습니다. 28일간 쓸 수 있어요."],
+   src:"https://kr.trip.com/blog/suica/", srcn:"트립닷컴"},
+
+  {t:"도쿄 서브웨이 티켓", body:[
+    "24시간 1,000엔 · 48시간 1,500엔 · 72시간 2,000엔. 도쿄메트로 9개 노선과 도에이 4개 노선을 무제한으로 탑니다.",
+    "JR과 사철은 포함되지 않습니다. 단기 체류 외국인만 살 수 있고, 자정이 아니라 처음 쓴 시각부터 시간을 셉니다.",
+    "이 일정으로 따지면 금요일(진보초·니혼바시)은 거의 메트로라 확실히 이득입니다. 목요일과 토요일은 JR·사철이 섞여요. 72시간권을 목요일 아침에 열면 목·금·토가 들어갑니다. 하루 세 번 이상 메트로를 타면 본전입니다."],
+   src:"https://www.tokyometro.jp/tst/en/index.html", srcn:"도쿄메트로 공식"},
+
+  {t:"막차와 택시", body:[
+    "이 일정에는 새벽까지 여는 LP바가 셋 있습니다. Spincoaster 02:00, CAVE 03:00, 그리고 시모키타자와의 Little Soul Cafe.",
+    "도쿄 지하철 막차는 그보다 훨씬 이릅니다. 그날 역에서 막차 시각을 확인하고, 끝까지 있을 계획이면 택시 예산을 따로 잡아두세요.",
+    "토요일 마지막이 시모키타자와라 숙소까지 거리가 있습니다. 여기가 가장 조심할 밤이에요."]}
+];
 
 // 야마노테선 고리 — 간단 지도의 방향 참고용
 const LOOP = [[35.6812,139.7671,"도쿄"],[35.6918,139.7709],[35.6984,139.7731],[35.7075,139.7748],[35.7138,139.7773,"우에노"],[35.7215,139.7780],[35.7278,139.7707],[35.7320,139.7668],[35.7381,139.7608],[35.7365,139.7470],[35.7334,139.7393],[35.7318,139.7286],[35.7295,139.7109,"이케부쿠로"],[35.7212,139.7066],[35.7126,139.7038],[35.7012,139.7000],[35.6896,139.7006,"신주쿠"],[35.6831,139.7020],[35.6702,139.7027],[35.6580,139.7016,"시부야"],[35.6467,139.7101],[35.6339,139.7157],[35.6262,139.7236],[35.6197,139.7286],[35.6285,139.7388,"시나가와"],[35.6355,139.7407],[35.6457,139.7476],[35.6555,139.7571],[35.6663,139.7583],[35.6750,139.7628]];
@@ -1010,6 +1070,39 @@ function stopHTML(d,s,prev){
     </article></li>`;
 }
 
+function arrivalHTML(d){
+  const ap=LS.get("tokyo-air-in","nrt");
+  const A=AIRPORTS[ap];
+  const land=(d.stops[0]||{}).t||"";
+  const routes=A.routes.map(r=>`<div class="aroute">
+    ${r.best?`<p class="rbest">이 일정엔 이게 낫습니다</p>`:""}
+    <p class="rname">${esc(r.n)}</p>
+    <p class="rmeta">${[r.d&&`<span>${esc(r.d)}</span>`, r.fare&&`<span><b>${esc(r.fare)}</b></span>`].filter(Boolean).join("")}</p>
+    <p class="note">${esc(r.note)}</p>
+  </div>`).join("");
+  return `<section class="block" aria-labelledby="arr-h">
+    <h2 id="arr-h">공항에서 숙소까지</h2>
+    <p class="sub">요금과 소요시간은 2026년 9월에 확인했습니다. 출발 전에 시간표를 한 번 더 보세요.</p>
+    <div class="card-box">
+      <div class="field">
+        <label>도착 공항<select id="a-air">${Object.keys(AIRPORTS).map(k=>`<option value="${k}"${k===ap?" selected":""}>${AIRPORTS[k].n}</option>`).join("")}</select></label>
+      </div>
+      ${land?`<p class="alertline">${esc(land)} 착륙이면 입국 심사와 수하물을 지나 나오는 건 한 시간쯤 뒤입니다. ${esc(A.last)}</p>`:""}
+      ${routes}
+      <div class="acts">
+        <a class="btn key" id="a-dir" href="${DIRQ(A.q,"赤坂駅 東京")}" target="_blank" rel="noopener">${ico("i-route")}${esc(A.n)}에서 숙소까지 길찾기</a>
+      </div>
+      <p class="srcline">확인: 2026년 9월 ·
+        <a href="https://www.kkday.com/ko/blog/27152/asia-japan-tokyo-limousinebus" target="_blank" rel="noopener">나리타</a> ·
+        <a href="https://www.haneda-tokyo-access.com/kr/ride/fares.html" target="_blank" rel="noopener">하네다</a></p>
+    </div>
+  </section>`;
+}
+function wireArrival(){
+  const sel=$("#a-air"); if(!sel) return;
+  sel.addEventListener("change",()=>{ LS.set("tokyo-air-in",sel.value); renderDay("wed"); });
+}
+
 function sundayHTML(){
   const ap=LS.get("tokyo-air","hnd"), ft=LS.get("tokyo-flight",""), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ap].mins));
   return `<section class="block" aria-labelledby="fly-h">
@@ -1088,6 +1181,7 @@ function renderDay(key){
       ${hasOpt?`<div class="dayopts"><button type="button" class="linkish" id="optbtn">${hide?"선택 일정 다시 보기":"선택 일정 접기"}</button></div>`:""}
       <ol class="timeline">${rows}</ol>
     </div>
+    ${d.key==="wed"?arrivalHTML(d):""}
     ${d.key==="sun"?sundayHTML():""}
   </section>`;
 
@@ -1120,6 +1214,7 @@ function renderDay(key){
     if(pick===null){ const f=shown.find(x=>x.lat&&!x.hotel); if(f) pick=f._idx; }
     if(pick!==null) setSel(pick,{pan:false,scrollCard:true});
   })();
+  if(d.key==="wed") wireArrival();
   if(d.key==="sun") wireSunday();
   $("#db-wd").textContent=d.wd; $("#db-dt").textContent=d.dt; $("#db-title").textContent=d.title;
   applyChecks(); applyNow();
@@ -1330,6 +1425,16 @@ tabsEl.addEventListener("keydown",e=>{
   if(e.key==="End")  n=keys.length-1;
   if(n!==null){ e.preventDefault(); select(keys[n],true); }
 });
+
+/* ---------- 도쿄에서 움직이기 ---------- */
+(function(){
+  const el=$("#transit"); if(!el) return;
+  el.innerHTML=TRANSIT.map(t=>`<div class="card-box">
+    <h3>${esc(t.t)}</h3>
+    ${t.body.map(x=>`<p>${esc(x)}</p>`).join("")}
+    ${t.src?`<p class="srcline">확인: 2026년 9월 · <a href="${esc(t.src)}" target="_blank" rel="noopener">${esc(t.srcn)}</a></p>`:""}
+  </div>`).join("");
+})();
 
 /* ---------- 예약 목록 ---------- */
 (function(){
