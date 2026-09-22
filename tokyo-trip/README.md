@@ -18,9 +18,19 @@
 - 지치는 날엔 "선택 일정 접기"로 빼도 되는 곳을 숨길 수 있습니다.
 - 일요일 화면에서 비행기 시간을 넣으면 긴자에서 나설 시각을 거꾸로 계산해 줍니다.
 
-## GitHub Pages로 올리기
+## 어떻게 생겼나
 
-1. 저장소 **Settings → Pages**에서 Source를 **Deploy from a branch**, 브랜치를 배포할 브랜치와 `/ (root)`로 지정합니다.
+저장소의 `design-md/` 컬렉션에서 세 가지를 가져와 섞었습니다. The Verge의 StoryStream 타임라인(왼쪽 레일의 모노 시각, 알약 모서리 카드, 지금 있어야 할 곳만 은행잎으로 꽉 채우는 액센트 블록), Linear의 4px 간격 체계와 헤어라인, Apple의 17px 본문과 여백. 은행나무 색과 Hahmlet 제목은 그대로입니다.
+
+## 배포
+
+### Vercel
+
+저장소 루트의 `vercel.json`이 모든 경로를 `tokyo-trip/`으로 넘깁니다. 그래서 Vercel에 이 저장소를 연결하기만 하면 사이트 루트에서 앱이 열립니다. 따로 설정할 것은 없고, Production Branch만 `main`이면 됩니다.
+
+### GitHub Pages
+
+1. 저장소 **Settings → Pages**에서 Source를 **Deploy from a branch**, 브랜치를 `main`과 `/ (root)`로 지정합니다.
 2. 몇 분 뒤 `https://<계정>.github.io/<저장소>/tokyo-trip/` 에서 열립니다.
 3. 경로는 전부 상대 경로라 하위 경로에서도 서비스 워커까지 그대로 동작합니다.
 
