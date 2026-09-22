@@ -1,0 +1,16 @@
+{
+  "name": "늦가을 도쿄 — 11월 18일부터 22일까지",
+  "short_name": "늦가을 도쿄",
+  "description": "2026년 11월 도쿄 닷새 일정. 미술관, 서점, 북카페, LP바.",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ECEEF1",
+  "theme_color": "#ECEEF1",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
