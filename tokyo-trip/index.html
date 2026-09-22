@@ -273,6 +273,11 @@ ol.timeline::before{content:"";position:absolute;left:61.5px;top:10px;bottom:10p
 .ghelp{margin-top:var(--s3);font-size:14px;color:var(--muted)}
 .ghelp summary{cursor:pointer;min-height:40px;display:flex;align-items:center;font-weight:600;color:var(--ink)}
 .ghelp ol{margin:var(--s2) 0 0;padding-left:1.2em}
+.ghelp p{font-size:14px;line-height:1.55;margin:var(--s2) 0 0}
+.pastelab{display:flex;flex-direction:column;gap:6px;margin:var(--s3) 0 0;font-size:13px;color:var(--muted)}
+.pastelab textarea{font:inherit;font-size:13px;font-family:var(--mono);line-height:1.5;padding:10px 12px;
+  border-radius:12px;border:1px solid var(--line);background:var(--paper);color:var(--ink);resize:vertical}
+.pastelab textarea:focus{border-color:var(--ginkgo);outline:none}
 .ghelp li{margin:0 0 6px}
 .leg{display:flex;gap:6px;align-items:flex-start;font-size:13px;color:var(--muted);margin:var(--s3) 0 0}
 .leg .ki{width:14px;height:14px;flex:none;margin-top:3px}
@@ -498,7 +503,18 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
       </div>
       <p class="gstat" id="gstat"></p>
       <details class="ghelp">
-        <summary>키 만드는 법</summary>
+        <summary>키 없이 넣기 &mdash; 클로드 채팅에서 받아 붙여넣기</summary>
+        <p>클로드 채팅에는 구글 지도 커넥터가 붙어 있습니다. 거기서 한 번 물어보고 결과를 여기에 붙여넣으면 키 없이도 평점이 들어갑니다. 사진은 이 방법으로 가져올 수 없어요.</p>
+        <div class="acts">
+          <button type="button" class="btn" id="gprompt">물어볼 문장 복사</button>
+        </div>
+        <label class="pastelab">받은 내용 붙여넣기
+          <textarea id="gpaste" rows="4" spellcheck="false" placeholder='[{"name":"국립서양미술관","rating":4.5,"reviews":12400,"type":"관광 명소"}, …]'></textarea>
+        </label>
+        <div class="acts"><button type="button" class="btn key" id="gpastego">넣기</button></div>
+      </details>
+      <details class="ghelp">
+        <summary>API 키로 받는 법</summary>
         <ol>
           <li>Google Cloud 콘솔에서 프로젝트를 만들고 결제를 연결합니다. 이 앱이 쓰는 만큼은 무료 한도 안입니다.</li>
           <li>&ldquo;Places API (New)&rdquo;를 사용 설정합니다.</li>
@@ -987,9 +1003,10 @@ const PFIELDS = "id,displayName,rating,userRatingCount,primaryTypeDisplayName,re
 let PSTORE = (()=>{ try{ return JSON.parse(LS.get("tokyo-places","{}"))||{}; }catch(e){ return {}; } })();
 const pAge   = ()=> PSTORE.at ? Date.now()-PSTORE.at : Infinity;
 const pStale = ()=> pAge() > PMAXAGE;
+const pkey = s => s.id || ("n:"+s.n);
 function placeOf(s){
-  if(!s.id || !PSTORE.byId || pStale()) return null;
-  return PSTORE.byId[s.id] || null;
+  if(!PSTORE.byId || pStale()) return null;
+  return PSTORE.byId[pkey(s)] || null;
 }
 function todayHours(d,P){
   if(!P.hours || !P.hours.length) return "";
@@ -1425,6 +1442,62 @@ tabsEl.addEventListener("keydown",e=>{
   if(e.key==="End")  n=keys.length-1;
   if(n!==null){ e.preventDefault(); select(keys[n],true); }
 });
+
+/* ---------- 키 없이 붙여넣기 ---------- */
+const NORM = x => String(x||"").replace(/[\s·・,，.()（）]/g,"").toLowerCase();
+function promptText(){
+  const names=ALL.map(x=>x.n);
+  return "도쿄 장소 " + names.length + "곳의 구글 지도 평점을 찾아서, 설명 없이 JSON 배열 하나만 출력해 줘.\n"
+    + '형식: [{"name":"한국어 이름 그대로","rating":4.5,"reviews":12400,"type":"분류"}]\n'
+    + "rating은 소수 한 자리 숫자, reviews는 리뷰 수 정수, type은 구글에 나오는 분류를 한국어로.\n"
+    + "찾지 못한 곳은 빼지 말고 rating을 0으로 넣어 줘.\n\n"
+    + names.map((n,i)=>(i+1)+". "+n).join("\n");
+}
+function importPasted(text){
+  let raw=String(text||"").trim();
+  raw=raw.replace(/^```[a-z]*\s*/i,"").replace(/```\s*$/,"").trim();
+  const a=raw.indexOf("["), b=raw.lastIndexOf("]");
+  if(a>=0 && b>a) raw=raw.slice(a,b+1);
+  let arr;
+  try{ arr=JSON.parse(raw); }catch(e){ return {err:"JSON을 읽지 못했어요. 대괄호로 시작하는 배열만 붙여넣어 주세요."}; }
+  if(!Array.isArray(arr)) return {err:"JSON 배열이어야 합니다."};
+
+  const index=new Map();
+  ALL.forEach(x=>{ [x.n,x.ja,x.q].filter(Boolean).forEach(k=>{ if(!index.has(NORM(k))) index.set(NORM(k),x); }); });
+
+  const out={}; let hit=0; const miss=[];
+  arr.forEach(r=>{
+    const nm=r.name||r.n||r.이름;
+    const st=index.get(NORM(nm));
+    if(!st){ if(nm) miss.push(String(nm)); return; }
+    const rec=Object.assign({}, PSTORE.byId&&PSTORE.byId[pkey(st)], {
+      rating:Number(r.rating)||0,
+      reviews:Number(r.reviews||r.userRatingCount)||0,
+      type:String(r.type||r.category||"").trim()
+    });
+    out[pkey(st)]=rec; hit++;
+  });
+  if(!hit) return {err:"일정에 있는 이름과 하나도 맞지 않았어요. 이름을 그대로 두고 다시 받아 보세요."};
+  PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, out)};
+  try{ LS.set("tokyo-places",JSON.stringify(PSTORE)); }catch(e){ return {err:"기기 저장 공간이 모자랍니다."}; }
+  return {hit, miss};
+}
+(function(){
+  const cp=$("#gprompt"), ta=$("#gpaste"), go=$("#gpastego");
+  if(!cp) return;
+  cp.addEventListener("click",async()=>{
+    const t=promptText();
+    try{ await navigator.clipboard.writeText(t); gStatus("문장을 복사했어요. 클로드 채팅에 붙여넣고, 받은 JSON을 아래 칸에 넣으세요."); }
+    catch(e){ ta.value=t; ta.select(); gStatus("복사가 막혀 있어 아래 칸에 넣어뒀습니다. 직접 복사해 주세요."); }
+  });
+  go.addEventListener("click",()=>{
+    const res=importPasted(ta.value);
+    if(res.err){ gStatus(res.err,true); return; }
+    ta.value="";
+    renderDay(CURRENT==="recs"?"wed":CURRENT);
+    gStatus(`${res.hit}곳 넣었습니다.` + (res.miss.length?` 이름이 안 맞은 것: ${res.miss.slice(0,3).join(", ")}${res.miss.length>3?" 외 "+(res.miss.length-3)+"개":""}.`:""));
+  });
+})();
 
 /* ---------- 도쿄에서 움직이기 ---------- */
 (function(){
