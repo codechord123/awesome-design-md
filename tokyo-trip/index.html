@@ -103,18 +103,41 @@ section.day{padding:var(--s7) 0 var(--s2)}
 /* 지도 — 이 화면의 주인공. 모바일에서 여백을 깨고 꽉 채운다(Apple 풀블리드). */
 figure.map{margin:0 0 var(--s6)}
 .mapbox{position:relative;isolation:isolate;background:var(--surface);border:1px solid var(--line);
-  border-radius:var(--r-panel);overflow:hidden;height:320px}
+  border-radius:var(--r-panel);overflow:hidden;height:400px}
 @media (max-width:479px){
-  .mapbox{margin:0 calc(-1 * var(--gut));border-radius:0;border-left:0;border-right:0;height:340px}
+  .mapbox{margin:0 calc(-1 * var(--gut));border-radius:0;border-left:0;border-right:0;height:420px}
 }
 #lmap{position:absolute;inset:0;background:var(--surface)}
-.mapdays{position:absolute;top:10px;left:10px;right:10px;z-index:1100;
-  display:flex;gap:5px;justify-content:center;flex-wrap:wrap;pointer-events:none}
-.mapday{pointer-events:auto;appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
-  font:inherit;font-size:12px;font-weight:600;border-radius:var(--r-tag);padding:0 11px;min-height:32px;cursor:pointer;
+.mapdays{position:absolute;top:10px;left:10px;right:56px;z-index:1100;
+  display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+.mapdays::-webkit-scrollbar{display:none}
+.mapday{flex:0 0 auto;appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
+  font:inherit;font-size:12.5px;font-weight:600;border-radius:var(--r-tag);padding:0 13px;min-height:34px;
+  cursor:pointer;white-space:nowrap;
   transition:background-color .15s ease,border-color .15s ease,color .15s ease}
 .mapday.on{background:var(--ginkgo);border-color:var(--ginkgo);color:var(--ginkgo-ink)}
-.mapbox.fallback .mapdays{display:none}
+
+/* 지도 아래 장소 카드 — 옆으로 넘기면 지도가 따라간다 */
+.mapcards{position:absolute;left:0;right:0;bottom:22px;z-index:1100;display:flex;gap:8px;
+  overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;
+  padding:0 12px 2px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.mapcards::-webkit-scrollbar{display:none}
+.mc{flex:0 0 auto;width:250px;scroll-snap-align:center;appearance:none;cursor:pointer;text-align:left;
+  background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:8px;color:inherit;font:inherit;
+  display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:center;
+  transition:border-color .15s ease,background-color .15s ease}
+.mc.on{border-color:var(--ginkgo);background:var(--surface);
+  background:color-mix(in srgb,var(--ginkgo) 12%,var(--surface))}
+.mc-img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--faint);border:1px solid var(--line)}
+.mc-img.ph{display:flex;align-items:center;justify-content:center;border-color:transparent;color:#fff;
+  background:var(--mck,var(--muted));font-family:var(--mono);font-size:15px;font-weight:700}
+.mc-b{min-width:0}
+.mc-t{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--muted)}
+.mc-n{display:block;font-size:14px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-r{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.mc-r b{font-weight:600;color:var(--ink)}
+.mapbox.fallback .mapdays,.mapbox.fallback .mapcards{display:none}
 .mapbox.fallback #lmap{display:none}
 .svgmap{position:absolute;inset:0;display:none}
 .mapbox.fallback .svgmap{display:block}
@@ -161,6 +184,7 @@ figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 14p
   box-shadow:0 0 0 2px var(--surface)}
 .lmk.is-opt{border:2px dashed var(--surface)}
 .lmk.is-now{box-shadow:0 0 0 3px var(--ginkgo)}
+.lmk.is-sel{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--mc,#E8B620);transform:scale(1.12)}
 .lhome{display:flex;align-items:center;justify-content:center;width:36px;height:22px;border-radius:7px;
   background:var(--ink);color:var(--paper);font:700 11px var(--sans);box-shadow:0 0 0 2px var(--surface)}
 
@@ -478,7 +502,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
 const HOTEL = {lat:35.6721, lng:139.7364, n:"아카사카 숙소", ja:"赤坂"};
 
 const DAYS = [
-  { key:"wed", wd:"수", dt:"11.18", date:"2026-11-18", title:"도착", summary:"20시 착륙, 숙소 도착은 21시 반쯤. 첫날은 비워둡니다.", walk:"이동은 공항에서 숙소까지만",
+  { key:"wed", wd:"수", dt:"11.18", short:"도착만", date:"2026-11-18", title:"도착", summary:"20시 착륙, 숙소 도착은 21시 반쯤. 첫날은 비워둡니다.", walk:"이동은 공항에서 숙소까지만",
     stops:[
       {t:"20:00", n:"공항 도착", kc:"move", k:"이동", note:"아카사카까지 1시간 남짓."},
       {t:"21:30", n:"아카사카 숙소 체크인", kc:"hotel", k:"숙소", hotel:true},
@@ -487,7 +511,7 @@ const DAYS = [
        q:"権八 西麻布", id:"ChIJEwlemnqLGGARhwMuRpwpkBI", lat:35.6601742, lng:139.7235797}
     ]},
 
-  { key:"thu", wd:"목", dt:"11.19", date:"2026-11-19", title:"우에노에서 스미다로", summary:"공원 안 미술관 두 곳, 오후엔 호쿠사이와 스카이트리.", walk:"도보 약 8km, 환승 3번",
+  { key:"thu", wd:"목", dt:"11.19", short:"우에노·스미다", date:"2026-11-19", title:"우에노에서 스미다로", summary:"공원 안 미술관 두 곳, 오후엔 호쿠사이와 스카이트리.", walk:"도보 약 8km, 환승 3번",
     stops:[
       {t:"9:30", n:"도쿄국립박물관", ja:"東京国立博物館", kc:"art", k:"박물관", closed:"월 휴관",
        note:"대덕사 개창 700년 특별전(10/14–12/6)과 히로시게전(9/29–12/20)이 함께 열립니다.",
@@ -514,7 +538,7 @@ const DAYS = [
        q:"Spincoaster Music Bar", id:"ChIJAQDUsM-MGGARLXIsEQGf3Ig", lat:35.6852642, lng:139.6992942}
     ]},
 
-  { key:"fri", wd:"금", dt:"11.20", date:"2026-11-20", title:"기타노마루에서 진보초로", summary:"근대미술관에서 헌책방 거리까지 걸어서 10분. 가장 편한 날.", walk:"도보 약 4km",
+  { key:"fri", wd:"금", dt:"11.20", short:"기타노마루·진보초", date:"2026-11-20", title:"기타노마루에서 진보초로", summary:"근대미술관에서 헌책방 거리까지 걸어서 10분. 가장 편한 날.", walk:"도보 약 4km",
     stops:[
       {t:"10:00", n:"도쿄국립근대미술관", ja:"東京国立近代美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"창구 당일권", close:"20:00",
        note:"다케히사 유메지전(10/23–1/11). 화가이자 시인, 디자이너였던 유메지의 대표작 〈구로후네야〉가 약 40년 만에 나옵니다.",
@@ -536,7 +560,7 @@ const DAYS = [
        q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841}
     ]},
 
-  { key:"sat", wd:"토", dt:"11.21", date:"2026-11-21", title:"츠키지, 롯폰기, 아오야마, 시부야", summary:"새벽 시장에서 밤 LP바까지. 가장 긴 하루예요.", walk:"도보 약 11km, 새벽 7시 반부터 밤까지",
+  { key:"sat", wd:"토", dt:"11.21", short:"츠키지·롯폰기·시부야", date:"2026-11-21", title:"츠키지, 롯폰기, 아오야마, 시부야", summary:"새벽 시장에서 밤 LP바까지. 가장 긴 하루예요.", walk:"도보 약 11km, 새벽 7시 반부터 밤까지",
     stops:[
       {t:"7:30", n:"츠키지 장외시장", ja:"築地場外市場", kc:"market", k:"시장", cash:true,
        note:"9시 넘으면 몸싸움. 일요일엔 대부분 닫아 오늘이 유일합니다.",
@@ -569,7 +593,7 @@ const DAYS = [
        q:"Little Soul Cafe 下北沢", id:"ChIJf9tx9WrzGGARqYc7EzjP_3A", lat:35.6632436, lng:139.6692659}
     ]},
 
-  { key:"sun", wd:"일", dt:"11.22", date:"2026-11-22", title:"긴자, 출국하는 날", summary:"미술관 하나, 갤러리 하나, 서점 둘. 비행기 시간에 맞춰 줄이세요.", walk:"도보 약 3km, 세 곳 모두 걸어서 10분 안쪽",
+  { key:"sun", wd:"일", dt:"11.22", short:"긴자·출국", date:"2026-11-22", title:"긴자, 출국하는 날", summary:"미술관 하나, 갤러리 하나, 서점 둘. 비행기 시간에 맞춰 줄이세요.", walk:"도보 약 3km, 세 곳 모두 걸어서 10분 안쪽",
     stops:[
       {t:"10:00", n:"아티존 미술관", ja:"アーティゾン美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"artizon",
        note:"교바시. 유럽에 간 일본 서양화가들, 후지이 히카루와 소장품의 협업 등 전시 세 개가 동시에 열립니다(10/24–1/31).",
@@ -728,7 +752,7 @@ function buildMap(d, stops){
 
   const pts=stops.filter(s=>s.lat && !s.hotel);
   const map=L.map($("#lmap"),{zoomControl:false, attributionControl:true, scrollWheelZoom:false});
-  L.control.zoom({position:"bottomright"}).addTo(map);
+  L.control.zoom({position:"topright"}).addTo(map);
   LMAP=map; MARKERS={};
   let loaded=0;
   const tiles=L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{
@@ -759,16 +783,62 @@ function buildMap(d, stops){
          <a class="pp-a" href="${DIR(p._from||HOTEL,p)}" target="_blank" rel="noopener">길찾기</a>
          <button type="button" class="pp-a" data-go="${p._idx}">일정 보기</button>
        </span>`,
-      {closeButton:true,autoPanPadding:[16,16],maxWidth:300,minWidth:210});
+      {closeButton:true,autoPanPaddingTopLeft:[16,56],autoPanPaddingBottomRight:[16,120],maxWidth:300,minWidth:210});
+    m.on("click",()=>setSel(p._idx,{pan:false,scrollCard:true}));
     m.on("popupopen",e=>{
       const b=e.popup.getElement().querySelector("[data-go]");
       if(b) b.onclick=()=>{ LMAP.closePopup(); goStop(Number(b.dataset.go)); };
     });
   });
 
+  // 위에는 일차 칩, 아래에는 장소 카드가 얹혀 있으니 그만큼 비켜서 맞춘다
+  const FIT={paddingTopLeft:[22,56], paddingBottomRight:[22,108], maxZoom:15};
   const bounds=L.latLngBounds([[HOTEL.lat,HOTEL.lng],...pts.map(p=>[p.lat,p.lng])]);
-  map.fitBounds(bounds,{padding:[30,30],maxZoom:15});
-  setTimeout(()=>{ try{ map.invalidateSize(); map.fitBounds(bounds,{padding:[30,30],maxZoom:15}); }catch(e){} },120);
+  map.fitBounds(bounds,FIT);
+  setTimeout(()=>{ try{ map.invalidateSize(); map.fitBounds(bounds,FIT); }catch(e){} },120);
+}
+
+/* ---------- 지도 아래 장소 카드 ---------- */
+const reduced = ()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+let MAPSEL=null;
+function setSel(idx,{pan=false,scrollCard=true}={}){
+  MAPSEL=idx;
+  $$(".mc",panelEl).forEach(el=>el.classList.toggle("on",Number(el.dataset.mc)===idx));
+  Object.keys(MARKERS).forEach(k=>{
+    const m=MARKERS[k], on=Number(k)===idx;
+    const el=m.getElement && m.getElement();
+    const d=el && el.querySelector(".lmk");
+    if(d) d.classList.toggle("is-sel",on);
+    try{ m.setZIndexOffset(on?1000:0); }catch(e){}   // 겹친 마커 위로 올린다
+  });
+  const m=MARKERS[idx];
+  if(m && pan && LMAP){ try{ LMAP.panTo(m.getLatLng(),{animate:!reduced()}); }catch(e){} }
+  if(scrollCard){
+    const box=$("#mapcards"), el=box&&box.querySelector(`.mc[data-mc="${idx}"]`);
+    if(box&&el) box.scrollTo({left:el.offsetLeft-(box.clientWidth-el.clientWidth)/2,
+                              behavior:reduced()?"auto":"smooth"});
+  }
+}
+function wireCards(){
+  const box=$("#mapcards"); if(!box) return;
+  let t=null;
+  box.addEventListener("scroll",()=>{
+    clearTimeout(t);
+    t=setTimeout(()=>{
+      const r=box.getBoundingClientRect(), mid=r.left+r.width/2;
+      let best=null, bd=1e9;
+      $$(".mc",box).forEach(el=>{
+        const b=el.getBoundingClientRect(), dd=Math.abs(b.left+b.width/2-mid);
+        if(dd<bd){ bd=dd; best=el; }
+      });
+      if(best && Number(best.dataset.mc)!==MAPSEL) setSel(Number(best.dataset.mc),{pan:true,scrollCard:false});
+    },110);
+  },{passive:true});
+  $$(".mc",box).forEach(el=>el.addEventListener("click",()=>{
+    const i=Number(el.dataset.mc);
+    setSel(i,{pan:true,scrollCard:true});
+    const m=MARKERS[i]; if(m) setTimeout(()=>{ try{ m.openPopup(); }catch(e){} }, reduced()?0:260);
+  }));
 }
 
 /* ---------- 구글 장소 정보 ----------
@@ -789,6 +859,15 @@ function todayHours(d,P){
   const dow=new Date(d.date+"T12:00:00+09:00").getUTCDay();   // 0=일
   const line=P.hours[(dow+6)%7] || "";                        // weekdayDescriptions[0]=월
   return line.replace(/^[^:]*:\s*/,"").trim();
+}
+const kNum = n => n>=10000
+  ? String(Math.round(n/1000)/10).replace(/\.0$/,"")+"만"
+  : n.toLocaleString("ko-KR");
+function cardLine(s,P){
+  const bits=[];
+  if(P&&P.rating) bits.push(`<b>${P.rating.toFixed(1)}</b> ★${P.reviews?" "+kNum(P.reviews):""}`);
+  bits.push(esc((P&&P.type)||s.k));
+  return bits.join(" · ");
 }
 function placeRow(d,s,P){
   if(!P) return "";
@@ -888,7 +967,19 @@ function renderDay(key){
   const seq=[HOTEL,...shown.filter(s=>s.lat && !s.hotel)];
 
   const dayNo=DAYS.indexOf(d)+1;
-  const chips=DAYS.map((x,i)=>`<button type="button" class="mapday${x.key===d.key?" on":""}" data-mapday="${x.key}"${x.key===d.key?' aria-current="true"':""}>${i+1}일차</button>`).join("");
+  const chips=DAYS.map(x=>`<button type="button" class="mapday${x.key===d.key?" on":""}" data-mapday="${x.key}"${x.key===d.key?' aria-current="true"':""}>${x.wd} &mdash; ${esc(x.short)}</button>`).join("");
+  const cards=shown.filter(x=>x.lat && !x.hotel).map(x=>{
+    const K=KIND[x.kc]||KIND.move, P=placeOf(x);
+    const img = P && P.photo
+      ? `<img class="mc-img" src="${esc(P.photo)}" alt="" loading="lazy" decoding="async">`
+      : `<span class="mc-img ph" style="--mck:${K.c}" aria-hidden="true">${x.num}</span>`;
+    return `<button type="button" class="mc" data-mc="${x._idx}" aria-label="${x.num}번 ${esc(x.n)}">
+      ${img}<span class="mc-b">
+        <span class="mc-t">${esc(x.t)}</span>
+        <span class="mc-n">${esc(x.n)}</span>
+        <span class="mc-r">${cardLine(x,P)}</span>
+      </span></button>`;
+  }).join("");
   panelEl.innerHTML=`<section class="day" role="tabpanel" aria-labelledby="tab-${d.key}" tabindex="-1">
     <header class="dayhead">
       <p class="eyebrow kicker">Day ${dayNo} &middot; ${d.dt} ${d.wd}</p>
@@ -901,6 +992,7 @@ function renderDay(key){
         <div id="lmap"></div>
         <div class="svgmap">${mapSVG(d, shown)}</div>
         <div class="mapdays" role="tablist" aria-label="일차">${chips}</div>
+        <div class="mapcards" id="mapcards" aria-label="이 날의 장소">${cards}</div>
       </div>
       <figcaption>
         <span class="mapnote">번호를 누르면 장소 정보와 링크가 열립니다.</span>
@@ -930,7 +1022,20 @@ function renderDay(key){
   $$(".namebtn",panelEl).forEach(b=>b.addEventListener("click",()=>openBig(d, Number(b.dataset.big))));
   $$("[data-focus]",panelEl).forEach(b=>b.addEventListener("click",()=>focusStop(Number(b.dataset.focus))));
   $$("[data-mapday]",panelEl).forEach(b=>b.addEventListener("click",()=>select(b.dataset.mapday)));
-  $$(".thumb",panelEl).forEach(im=>im.addEventListener("error",()=>im.remove()));
+  $$(".thumb, .mc-img",panelEl).forEach(im=>im.addEventListener("error",()=>{
+    if(im.tagName==="IMG") im.remove();
+  }));
+  wireCards();
+  (function(){
+    const info=nowInfo();
+    let pick=null;
+    if(info.phase==="during"){
+      const it=(info.cur&&info.cur.d.key===d.key)?info.cur:(info.next&&info.next.d.key===d.key?info.next:null);
+      if(it && MARKERS[it.i]!==undefined) pick=it.i;
+    }
+    if(pick===null){ const f=shown.find(x=>x.lat&&!x.hotel); if(f) pick=f._idx; }
+    if(pick!==null) setSel(pick,{pan:false,scrollCard:true});
+  })();
   if(d.key==="sun") wireSunday();
   $("#db-wd").textContent=d.wd; $("#db-dt").textContent=d.dt; $("#db-title").textContent=d.title;
   applyChecks(); applyNow();
