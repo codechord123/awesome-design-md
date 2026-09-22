@@ -1,10 +1,11 @@
 /* 늦가을 도쿄 — 오프라인 캐시
    shell: 설치할 때 한 번에 저장 / tiles·fonts: 본 것만 저장 */
-const VER    = "v2";
+const VER    = "v3";
 const SHELL  = "tokyo-shell-" + VER;
 const TILES  = "tokyo-tiles-v1";
 const FONTS  = "tokyo-fonts-v1";
-const KEEP   = [SHELL, TILES, FONTS];
+const PHOTOS = "tokyo-photos-v1";   // 구글 장소 사진 — 본 것만
+const KEEP   = [SHELL, TILES, FONTS, PHOTOS];
 const MAXTILES = 900;
 
 const ASSETS = [
@@ -94,5 +95,6 @@ self.addEventListener("fetch", e=>{
   if(url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com"){
     e.respondWith(cacheFirst(req, FONTS)); return;
   }
+  if(url.hostname.endsWith("googleusercontent.com")){ e.respondWith(cacheFirst(req, PHOTOS)); return; }
   if(url.origin === location.origin){ e.respondWith(cacheFirst(req, SHELL)); return; }
 });
