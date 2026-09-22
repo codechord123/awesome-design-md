@@ -640,9 +640,11 @@ const LS = {
 // place_id 가 있으면 구글 지도의 장소 카드(사진·평점·영업시간·리뷰)로 바로 들어간다.
 // 없으면 검색으로 떨어진다.
 const HL = "&hl=ko";   // 구글 쪽 화면을 한국어로 연다
-const MAPS  = (q,id)=>id
-  ? "https://www.google.com/maps/place/?q=place_id:"+id+HL
-  : "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q)+HL;
+// 구글 공식 Maps URLs 형식. query_place_id 는 반드시 query 와 같이 보내야 하고,
+// 이 조합이라야 아이폰·안드로이드 구글 지도 앱에서도 그 장소 카드로 바로 열린다.
+// maps/place/?q=place_id:… 형식은 앱이 검색어 텍스트로 읽어버린다. 쓰지 말 것.
+const MAPS  = (q,id)=>"https://www.google.com/maps/search/?api=1&query="
+  + encodeURIComponent(q||"") + (id ? "&query_place_id="+id : "") + HL;
 const DIR   = (o,d)=>"https://www.google.com/maps/dir/?api=1&origin="+o.lat+","+o.lng+"&destination="+(d.q?encodeURIComponent(d.q):d.lat+","+d.lng)+(d.id?"&destination_place_id="+d.id:"")+"&travelmode=transit"+HL;
 const DIRQ  = (o,d)=>"https://www.google.com/maps/dir/?api=1&origin="+encodeURIComponent(o)+"&destination="+encodeURIComponent(d)+"&travelmode=transit"+HL;
 const DAYDIR= pts=>"https://www.google.com/maps/dir/"+pts.map(p=>p.lat+","+p.lng).join("/")+"?hl=ko";
@@ -780,7 +782,7 @@ function buildMap(d, stops){
        <p class="pp-n">${esc(p.n)}</p>
        ${p.ja?`<p class="pp-ja">${esc(p.ja)}</p>`:""}
        <span class="pp-row">
-         <a class="pp-a key" href="${MAPS(p.q,p.id)}" target="_blank" rel="noopener">구글 지도</a>
+         <a class="pp-a key" href="${MAPS(p.q||p.n,p.id)}" target="_blank" rel="noopener">구글 지도</a>
          <a class="pp-a" href="${DIR(p._from||HOTEL,p)}" target="_blank" rel="noopener">길찾기</a>
          <button type="button" class="pp-a" data-go="${p._idx}">일정 보기</button>
        </span>`,
@@ -913,7 +915,7 @@ function stopHTML(d,s,prev){
     : `<button type="button" class="namebtn" data-big="${s._idx}"><span class="name">${esc(s.n)}${s.ja?"":ico("i-zoom","ki zoom")}</span>${ja}</button>`;
   const leg = s.leg ? `<p class="leg">${ico("i-move")}<span>${esc(s.leg.line)} ${esc(s.leg.from)} → ${esc(s.leg.to)}${s.leg.note?" · "+esc(s.leg.note):""}${s.leg.v?"":" (확인 전)"}</span></p>` : "";
   const acts=[];
-  if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q,s.id)}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
+  if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q||s.n,s.id)}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
   if(s.lat && !s.hotel) acts.push(`<a class="btn" href="${DIR(prev,s)}" target="_blank" rel="noopener">${ico("i-route")}여기까지 길찾기</a>`);
   const meta=badgeHTML(s);
   const P=placeOf(s);
@@ -1119,7 +1121,7 @@ function openBig(d,idx){
   $("#ja-ko").textContent  = s.ja ? s.n : "";
   $("#ja-sub").textContent = s.jaTodo ? "일본어 표기는 아직 확인 전이에요. 지도 화면을 함께 보여주세요." : (s.k||"");
   const a=$("#ja-map");
-  if(s.q){ a.hidden=false; a.href=MAPS(s.q,s.id); } else a.hidden=true;
+  if(s.q||s.n){ a.hidden=false; a.href=MAPS(s.q||s.n,s.id); } else a.hidden=true;
   if(typeof dlg.showModal==="function") dlg.showModal(); else dlg.setAttribute("open","");
 }
 (function(){
