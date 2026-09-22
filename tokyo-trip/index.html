@@ -25,7 +25,7 @@
 :root{
   --paper:#ECEEF1;--surface:#F7F8FA;--ink:#1E2B4A;--muted:#5C6680;--line:#C9CED8;--faint:#DDE1E8;
   --ginkgo:#E8B620;--ginkgo-ink:#1E2B4A;--pine:#2F5D50;
-  --k-art:#2F5D50;--k-book:#8A5A2B;--k-food:#B4472E;--k-bar:#5B4B8A;--k-market:#0F6E7E;--k-view:#3A6EA5;--k-move:#5C6680;
+  --k-art:#2F5D50;--k-book:#8A5A2B;--k-food:#B4472E;--k-bar:#5B4B8A;--k-market:#0F6E7E;--k-view:#3A6EA5;--k-move:#5C6680;--k-leaf:#6E7F3C;
   --serif:"Hahmlet","Noto Serif KR","Nanum Myeongjo","AppleMyungjo",serif;
   --sans:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
   --mono:"JetBrains Mono","IBM Plex Sans KR",ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -38,10 +38,10 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){--paper:#141A2B;--surface:#1B2338;--ink:#E6E8EE;--muted:#9AA3B8;--line:#2C3550;--faint:#232C45;--ginkgo:#E8B620;--ginkgo-ink:#141A2B;--pine:#7FB8A4;
-    --k-art:#7FB8A4;--k-book:#CBA06A;--k-food:#E28B73;--k-bar:#AFA2E6;--k-market:#5FC2D1;--k-view:#8FB6E4;--k-move:#9AA3B8;--tint:9%;--edge:30%;}
+    --k-art:#7FB8A4;--k-book:#CBA06A;--k-food:#E28B73;--k-bar:#AFA2E6;--k-market:#5FC2D1;--k-view:#8FB6E4;--k-move:#9AA3B8;--k-leaf:#B6C47E;--tint:9%;--edge:30%;}
 }
 :root[data-theme="dark"]{--paper:#141A2B;--surface:#1B2338;--ink:#E6E8EE;--muted:#9AA3B8;--line:#2C3550;--faint:#232C45;--ginkgo:#E8B620;--ginkgo-ink:#141A2B;--pine:#7FB8A4;
-  --k-art:#7FB8A4;--k-book:#CBA06A;--k-food:#E28B73;--k-bar:#AFA2E6;--k-market:#5FC2D1;--k-view:#8FB6E4;--k-move:#9AA3B8;--tint:9%;--edge:30%;}
+  --k-art:#7FB8A4;--k-book:#CBA06A;--k-food:#E28B73;--k-bar:#AFA2E6;--k-market:#5FC2D1;--k-view:#8FB6E4;--k-move:#9AA3B8;--k-leaf:#B6C47E;--tint:9%;--edge:30%;}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);scroll-padding-bottom:calc(var(--tabh) + 24px)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;
@@ -79,6 +79,13 @@ h1{font-family:var(--serif);font-weight:800;font-size:clamp(46px,13vw,76px);line
 .state b{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--ink)}
 .state .sep{opacity:.45}
 
+.stats{display:flex;flex-wrap:nowrap;gap:0;margin:var(--s5) 0 0;font-size:13px;color:var(--muted);
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.stats::-webkit-scrollbar{display:none}
+.stats span{flex:0 0 auto;white-space:nowrap;padding:0 11px;border-left:1px solid var(--line);line-height:1.5}
+.stats span:first-child{padding-left:0;border-left:0}
+.stats b{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--ink)}
+
 /* 상단 고정 바 */
 .daybar{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--paper);
   background:color-mix(in srgb,var(--paper) 90%,transparent);
@@ -98,6 +105,15 @@ section.day{padding:var(--s7) 0 var(--s2)}
 .day h2{font-family:var(--serif);font-weight:800;font-size:clamp(31px,8.5vw,46px);line-height:1.02;
   letter-spacing:-.025em;margin:0 0 var(--s4)}
 .day .summary{margin:0 0 var(--s2);font-size:17px;line-height:1.55}
+.daymeta{display:flex;flex-wrap:nowrap;gap:0;margin:0 0 var(--s3);font-size:13px;color:var(--muted);
+  overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.daymeta::-webkit-scrollbar{display:none}
+.daymeta span{flex:0 0 auto;white-space:nowrap;padding:0 10px;border-left:1px solid var(--line);line-height:1.5}
+.daymeta span:first-child{padding-left:0;border-left:0}
+.daymeta b{font-family:var(--mono);font-weight:600;font-size:12px;color:var(--ink)}
+.prog{height:2px;background:var(--line);border-radius:2px;overflow:hidden;margin:0 0 var(--s5);max-width:260px}
+.prog[hidden]{display:none}
+.prog i{display:block;height:100%;background:var(--ginkgo);border-radius:2px}
 .day .walk{margin:0 0 var(--s5);font-size:14px;color:var(--muted)}
 
 /* 지도 — 이 화면의 주인공. 모바일에서 여백을 깨고 꽉 채운다(Apple 풀블리드). */
@@ -283,6 +299,19 @@ ol.timeline::before{content:"";position:absolute;left:61.5px;top:10px;bottom:10p
 .btn.key:hover{background:var(--ginkgo);filter:brightness(1.06)}
 .btn.key .ki{opacity:1}
 
+/* 추천 목록 */
+ol.reclist{list-style:none;margin:0;padding:0;display:grid;gap:var(--s3)}
+.rec .card{border-radius:var(--r-card)}
+.rec .name{font-size:19px}
+.rec .ja{margin-top:3px}
+.whenchip{display:inline-block;margin:var(--s3) 0 0;padding:4px 11px;border-radius:var(--r-tag);
+  border:1px solid var(--kc,var(--line));color:var(--kc,var(--muted));
+  font-size:12px;font-weight:600;line-height:1.5}
+.srcline{margin:var(--s4) 0 0;font-size:12px;color:var(--muted)}
+.srcline a{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+.tipline{margin:var(--s3) 0 0;padding-left:12px;border-left:2px solid var(--kc,var(--line));
+  font-size:14px;line-height:1.55;color:var(--muted)}
+
 /* 아래 섹션들 */
 .block{padding:var(--s7) 0 var(--s2);border-top:1px solid var(--line);margin-top:var(--s6)}
 .block .kicker{margin:0 0 var(--s3)}
@@ -337,16 +366,21 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
   background:color-mix(in srgb,var(--paper) 92%,transparent);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);
   padding:var(--s2) 0 calc(var(--s2) + env(safe-area-inset-bottom,0px))}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.tab{appearance:none;border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:var(--r-tag);
-  padding:6px 0 5px;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;
-  line-height:1.1;min-height:52px;justify-content:center;position:relative;gap:3px;
-  transition:background-color .15s ease,border-color .15s ease,color .15s ease}
-.tab .wd{font-family:var(--serif);font-weight:800;font-size:20px}
-.tab .dt{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;color:var(--muted)}
-.tab[aria-selected="true"]{background:var(--ginkgo);border-color:var(--ginkgo);color:var(--ginkgo-ink)}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr) 0.78fr;gap:2px;
+  background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:3px}
+.tab{appearance:none;border:0;background:transparent;color:var(--ink);border-radius:13px;
+  padding:5px 0 4px;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;
+  line-height:1.1;min-height:46px;justify-content:center;position:relative;gap:2px;
+  transition:background-color .15s ease,color .15s ease}
+.tab .wd{font-family:var(--serif);font-weight:800;font-size:19px}
+.tab .dt{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.04em;color:var(--muted)}
+.tab .ki{width:17px;height:17px;opacity:.85}
+.tab[aria-selected="true"]{background:var(--ginkgo);color:var(--ginkgo-ink)}
 .tab[aria-selected="true"] .dt{color:var(--ginkgo-ink);opacity:.75}
-.tab.today::after{content:"";position:absolute;top:6px;right:9px;width:5px;height:5px;border-radius:50%;background:var(--pine)}
+.tab.extra{border-left:1px solid var(--line);border-radius:13px}
+.tab.extra .dt{font-family:var(--sans);font-size:10.5px;letter-spacing:0;color:var(--muted)}
+.tab.extra[aria-selected="true"] .dt{color:var(--ginkgo-ink)}
+.tab.today::after{content:"";position:absolute;top:5px;right:7px;width:5px;height:5px;border-radius:50%;background:var(--pine)}
 .tab[aria-selected="true"].today::after{background:var(--ginkgo-ink)}
 
 /* 넓은 화면에서는 지도를 왼쪽에 고정하고 그날 장소를 오른쪽에 세운다 */
@@ -383,6 +417,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
     <div class="rule"></div>
     <p class="lede">11월 18일 수요일부터 22일 일요일까지. 아카사카에서 출발하는 서점, 미술관, LP바의 닷새.</p>
     <p class="state" id="state"></p>
+    <div class="stats" id="stats"></div>
   </header>
 </div>
 
@@ -493,6 +528,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
   <symbol id="i-move" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="3.5" width="14" height="13" rx="3.5"/><path d="M5 10.5h14"/><path d="M8.5 20.5 10.5 17M15.5 20.5 13.5 17"/></symbol>
   <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5s7-7.2 7-11.5a7 7 0 1 0-14 0c0 4.3 7 11.5 7 11.5z"/><circle cx="12" cy="10" r="2.6"/></symbol>
   <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18h5.5a4 4 0 0 0 0-8H9"/><path d="M11.5 7.5 9 10l2.5 2.5"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-6.2"/><path d="M12 15.3c-4.1 0-7.2-3-7.2-6.9 0-2 .9-3.8 2.2-5 3.1 1.1 5 3.9 5 6.9 0-3 1.9-5.8 5-6.9 1.3 1.2 2.2 3 2.2 5 0 3.9-3.1 6.9-7.2 6.9z"/></symbol>
   <symbol id="i-zoom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M8 10.5h5M10.5 8v5"/></symbol>
 </svg>
 
@@ -560,7 +596,7 @@ const DAYS = [
        q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841}
     ]},
 
-  { key:"sat", wd:"토", dt:"11.21", short:"츠키지·롯폰기·시부야", date:"2026-11-21", title:"츠키지, 롯폰기, 아오야마, 시부야", summary:"새벽 시장에서 밤 LP바까지. 가장 긴 하루예요.", walk:"도보 약 11km, 새벽 7시 반부터 밤까지",
+  { key:"sat", wd:"토", dt:"11.21", short:"츠키지·롯폰기·시부야", date:"2026-11-21", title:"츠키지, 롯폰기, 아오야마, 시부야", summary:"새벽 시장에서 밤 LP바까지. 가장 긴 하루예요.", walk:"도보 약 11km",
     stops:[
       {t:"7:30", n:"츠키지 장외시장", ja:"築地場外市場", kc:"market", k:"시장", cash:true,
        note:"9시 넘으면 몸싸움. 일요일엔 대부분 닫아 오늘이 유일합니다.",
@@ -610,6 +646,43 @@ const DAYS = [
     ]}
 ];
 
+// 일정 밖 추천. 2026년 9월 22일 검색으로 확인한 것만 넣는다. 출처 없는 항목은 넣지 말 것.
+const RECS = [
+  {n:"에도도쿄박물관", ja:"江戸東京博物館", kc:"art", k:"박물관", area:"료고쿠", when:"thu",
+   why:"4년 동안 닫혀 있다가 2026년 3월 31일 다시 열었습니다. 에도 거리 재현이 넓어졌고 니혼바시 다리를 실물 크기로 들여놨어요. 스마트폰 다국어 안내가 13개 언어를 지원합니다.",
+   tip:"목요일 호쿠사이 미술관과 같은 료고쿠입니다. 둘 다 보려면 15:15 호쿠사이를 앞당기세요.",
+   q:"江戸東京博物館", src:"https://www.english.metro.tokyo.lg.jp/w/116-101-007403", srcn:"도쿄도 공식"},
+
+  {n:"아사쿠사 문화관광센터 전망대", ja:"浅草文化観光センター", kc:"view", k:"전망대, 무료", area:"아사쿠사", when:"thu",
+   why:"쿠마 겐고가 설계한 건물이고, 꼭대기 전망대가 무료입니다. 센소지와 스카이트리를 한 프레임에 넣을 수 있어요.",
+   tip:"목요일 스카이트리로 가는 길에 들르면 동선이 맞습니다. 네즈미술관도 쿠마 겐고라 같이 보면 재미있어요.",
+   q:"浅草文化観光センター", src:"https://kr.hotels.com/go/japan/most-instagrammable-places-tokyo", srcn:"Go Guides"},
+
+  {n:"도쿄도 사진미술관", ja:"東京都写真美術館", kc:"art", k:"미술관", area:"에비스", when:"sat",
+   why:"일본 최초의 사진 전문 미술관입니다. 소장품이 3만 5천 점, 전시실 세 개에서 해마다 스무 번 넘는 전시가 열려요.",
+   tip:"에비스역에서 몇 분 거리라 토요일 시부야 동선에서 한 정거장입니다. 가는 전시가 무엇인지는 먼저 확인하세요.",
+   q:"東京都写真美術館", src:"https://www.gotokyo.org/kr/spot/1744/index.html", srcn:"GO TOKYO"},
+
+  {n:"구풍 카레 본디", ja:"欧風カレー ボンディ 神保町本店", kc:"food", k:"식당, 점심", area:"진보초", when:"fri",
+   why:"진보초는 카레 격전지예요. 책을 한 손에 들고 먹을 수 있다는 이유로 헌책방 거리에 카레집이 늘었다고 합니다. 본디는 간다에서 두 번째로 오래된 집이고 1회 카레 그랑프리 우승집입니다.",
+   tip:"금요일 점심이 비어 있습니다. 책거리(12:15)와 난요도(13:45) 사이에 넣기 좋아요. 매운 걸 좋아하시면 오차노미즈 쪽 에티오피아도 있습니다.",
+   q:"欧風カレー ボンディ 神保町本店", src:"https://visit-chiyoda.com/kanda-jimbocho-best-eats-cafe-restaurants/", srcn:"Visit Chiyoda"},
+
+  {n:"수마트라 카레 쿄에이도", ja:"スマトラカレー 共栄堂", kc:"food", k:"식당, 점심", area:"진보초", when:"fri",
+   why:"1924년에 문을 연 집입니다. 밀가루를 쓰지 않고 향신료 스물여섯 가지로 채소와 고기 맛을 졸여서 냅니다. 진보초역에서 야스쿠니도리 쪽으로 1분.",
+   q:"スマトラカレー 共栄堂", src:"https://japantravel.navitime.com/ko/area/jp/guide/NTJnews0256-ko/", srcn:"NAVITIME"},
+
+  {n:"진구가이엔 은행나무길", ja:"神宮外苑いちょう並木", kc:"leaf", k:"사진 스팟, 단풍", area:"아오야마", when:"sat",
+   why:"300미터 은행나무 터널입니다. 늦가을 도쿄에서 가장 유명한 노란 길이에요.",
+   tip:"절정은 11월 하순에서 12월 상순입니다. 18~22일은 절정 직전이라 아직 초록이 섞여 있을 수 있어요. 토요일 와타리움 바로 근처입니다.",
+   q:"神宮外苑いちょう並木", src:"https://www.gotokyo.org/kr/story/guide/autumn-leaves-forecast/index.html", srcn:"GO TOKYO"},
+
+  {n:"리쿠기엔", ja:"六義園", kc:"leaf", k:"사진 스팟, 정원", area:"고마고메", when:"any",
+   why:"에도 시대에 만든 정원입니다. 단풍 드는 나무가 560그루쯤 있어요.",
+   tip:"야간 특별 관람은 11월 28일쯤 시작합니다. 이번 일정(~22일)에는 아직 안 하니 낮에 가세요. 주말은 붐비니 평일 아침이 낫습니다.",
+   q:"六義園", src:"https://www.gotokyo.org/kr/story/guide/autumn-leaves-forecast/index.html", srcn:"GO TOKYO"}
+];
+
 const CHECKS = [
   {id:"artizon", t:"아티존 미술관", d:"일요일 10:00 슬롯. 웹 예약이 매진되면 창구 판매가 없어요. 연휴라 가장 먼저."},
   {id:"nezu",    t:"네즈미술관",   d:"토요일 12:00 또는 13:00 슬롯. 구매 후 변경·취소 불가, 카드 결제만."},
@@ -657,7 +730,8 @@ const KIND = {
   market:{c:"var(--k-market)", i:"i-market"},
   view:  {c:"var(--k-view)",   i:"i-view"},
   hotel: {c:"var(--ink)",      i:"i-hotel"},
-  move:  {c:"var(--k-move)",   i:"i-move"}
+  move:  {c:"var(--k-move)",   i:"i-move"},
+  leaf:  {c:"var(--k-leaf)",   i:"i-leaf"}
 };
 const ico = (id,cls="ki")=>`<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
 
@@ -970,6 +1044,8 @@ function renderDay(key){
   const seq=[HOTEL,...shown.filter(s=>s.lat && !s.hotel)];
 
   const dayNo=DAYS.indexOf(d)+1;
+  const pad2=t=>/^\d:/.test(t)?"0"+t:t;
+  const times=shown.map(x=>pad2(x.t)), span0=times[0]||"", span1=times[times.length-1]||"";
   const chips=DAYS.map(x=>`<button type="button" class="mapday${x.key===d.key?" on":""}" data-mapday="${x.key}"${x.key===d.key?' aria-current="true"':""}>${x.wd} &mdash; ${esc(x.short)}</button>`).join("");
   const cards=shown.filter(x=>x.lat && !x.hotel).map(x=>{
     const K=KIND[x.kc]||KIND.move, P=placeOf(x);
@@ -988,7 +1064,12 @@ function renderDay(key){
       <p class="eyebrow kicker">Day ${dayNo} &middot; ${d.dt} ${d.wd}</p>
       <h2>${esc(d.title)}</h2>
       <p class="summary">${esc(d.summary)}</p>
-      <p class="walk">${esc(d.walk)}</p>
+      <div class="daymeta">
+        <span><b>${shown.filter(x=>x.lat&&!x.hotel).length}</b>곳</span>
+        <span>${esc(span0)}&ndash;${esc(span1)}</span>
+        <span>${esc(d.walk)}</span>
+      </div>
+      <div class="prog" id="prog" hidden><i></i></div>
     </header>
     <figure class="map">
       <div class="mapbox" id="mapbox">
@@ -1054,6 +1135,44 @@ function focusStop(idx){
     try{ LMAP.setView(m.getLatLng(), Math.max(LMAP.getZoom(),15), {animate:!reduce}); m.openPopup(); }catch(e){}
   }, reduce?0:340);
 }
+function renderRecs(){
+  CURRENT="recs";
+  if(LMAP){ try{LMAP.remove();}catch(e){} LMAP=null; }
+  MARKERS={}; MAPSEL=null;
+  const label={wed:"수요일",thu:"목요일",fri:"금요일",sat:"토요일",sun:"일요일",any:"아무 날이나"};
+  const items=RECS.map(r=>{
+    const K=KIND[r.kc]||KIND.move;
+    return `<li class="rec" style="--kc:${K.c}">
+      <article class="card">
+        <p class="eyebrow ko">${ico(K.i)}<span>${esc(r.k)} · ${esc(r.area)}</span></p>
+        <button type="button" class="namebtn" data-rec="${esc(r.n)}">
+          <span class="name">${esc(r.n)}</span>
+          ${r.ja?`<p class="ja">${esc(r.ja)}${ico("i-zoom","ki zoom")}</p>`:""}
+        </button>
+        <p class="whenchip">${esc(label[r.when]||label.any)}</p>
+        <p class="note">${esc(r.why)}</p>
+        ${r.tip?`<p class="tipline">${esc(r.tip)}</p>`:""}
+        <div class="acts"><a class="btn" href="${MAPS(r.q||r.n)}" target="_blank" rel="noopener">${ico("i-map")}지도</a></div>
+        <p class="srcline">확인: 2026년 9월 · <a href="${esc(r.src)}" target="_blank" rel="noopener">${esc(r.srcn)}</a></p>
+      </article></li>`;
+  }).join("");
+  panelEl.innerHTML=`<section class="day recs" role="tabpanel" aria-labelledby="tab-recs" tabindex="-1">
+    <header class="dayhead">
+      <p class="eyebrow kicker">Extra &middot; 일정 밖</p>
+      <h2>더 가볼 만한 곳</h2>
+      <p class="summary">지금 일정에는 없지만 동선에서 크게 벗어나지 않는 곳들이에요. 끼워 넣을 자리도 같이 적어뒀습니다.</p>
+      <div class="daymeta"><span><b>${RECS.length}</b>곳</span><span>2026년 9월에 확인</span></div>
+    </header>
+    <ol class="reclist">${items}</ol>
+  </section>`;
+  $$(".namebtn",panelEl).forEach(b=>b.addEventListener("click",()=>{
+    const r=RECS.find(x=>x.n===b.dataset.rec); if(!r) return;
+    openBig({stops:[{n:r.n, ja:r.ja, k:r.k, q:r.q}]}, 0);
+  }));
+  $("#db-wd").textContent="추천"; $("#db-dt").textContent=""; $("#db-title").textContent="일정 밖에서 가볼 만한 곳";
+  applyNow();
+}
+
 function goStop(idx){
   const el=panelEl.querySelector(`.stop[data-idx="${idx}"]`); if(!el) return;
   const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1087,11 +1206,29 @@ function applyNow(){
   }
   stateEl.innerHTML=txt;
 
+  const statEl=$("#stats");
+  if(statEl && !statEl.dataset.done){
+    const byKind={};
+    ALL.forEach(x=>{ const key=x.kc==="art"?"미술관·박물관":x.kc==="book"?"서점·북카페":x.kc==="food"?"식당":x.kc==="bar"?"LP바":null;
+      if(key) byKind[key]=(byKind[key]||0)+1; });
+    const bits=[`<span>닷새 &middot; <b>${ALL.length}</b>곳</span>`]
+      .concat(Object.keys(byKind).map(k=>`<span>${k} <b>${byKind[k]}</b></span>`));
+    statEl.innerHTML=bits.join(""); statEl.dataset.done="1";
+  }
+
   const btn=$("#db-now");
   btn.hidden = info.phase!=="during";
   btn.onclick=()=>{ const it=info.cur||info.next; if(!it) return; if(it.d.key!==CURRENT) select(it.d.key); setTimeout(()=>goStop(it.i),60); };
 
   const d=DAYS.find(x=>x.key===CURRENT); if(!d) return;
+  const prog=$("#prog");
+  if(prog){
+    const ts=d.stops.map(x=>at(d.date,x.t));
+    const a=Math.min(...ts), b=Math.max(...ts);
+    const on = info.phase==="during" && info.now>=a && info.now<=b && b>a;
+    prog.hidden=!on;
+    if(on) prog.firstElementChild.style.width=Math.round((info.now-a)/(b-a)*100)+"%";
+  }
   $$(".stop",panelEl).forEach(el=>{
     const s=d.stops[Number(el.dataset.idx)]; if(!s) return;
     const ts=at(d.date,s.t), chip=$(".nowchip",el);
@@ -1162,14 +1299,19 @@ function wireSunday(){
 }
 
 /* ---------- 날짜 탭 ---------- */
+const TABKEYS = ()=>DAYS.map(d=>d.key).concat("recs");
 function renderTabs(active){
   const today=tokyoNow().ymd;
   tabsEl.innerHTML=DAYS.map(d=>`<button class="tab${d.date===today?" today":""}" role="tab" id="tab-${d.key}" aria-controls="panel"
     aria-selected="${d.key===active}" tabindex="${d.key===active?0:-1}" data-key="${d.key}">
-    <span class="wd">${d.wd}</span><span class="dt">${d.dt}</span>${d.date===today?'<span class="sr">오늘</span>':""}</button>`).join("");
+    <span class="wd">${d.wd}</span><span class="dt">${d.dt}</span>${d.date===today?'<span class="sr">오늘</span>':""}</button>`).join("")
+  + `<button class="tab extra" role="tab" id="tab-recs" aria-controls="panel"
+      aria-selected="${active==="recs"}" tabindex="${active==="recs"?0:-1}" data-key="recs">
+      ${ico("i-leaf")}<span class="dt">추천</span></button>`;
 }
 function select(key,focus){
-  renderTabs(key); renderDay(key); LS.set("tokyo-day",key);
+  renderTabs(key);
+  if(key==="recs") renderRecs(); else { renderDay(key); LS.set("tokyo-day",key); }
   if(focus){ const b=$("#tab-"+key); if(b) b.focus(); }
 }
 tabsEl.addEventListener("click",e=>{
@@ -1179,13 +1321,14 @@ tabsEl.addEventListener("click",e=>{
   window.scrollTo({top:Math.max(0,panelEl.offsetTop-64),behavior:reduce?"auto":"smooth"});
 });
 tabsEl.addEventListener("keydown",e=>{
-  const i=DAYS.findIndex(d=>d.key===document.activeElement?.dataset?.key); if(i<0) return;
+  const keys=TABKEYS();
+  const i=keys.indexOf(document.activeElement?.dataset?.key); if(i<0) return;
   let n=null;
-  if(e.key==="ArrowRight") n=(i+1)%DAYS.length;
-  if(e.key==="ArrowLeft")  n=(i-1+DAYS.length)%DAYS.length;
+  if(e.key==="ArrowRight") n=(i+1)%keys.length;
+  if(e.key==="ArrowLeft")  n=(i-1+keys.length)%keys.length;
   if(e.key==="Home") n=0;
-  if(e.key==="End")  n=DAYS.length-1;
-  if(n!==null){ e.preventDefault(); select(DAYS[n].key,true); }
+  if(e.key==="End")  n=keys.length-1;
+  if(n!==null){ e.preventDefault(); select(keys[n],true); }
 });
 
 /* ---------- 예약 목록 ---------- */
