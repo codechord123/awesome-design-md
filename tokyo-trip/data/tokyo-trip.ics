@@ -39,53 +39,71 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-0@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T003000Z
-DTEND:20261119T020000Z
-SUMMARY:1. 스미다 호쿠사이 미술관
-LOCATION:すみだ北斎美術館
-DESCRIPTION:すみだ北斎美術館\n9:30에 여는 시간에 맞춰 가
- 면 한산해요. 우키요에 목판화 공정을 따로 보여줍니다.
-  바로 옆이 2026년 3월에 다시 연 에도도쿄박물관이에요(
- 추천 탭).\nhttps://www.google.com/maps/search/?api=1&query=%E3%81%99%E3
- %81%BF%E3%81%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_i
- d=ChIJgRjTtzOJGGARqoKBtB8BAno&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E3%81%99%E3%81%BF%E3%8
- 1%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJgRjTt
- zOJGGARqoKBtB8BAno&hl=ko
+DTSTART:20261119T000000Z
+DTEND:20261119T013000Z
+SUMMARY:1. 리쿠기엔
+LOCATION:六義園
+DESCRIPTION:六義園\n에도 시대 다이묘 정원. 9시에 열어요. 
+ 평일 아침이라 가장 한산한 시간입니다. 단풍철엔 駒込
+ 역에서 2분인 染井門이 열려서 정문(7분)보다 가까워요. 
+ 야간 라이트업은 이번 일정 뒤에 시작합니다.\nhttps://www.
+ google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9C%92&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9
+ C%92&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:스미다 호쿠사이 미술관
+DESCRIPTION:리쿠기엔
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-1@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T020000Z
-DTEND:20261119T033000Z
-SUMMARY:2. 도쿄 스카이트리
-LOCATION:東京スカイツリー
-DESCRIPTION:東京スカイツリー\n평일은 10시에 엽니다. 해가 
- 16:30쯤 져서 원래 계획한 17:30은 이미 어두운 시간이었어
- 요. 오전의 맑은 공기로 멀리 보고\, 해 질 녘은 리쿠기
- 엔에서 봅니다.\n예약: 날짜 지정권\nhttps://www.google.com/map
- s/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%
- 84%E3%83%AA%E3%83%BC&query_place_id=ChIJ35ov0dCOGGARKvdDH7NPHX0&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%8
- 2%B9%E3%82%AB%E3%82%A4%E3%83%84%E3%83%AA%E3%83%BC&query_place_id=ChIJ35ov0
- dCOGGARKvdDH7NPHX0&hl=ko
+DTSTART:20261119T013000Z
+DTEND:20261119T033500Z
+SUMMARY:2. 도쿄국립박물관
+LOCATION:東京国立博物館
+DESCRIPTION:東京国立博物館\n대덕사 개창 700년 특별전(10/14
+ –12/6)과 히로시게전(9/29–12/20)이 함께 열립니다.\nhttps:/
+ /www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9B%BD%E7%AB
+ %8B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3XdJvRjWLyM&
+ hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9
+ B%BD%E7%AB%8B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3X
+ dJvRjWLyM&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:도쿄 스카이트리
-TRIGGER:-PT60M
+DESCRIPTION:도쿄국립박물관
+TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-2@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T033000Z
-DTEND:20261119T043000Z
-SUMMARY:3. ROUTE BOOKS
+DTSTART:20261119T033500Z
+DTEND:20261119T035000Z
+SUMMARY:3. 국립서양미술관
+LOCATION:国立西洋美術館
+DESCRIPTION:国立西洋美術館\n르코르뷔지에가 설계한 세계
+ 유산 건물. 점심 가는 길에 밖에서 10분만 봅니다.\nhttps:/
+ /www.google.com/maps/search/?api=1&query=%E5%9B%BD%E7%AB%8B%E8%A5%BF%E6%B4
+ %8B%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJf8xB-pyOGGARizzhlNTcI7s&
+ hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E5%9B%BD%E7%AB%8B%E8%A
+ 5%BF%E6%B4%8B%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJf8xB-pyOGGARiz
+ zhlNTcI7s&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:국립서양미술관
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-thu-3@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261119T035000Z
+DTEND:20261119T051500Z
+SUMMARY:4. ROUTE BOOKS
 LOCATION:ROUTE BOOKS
 DESCRIPTION:히가시우에노. 카페 안에 서가가 있는 구조. 오
  늘 점심 자리예요.\nhttps://www.google.com/maps/search/?api=1&query=
@@ -99,106 +117,88 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-3@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261119T043000Z
-DTEND:20261119T044500Z
-SUMMARY:4. 국립서양미술관
-LOCATION:国立西洋美術館
-DESCRIPTION:国立西洋美術館\n르코르뷔지에가 설계한 세계
- 유산 건물. 오늘은 안에 들어가지 않고 박물관 가는 길
- 에 밖에서 10분만 봅니다.\nhttps://www.google.com/maps/search/?api
- =1&query=%E5%9B%BD%E7%AB%8B%E8%A5%BF%E6%B4%8B%E7%BE%8E%E8%A1%93%E9%A4%A8&q
- uery_place_id=ChIJf8xB-pyOGGARizzhlNTcI7s&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E5%9B%BD%E7%AB%8B%E8%A
- 5%BF%E6%B4%8B%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJf8xB-pyOGGARiz
- zhlNTcI7s&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:국립서양미술관
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
 UID:tokyo-2026-thu-4@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T044500Z
-DTEND:20261119T070000Z
-SUMMARY:5. 도쿄국립박물관
-LOCATION:東京国立博物館
-DESCRIPTION:東京国立博物館\n대덕사 개창 700년 특별전(10/14
- –12/6)과 히로시게전(9/29–12/20)이 함께 열립니다. 리쿠
- 기엔 입장 마감(16:30) 때문에 15:30에는 나오세요.\nhttps://w
- ww.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9B%BD%E7%AB%8
- B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3XdJvRjWLyM&hl
- =ko
-URL:https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9
- B%BD%E7%AB%8B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3X
- dJvRjWLyM&hl=ko
+DTSTART:20261119T051500Z
+DTEND:20261119T065000Z
+SUMMARY:5. 스미다 호쿠사이 미술관
+LOCATION:すみだ北斎美術館
+DESCRIPTION:すみだ北斎美術館\n우키요에 목판화 공정을 따
+ 로 보여줍니다. 15:30에는 나와야 스카이트리 노을에 맞
+ 춰요. 바로 옆이 2026년 3월에 다시 연 에도도쿄박물관이
+ 에요(추천 탭).\nhttps://www.google.com/maps/search/?api=1&query=%E3%8
+ 1%99%E3%81%BF%E3%81%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_
+ place_id=ChIJgRjTtzOJGGARqoKBtB8BAno&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E3%81%99%E3%81%BF%E3%8
+ 1%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJgRjTt
+ zOJGGARqoKBtB8BAno&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:도쿄국립박물관
+DESCRIPTION:스미다 호쿠사이 미술관
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-5@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T070000Z
-DTEND:20261119T084500Z
-SUMMARY:6. 리쿠기엔
-LOCATION:六義園
-DESCRIPTION:六義園\n에도 시대 다이묘 정원. 입장은 16:30까
- 지\, 17:00에 닫아요. 해가 16:30쯤 지니 노을 속 단풍을 보
- 는 시간입니다. 단풍철엔 駒込역에서 2분인 染井門이 열
- 려서 정문(7분)보다 가까워요. 야간 라이트업은 이번 일
- 정 뒤에 시작합니다.\nhttps://www.google.com/maps/search/?api=1&que
- ry=%E5%85%AD%E7%BE%A9%E5%9C%92&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9
- C%92&hl=ko
+DTSTART:20261119T065000Z
+DTEND:20261119T085000Z
+SUMMARY:6. 도쿄 스카이트리
+LOCATION:東京スカイツリー
+DESCRIPTION:東京スカイツリー\n11월 19일 도쿄 일몰은 16:32쯤
+ . 16시 전에 올라가 있으면 해 지는 것부터 야경까지 한 
+ 번에 봅니다. 노을 시간대는 인기라 입장 시각을 16:00 전
+ 으로 예약하세요.\n예약: 날짜 지정권\nhttps://www.google.com/
+ maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%
+ 83%84%E3%83%AA%E3%83%BC&query_place_id=ChIJ35ov0dCOGGARKvdDH7NPHX0&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%8
+ 2%B9%E3%82%AB%E3%82%A4%E3%83%84%E3%83%AA%E3%83%BC&query_place_id=ChIJ35ov0
+ dCOGGARKvdDH7NPHX0&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:리쿠기엔
-TRIGGER:-PT30M
+DESCRIPTION:도쿄 스카이트리
+TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-6@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T084500Z
-DTEND:20261119T103000Z
-SUMMARY:7. 이즈모 이케부쿠로 장어
-LOCATION:いづも 池袋
-DESCRIPTION:いづも 池袋\n池袋역 서쪽 출구에서 1분. 전 좌
- 석 흡연 가능한 이자카야라 담배 냄새가 밸 수 있어요. 
- 예약은 17:45로.\n예약: 예약\nhttps://www.google.com/maps/search/?a
- pi=1&query=Izumo%20Ikebukuro%20UNAGI&query_place_id=ChIJnd726AaNGGARMKFX_a
- cEet4&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=Izumo%20Ikebukuro%20UNA
- GI&query_place_id=ChIJnd726AaNGGARMKFX_acEet4&hl=ko
+DTSTART:20261119T085000Z
+DTEND:20261119T104500Z
+SUMMARY:7. 고마카타 도제우
+LOCATION:駒形どぜう 本店
+DESCRIPTION:駒形どぜう 本店\n1801년에 문을 연 미꾸라지 요
+ 리집. 다다미 방에서 얕은 냄비에 끓여 먹는 에도 서민 
+ 음식이에요. 11:00~20:30(주문 20:00까지). 쉬는 날이 달마다 
+ 달라서 11월 휴무일을 공식 사이트에서 확인하세요.\nhttp
+ s://www.google.com/maps/search/?api=1&query=%E9%A7%92%E5%BD%A2%E3%81%A9%E3
+ %81%9C%E3%81%86%20%E6%9C%AC%E5%BA%97&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E9%A7%92%E5%BD%A2%E3%8
+ 1%A9%E3%81%9C%E3%81%86%20%E6%9C%AC%E5%BA%97&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:이즈모 이케부쿠로 장어
-TRIGGER:-PT60M
+DESCRIPTION:고마카타 도제우
+TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-7@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T103000Z
-DTEND:20261119T120000Z
-SUMMARY:8. Spincoaster Music Bar
-LOCATION:Spincoaster Music Bar
-DESCRIPTION:요요기역에서 걸어서 4분\, 19시에 열고 일요일 
- 휴무. 17석이라 일찍 가는 게 좋아요. 예약 사이트에선 'S
- pincoaster Music Bar Shinjuku'로도 나옵니다. 음반 신청 가능.\n
- https://www.google.com/maps/search/?api=1&query=Spincoaster%20Music%20Bar&
- query_place_id=ChIJAQDUsM-MGGARLXIsEQGf3Ig&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=Spincoaster%20Music%20B
- ar&query_place_id=ChIJAQDUsM-MGGARLXIsEQGf3Ig&hl=ko
+DTSTART:20261119T104500Z
+DTEND:20261119T121500Z
+SUMMARY:8. bar all
+LOCATION:バー オール
+DESCRIPTION:バー オール\n숙소에서 걸어서 2분 거리(赤坂3-20
+ -9\, 2층). 레코드 3\,000장 넘게\, 1975년 스피커와 진공관 
+ 앰프로 60~80년대 록·AOR을 틀어요. 19시~새벽 4시\, 일·공
+ 휴일 휴무. 막차 걱정 없이 걸어서 들어가는 밤.\nhttps://w
+ ww.google.com/maps/search/?api=1&query=bar%20all%20%E8%B5%A4%E5%9D%82&hl=k
+ o
+URL:https://www.google.com/maps/search/?api=1&query=bar%20all%20%E8%B5%A4%E
+ 5%9D%82&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Spincoaster Music Bar
+DESCRIPTION:bar all
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
@@ -548,18 +548,19 @@ UID:tokyo-2026-sat-9@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T120000Z
 DTEND:20261121T133000Z
-SUMMARY:10. Little Soul Cafe
-LOCATION:リトルソウルカフェ
-DESCRIPTION:リトルソウルカフェ\n시모키타자와의 소울 LP바
- . 자리값 500엔.\nhttps://www.google.com/maps/search/?api=1&query=Littl
- e%20Soul%20Cafe%20%E4%B8%8B%E5%8C%97%E6%B2%A2&query_place_id=ChIJf9tx9WrzG
- GARqYc7EzjP_3A&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=Little%20Soul%20Cafe%20
- %E4%B8%8B%E5%8C%97%E6%B2%A2&query_place_id=ChIJf9tx9WrzGGARqYc7EzjP_3A&hl=
- ko
+SUMMARY:10. Bar Luther 赤坂
+LOCATION:バー ルーサー 赤坂
+DESCRIPTION:バー ルーサー 赤坂\n숙소 옆 블록 지하(赤坂3-20
+ -2). 70~80년대 소울·블랙 컨템퍼러리·AOR을 아날로그로 
+ 트는 바. 일요일 휴무. 영업시간이 출처마다 달라서(19:00
+ ~03:30 / 18:00~22:00) 전화(03-6277-8016)로 확인하세요. 긴 토요
+ 일의 끝을 숙소 앞에서.\nhttps://www.google.com/maps/search/?api=1
+ &query=Bar%20Luther%20Akasaka&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=Bar%20Luther%20Akasaka&
+ hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Little Soul Cafe
+DESCRIPTION:Bar Luther 赤坂
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
