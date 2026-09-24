@@ -23,12 +23,13 @@ BEGIN:VEVENT
 UID:tokyo-2026-wed-1@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261118T133000Z
-DTEND:20261118T140000Z
+DTEND:20261118T150000Z
 SUMMARY:숙소 체크인 · SPABLIC INN
 DESCRIPTION:스카이라이너로 게이세이우에노까지 41분\, 우
  에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지
   갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시
- 간까지 넣은 추정입니다.
+ 간까지 넣은 추정입니다. 내일 9:30 호쿠사이 미술관부터
+  시작하니 오늘은 바로 쉬세요.
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:숙소 체크인 · SPABLIC INN
@@ -36,116 +37,18 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-wed-2@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261118T140000Z
-DTEND:20261118T153000Z
-SUMMARY:1. 곤파치 니시아자부
-LOCATION:権八 西麻布
-DESCRIPTION:権八 西麻布\n여력이 있을 때만. 나리타로 들어
- 오면 도착이 늦으니 첫날은 쉬는 쪽을 권합니다.\nhttps://
- www.google.com/maps/search/?api=1&query=%E6%A8%A9%E5%85%AB%20%E8%A5%BF%E9%
- BA%BB%E5%B8%83&query_place_id=ChIJEwlemnqLGGARhwMuRpwpkBI&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E6%A8%A9%E5%85%AB%20%E
- 8%A5%BF%E9%BA%BB%E5%B8%83&query_place_id=ChIJEwlemnqLGGARhwMuRpwpkBI&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:곤파치 니시아자부
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
 UID:tokyo-2026-thu-0@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T000000Z
-DTEND:20261119T013000Z
-SUMMARY:1. 리쿠기엔
-LOCATION:六義園
-DESCRIPTION:六義園\n에도 시대 다이묘 정원. 9시에 열어요(
- 입장 마감 16:30). 정문은 駒込역에서 걸어서 7분\, 단풍철
- 엔 역에서 2분인 染井門도 엽니다. 평일 아침이라 한산
- 할 때예요. 야간 라이트업은 이번 일정 뒤에 시작합니다
- .\nhttps://www.google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9
- C%92&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9
- C%92&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:리쿠기엔
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:tokyo-2026-thu-1@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261119T013000Z
-DTEND:20261119T033000Z
-SUMMARY:2. 도쿄국립박물관
-LOCATION:東京国立博物館
-DESCRIPTION:東京国立博物館\n대덕사 개창 700년 특별전(10/14
- –12/6)과 히로시게전(9/29–12/20)이 함께 열립니다.\nhttps:/
- /www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9B%BD%E7%AB
- %8B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3XdJvRjWLyM&
- hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9
- B%BD%E7%AB%8B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3X
- dJvRjWLyM&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:도쿄국립박물관
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:tokyo-2026-thu-2@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261119T033000Z
-DTEND:20261119T043000Z
-SUMMARY:3. 국립서양미술관
-LOCATION:国立西洋美術館
-DESCRIPTION:国立西洋美術館\n르코르뷔지에가 설계한 세계
- 유산 건물. 건물만 봐도 20분이면 충분합니다.\nhttps://www.
- google.com/maps/search/?api=1&query=%E5%9B%BD%E7%AB%8B%E8%A5%BF%E6%B4%8B%E
- 7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJf8xB-pyOGGARizzhlNTcI7s&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E5%9B%BD%E7%AB%8B%E8%A
- 5%BF%E6%B4%8B%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJf8xB-pyOGGARiz
- zhlNTcI7s&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:국립서양미술관
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:tokyo-2026-thu-3@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261119T043000Z
-DTEND:20261119T061500Z
-SUMMARY:4. ROUTE BOOKS
-LOCATION:ROUTE BOOKS
-DESCRIPTION:히가시우에노. 카페 안에 서가가 있는 구조.\nhtt
- ps://www.google.com/maps/search/?api=1&query=ROUTE%20BOOKS&query_place_id=
- ChIJw1ucnpmOGGAR9Rs5XdSMYL0&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=ROUTE%20BOOKS&query_pla
- ce_id=ChIJw1ucnpmOGGAR9Rs5XdSMYL0&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:ROUTE BOOKS
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:tokyo-2026-thu-4@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261119T061500Z
-DTEND:20261119T083000Z
-SUMMARY:5. 스미다 호쿠사이 미술관
+DTSTART:20261119T003000Z
+DTEND:20261119T020000Z
+SUMMARY:1. 스미다 호쿠사이 미술관
 LOCATION:すみだ北斎美術館
-DESCRIPTION:すみだ北斎美術館\n우키요에 목판화 공정을 따
- 로 보여줍니다. 입장 마감은 보통 폐관 30분 전이니 17시 
- 전에 들어가세요.\nhttps://www.google.com/maps/search/?api=1&query=%
- E3%81%99%E3%81%BF%E3%81%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&qu
- ery_place_id=ChIJgRjTtzOJGGARqoKBtB8BAno&hl=ko
+DESCRIPTION:すみだ北斎美術館\n9:30에 여는 시간에 맞춰 가
+ 면 한산해요. 우키요에 목판화 공정을 따로 보여줍니다.
+  바로 옆이 2026년 3월에 다시 연 에도도쿄박물관이에요(
+ 추천 탭).\nhttps://www.google.com/maps/search/?api=1&query=%E3%81%99%E3
+ %81%BF%E3%81%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_i
+ d=ChIJgRjTtzOJGGARqoKBtB8BAno&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E3%81%99%E3%81%BF%E3%8
  1%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJgRjTt
  zOJGGARqoKBtB8BAno&hl=ko
@@ -156,16 +59,18 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-5@tokyo-trip
+UID:tokyo-2026-thu-1@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T083000Z
-DTEND:20261119T103000Z
-SUMMARY:6. 도쿄 스카이트리
+DTSTART:20261119T020000Z
+DTEND:20261119T033000Z
+SUMMARY:2. 도쿄 스카이트리
 LOCATION:東京スカイツリー
-DESCRIPTION:東京スカイツリー\n해질녘에 올라가면 낮과 야
- 경을 다 봅니다.\n예약: 날짜 지정권\nhttps://www.google.com/ma
- ps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%83
- %84%E3%83%AA%E3%83%BC&query_place_id=ChIJ35ov0dCOGGARKvdDH7NPHX0&hl=ko
+DESCRIPTION:東京スカイツリー\n평일은 10시에 엽니다. 해가 
+ 16:30쯤 져서 원래 계획한 17:30은 이미 어두운 시간이었어
+ 요. 오전의 맑은 공기로 멀리 보고\, 해 질 녘은 리쿠기
+ 엔에서 봅니다.\n예약: 날짜 지정권\nhttps://www.google.com/map
+ s/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%82%B9%E3%82%AB%E3%82%A4%E3%83%
+ 84%E3%83%AA%E3%83%BC&query_place_id=ChIJ35ov0dCOGGARKvdDH7NPHX0&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E3%8
  2%B9%E3%82%AB%E3%82%A4%E3%83%84%E3%83%AA%E3%83%BC&query_place_id=ChIJ35ov0
  dCOGGARKvdDH7NPHX0&hl=ko
@@ -176,17 +81,99 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
+UID:tokyo-2026-thu-2@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261119T033000Z
+DTEND:20261119T043000Z
+SUMMARY:3. ROUTE BOOKS
+LOCATION:ROUTE BOOKS
+DESCRIPTION:히가시우에노. 카페 안에 서가가 있는 구조. 오
+ 늘 점심 자리예요.\nhttps://www.google.com/maps/search/?api=1&query=
+ ROUTE%20BOOKS&query_place_id=ChIJw1ucnpmOGGAR9Rs5XdSMYL0&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=ROUTE%20BOOKS&query_pla
+ ce_id=ChIJw1ucnpmOGGAR9Rs5XdSMYL0&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:ROUTE BOOKS
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-thu-3@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261119T043000Z
+DTEND:20261119T044500Z
+SUMMARY:4. 국립서양미술관
+LOCATION:国立西洋美術館
+DESCRIPTION:国立西洋美術館\n르코르뷔지에가 설계한 세계
+ 유산 건물. 오늘은 안에 들어가지 않고 박물관 가는 길
+ 에 밖에서 10분만 봅니다.\nhttps://www.google.com/maps/search/?api
+ =1&query=%E5%9B%BD%E7%AB%8B%E8%A5%BF%E6%B4%8B%E7%BE%8E%E8%A1%93%E9%A4%A8&q
+ uery_place_id=ChIJf8xB-pyOGGARizzhlNTcI7s&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E5%9B%BD%E7%AB%8B%E8%A
+ 5%BF%E6%B4%8B%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJf8xB-pyOGGARiz
+ zhlNTcI7s&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:국립서양미술관
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-thu-4@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261119T044500Z
+DTEND:20261119T070000Z
+SUMMARY:5. 도쿄국립박물관
+LOCATION:東京国立博物館
+DESCRIPTION:東京国立博物館\n대덕사 개창 700년 특별전(10/14
+ –12/6)과 히로시게전(9/29–12/20)이 함께 열립니다. 리쿠
+ 기엔 입장 마감(16:30) 때문에 15:30에는 나오세요.\nhttps://w
+ ww.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9B%BD%E7%AB%8
+ B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3XdJvRjWLyM&hl
+ =ko
+URL:https://www.google.com/maps/search/?api=1&query=%E6%9D%B1%E4%BA%AC%E5%9
+ B%BD%E7%AB%8B%E5%8D%9A%E7%89%A9%E9%A4%A8&query_place_id=ChIJEX3XFIOOGGAR3X
+ dJvRjWLyM&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:도쿄국립박물관
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-thu-5@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261119T070000Z
+DTEND:20261119T084500Z
+SUMMARY:6. 리쿠기엔
+LOCATION:六義園
+DESCRIPTION:六義園\n에도 시대 다이묘 정원. 입장은 16:30까
+ 지\, 17:00에 닫아요. 해가 16:30쯤 지니 노을 속 단풍을 보
+ 는 시간입니다. 단풍철엔 駒込역에서 2분인 染井門이 열
+ 려서 정문(7분)보다 가까워요. 야간 라이트업은 이번 일
+ 정 뒤에 시작합니다.\nhttps://www.google.com/maps/search/?api=1&que
+ ry=%E5%85%AD%E7%BE%A9%E5%9C%92&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9
+ C%92&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:리쿠기엔
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
 UID:tokyo-2026-thu-6@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T103000Z
-DTEND:20261119T123000Z
+DTSTART:20261119T084500Z
+DTEND:20261119T103000Z
 SUMMARY:7. 이즈모 이케부쿠로 장어
 LOCATION:いづも 池袋
-DESCRIPTION:いづも 池袋\n줄이 길어요. 池袋역 서쪽 출구에
- 서 1분. 전 좌석 흡연 가능한 이자카야라 담배 냄새가 밸
-  수 있어요.\n예약: 예약\nhttps://www.google.com/maps/search/?api=1
- &query=Izumo%20Ikebukuro%20UNAGI&query_place_id=ChIJnd726AaNGGARMKFX_acEet
- 4&hl=ko
+DESCRIPTION:いづも 池袋\n池袋역 서쪽 출구에서 1분. 전 좌
+ 석 흡연 가능한 이자카야라 담배 냄새가 밸 수 있어요. 
+ 예약은 17:45로.\n예약: 예약\nhttps://www.google.com/maps/search/?a
+ pi=1&query=Izumo%20Ikebukuro%20UNAGI&query_place_id=ChIJnd726AaNGGARMKFX_a
+ cEet4&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=Izumo%20Ikebukuro%20UNA
  GI&query_place_id=ChIJnd726AaNGGARMKFX_acEet4&hl=ko
 BEGIN:VALARM
@@ -198,13 +185,15 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-7@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T123000Z
-DTEND:20261119T140000Z
+DTSTART:20261119T103000Z
+DTEND:20261119T120000Z
 SUMMARY:8. Spincoaster Music Bar
 LOCATION:Spincoaster Music Bar
-DESCRIPTION:요요기역 옆. 음반 신청 가능.\nhttps://www.google.com
- /maps/search/?api=1&query=Spincoaster%20Music%20Bar&query_place_id=ChIJAQD
- UsM-MGGARLXIsEQGf3Ig&hl=ko
+DESCRIPTION:요요기역에서 걸어서 4분\, 19시에 열고 일요일 
+ 휴무. 17석이라 일찍 가는 게 좋아요. 예약 사이트에선 'S
+ pincoaster Music Bar Shinjuku'로도 나옵니다. 음반 신청 가능.\n
+ https://www.google.com/maps/search/?api=1&query=Spincoaster%20Music%20Bar&
+ query_place_id=ChIJAQDUsM-MGGARLXIsEQGf3Ig&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=Spincoaster%20Music%20B
  ar&query_place_id=ChIJAQDUsM-MGGARLXIsEQGf3Ig&hl=ko
 BEGIN:VALARM
@@ -217,7 +206,7 @@ BEGIN:VEVENT
 UID:tokyo-2026-fri-0@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T010000Z
-DTEND:20261120T031500Z
+DTEND:20261120T030000Z
 SUMMARY:1. 도쿄국립근대미술관
 LOCATION:東京国立近代美術館
 DESCRIPTION:東京国立近代美術館\n다케히사 유메지전(10/23–
@@ -238,9 +227,31 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-fri-1@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261120T031500Z
+DTSTART:20261120T030000Z
+DTEND:20261120T040000Z
+SUMMARY:2. 구풍 카레 본디
+LOCATION:欧風カレー ボンディ 神保町本店
+DESCRIPTION:欧風カレー ボンディ 神保町本店\n진보초 카레
+ 의 대표. 간다 고서센터 빌딩 2층\, 평일 11:00~22:00\, 연중
+ 무휴. 점심때 줄이 서니 12시 전에 도착하면 좋아요.\nhttp
+ s://www.google.com/maps/search/?api=1&query=%E6%AC%A7%E9%A2%A8%E3%82%AB%E3
+ %83%AC%E3%83%BC%20%E3%83%9C%E3%83%B3%E3%83%87%E3%82%A3%20%E7%A5%9E%E4%BF%9
+ D%E7%94%BA%E6%9C%AC%E5%BA%97&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E6%AC%A7%E9%A2%A8%E3%8
+ 2%AB%E3%83%AC%E3%83%BC%20%E3%83%9C%E3%83%B3%E3%83%87%E3%82%A3%20%E7%A5%9E%
+ E4%BF%9D%E7%94%BA%E6%9C%AC%E5%BA%97&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:구풍 카레 본디
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-fri-2@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261120T040000Z
 DTEND:20261120T044500Z
-SUMMARY:2. 책거리 CHEKCCORI
+SUMMARY:3. 책거리 CHEKCCORI
 LOCATION:チェッコリ
 DESCRIPTION:チェッコリ\n한국책 전문 서점. 수~토만 엽니다.
  \nhttps://www.google.com/maps/search/?api=1&query=CHEKCCORI%20%E7%A5%9E%E4
@@ -254,11 +265,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-2@tokyo-trip
+UID:tokyo-2026-fri-3@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T044500Z
-DTEND:20261120T060000Z
-SUMMARY:3. 난요도 서점
+DTEND:20261120T053000Z
+SUMMARY:4. 난요도 서점
 LOCATION:南洋堂書店
 DESCRIPTION:南洋堂書店\n건축 전문 헌책방. 실내 촬영 금지.
  \nhttps://www.google.com/maps/search/?api=1&query=%E5%8D%97%E6%B4%8B%E5%A0
@@ -272,16 +283,17 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-3@tokyo-trip
+UID:tokyo-2026-fri-4@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261120T060000Z
-DTEND:20261120T083000Z
-SUMMARY:4. 진보초 북센터
+DTSTART:20261120T053000Z
+DTEND:20261120T064500Z
+SUMMARY:5. 진보초 북센터
 LOCATION:神保町ブックセンター
 DESCRIPTION:神保町ブックセンター\n이와나미쇼텐 건물. 산 
- 책 펼쳐보며 커피.\nhttps://www.google.com/maps/search/?api=1&query=
- %E7%A5%9E%E4%BF%9D%E7%94%BA%E3%83%96%E3%83%83%E3%82%AF%E3%82%BB%E3%83%B3%E
- 3%82%BF%E3%83%BC&query_place_id=ChIJebJT_ROMGGARV_jAAmMVIFY&hl=ko
+ 책 펼쳐보며 커피 한 잔 쉬어 가는 자리.\nhttps://www.google.
+ com/maps/search/?api=1&query=%E7%A5%9E%E4%BF%9D%E7%94%BA%E3%83%96%E3%83%83
+ %E3%82%AF%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC&query_place_id=ChIJebJT_ROMG
+ GARV_jAAmMVIFY&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E4%BF%9D%E7%9
  4%BA%E3%83%96%E3%83%83%E3%82%AF%E3%82%BB%E3%83%B3%E3%82%BF%E3%83%BC&query_
  place_id=ChIJebJT_ROMGGARV_jAAmMVIFY&hl=ko
@@ -292,11 +304,34 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-4@tokyo-trip
+UID:tokyo-2026-fri-5@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261120T064500Z
+DTEND:20261120T083000Z
+SUMMARY:6. 아티존 미술관
+LOCATION:アーティゾン美術館
+DESCRIPTION:アーティゾン美術館\n교바시. 유럽에 간 일본 
+ 서양화가들\, 후지이 히카루와 소장품의 협업 등 전시 
+ 세 개가 동시에 열립니다(10/24–1/31). 금요일은 20:00까지
+ 라 여유 있게 보고\, 17:10쯤 나와 기쿠스시까지 걸어가면
+  됩니다.\n예약: 일시 지정 예약\nhttps://www.google.com/maps/sea
+ rch/?api=1&query=%E3%82%A2%E3%83%BC%E3%83%86%E3%82%A3%E3%82%BE%E3%83%B3%E7
+ %BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJOzAxseKLGGARWxBlxNWWRPs&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%BC%E3%8
+ 3%86%E3%82%A3%E3%82%BE%E3%83%B3%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=
+ ChIJOzAxseKLGGARWxBlxNWWRPs&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:아티존 미술관
+TRIGGER:-PT60M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-fri-6@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T083000Z
 DTEND:20261120T113000Z
-SUMMARY:5. 기쿠스시
+SUMMARY:7. 기쿠스시
 LOCATION:Kiku Sushi 日本橋
 DESCRIPTION:니혼바시 가부토초. 토·일 휴무라 이번엔 이날
  뿐.\n예약: 예약\nhttps://www.google.com/maps/search/?api=1&query=Kiku
@@ -311,15 +346,16 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-5@tokyo-trip
+UID:tokyo-2026-fri-7@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T113000Z
 DTEND:20261120T130000Z
-SUMMARY:6. THE MUSIC BAR CAVE SHIBUYA
+SUMMARY:8. THE MUSIC BAR CAVE SHIBUYA
 LOCATION:THE MUSIC BAR CAVE SHIBUYA
-DESCRIPTION:지하 LP바. 8시 넘으면 자리가 찹니다.\nhttps://www.
- google.com/maps/search/?api=1&query=THE%20MUSIC%20BAR%20CAVE%20SHIBUYA&que
- ry_place_id=ChIJSZ7DkMGNGGARDBKSX-n_p_E&hl=ko
+DESCRIPTION:지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키
+ 지가 7:30이니 너무 늦지 않게.\nhttps://www.google.com/maps/searc
+ h/?api=1&query=THE%20MUSIC%20BAR%20CAVE%20SHIBUYA&query_place_id=ChIJSZ7Dk
+ MGNGGARDBKSX-n_p_E&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=THE%20MUSIC%20BAR%20CAV
  E%20SHIBUYA&query_place_id=ChIJSZ7DkMGNGGARDBKSX-n_p_E&hl=ko
 BEGIN:VALARM
@@ -530,34 +566,13 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-sun-0@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261122T010000Z
+DTSTART:20261122T013000Z
 DTEND:20261122T023000Z
-SUMMARY:1. 아티존 미술관
-LOCATION:アーティゾン美術館
-DESCRIPTION:アーティゾン美術館\n교바시. 유럽에 간 일본 
- 서양화가들\, 후지이 히카루와 소장품의 협업 등 전시 
- 세 개가 동시에 열립니다(10/24–1/31).\n예약: 일시 지정 
- 예약\nhttps://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%BC
- %E3%83%86%E3%82%A3%E3%82%BE%E3%83%B3%E7%BE%8E%E8%A1%93%E9%A4%A8&query_plac
- e_id=ChIJOzAxseKLGGARWxBlxNWWRPs&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E3%82%A2%E3%83%BC%E3%8
- 3%86%E3%82%A3%E3%82%BE%E3%83%B3%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=
- ChIJOzAxseKLGGARWxBlxNWWRPs&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:아티존 미술관
-TRIGGER:-PT60M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:tokyo-2026-sun-1@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261122T023000Z
-DTEND:20261122T033000Z
-SUMMARY:2. 긴자 츠타야 서점
+SUMMARY:1. 긴자 츠타야 서점
 LOCATION:銀座 蔦屋書店
-DESCRIPTION:銀座 蔦屋書店\nGINZA SIX 6층\, 10:30에 엽니다. 아
- 트와 사진집 서가가 압권. 짐 부칠 책은 여기서 마지막
+DESCRIPTION:銀座 蔦屋書店\nGINZA SIX 6층\, 10:30에 엽니다. 체
+ 크아웃(11:00) 전에 짐을 숙소에 맡기고 나오세요. 아트와
+  사진집 서가가 압권이고\, 짐 부칠 책은 여기서 마지막
  으로.\nhttps://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A
  7%20%E8%94%A6%E5%B1%8B%E6%9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaLGGAR_L
  GfsNivcXE&hl=ko
@@ -571,16 +586,38 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
+UID:tokyo-2026-sun-1@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261122T023000Z
+DTEND:20261122T033000Z
+SUMMARY:2. 시세이도 파라 긴자 본점
+LOCATION:資生堂パーラー 銀座本店レストラン
+DESCRIPTION:資生堂パーラー 銀座本店レストラン\n긴자의 
+ 오래된 양식당. 11:30에 열고 월요일 휴무. 시세이도 갤러
+ 리와 같은 건물이라 점심 뒤 바로 내려가면 됩니다.\nhttp
+ s://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3
+ %83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E9%8A%80%E5%BA%A7%E6%9C%AC%E5%BA%97%E
+ 3%83%AC%E3%82%B9%E3%83%88%E3%83%A9%E3%83%B3&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A
+ 0%82%E3%83%91%E3%83%BC%E3%83%A9%E3%83%BC%20%E9%8A%80%E5%BA%A7%E6%9C%AC%E5%
+ BA%97%E3%83%AC%E3%82%B9%E3%83%88%E3%83%A9%E3%83%B3&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:시세이도 파라 긴자 본점
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
 UID:tokyo-2026-sun-2@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261122T033000Z
 DTEND:20261122T040000Z
 SUMMARY:3. 시세이도 갤러리
 LOCATION:資生堂ギャラリー
-DESCRIPTION:資生堂ギャラリー\n긴자 지하. 30분이면 됩니다.
- \nhttps://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0
- %82%E3%82%AE%E3%83%A3%E3%83%A9%E3%83%AA%E3%83%BC&query_place_id=ChIJBwTDye
- iLGGARuY5n3x3bdCk&hl=ko
+DESCRIPTION:資生堂ギャラリー\n같은 건물 지하. 일요일은 11
+ :00~18:00. 30분이면 됩니다.\nhttps://www.google.com/maps/search/?api
+ =1&query=%E8%B3%87%E7%94%9F%E5%A0%82%E3%82%AE%E3%83%A3%E3%83%A9%E3%83%AA%E
+ 3%83%BC&query_place_id=ChIJBwTDyeiLGGARuY5n3x3bdCk&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A
  0%82%E3%82%AE%E3%83%A3%E3%83%A9%E3%83%AA%E3%83%BC&query_place_id=ChIJBwTDy
  eiLGGARuY5n3x3bdCk&hl=ko
@@ -597,11 +634,11 @@ DTSTART:20261122T040000Z
 DTEND:20261122T053000Z
 SUMMARY:4. 모리오카 서점
 LOCATION:森岡書店 銀座店
-DESCRIPTION:森岡書店 銀座店\n책 한 권만 파는 5평 서점. 13
- 시에 여는데 13:25쯤 긴자를 떠나야 하니 짧게 보세요.\nht
- tps://www.google.com/maps/search/?api=1&query=%E6%A3%AE%E5%B2%A1%E6%9B%B8%
- E5%BA%97%20%E9%8A%80%E5%BA%A7&query_place_id=ChIJqTpnNOCLGGARzXnKjoTqPyE&h
- l=ko
+DESCRIPTION:森岡書店 銀座店\n책 한 권만 파는 5평 서점이라
+  10~20분이면 충분해요. 13시에 열고\, 13:25쯤 긴자를 떠납
+ 니다.\nhttps://www.google.com/maps/search/?api=1&query=%E6%A3%AE%E5%B2%A
+ 1%E6%9B%B8%E5%BA%97%20%E9%8A%80%E5%BA%A7&query_place_id=ChIJqTpnNOCLGGARzX
+ nKjoTqPyE&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E6%A3%AE%E5%B2%A1%E6%9
  B%B8%E5%BA%97%20%E9%8A%80%E5%BA%A7&query_place_id=ChIJqTpnNOCLGGARzXnKjoTq
  PyE&hl=ko

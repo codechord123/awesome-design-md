@@ -615,7 +615,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
   <section class="block" data-sub="prep" aria-labelledby="facts-h">
     <h2 id="facts-h">알아둘 것</h2>
     <ul class="facts">
-      <li>11월 23일 월요일이 일본 공휴일(근로감사의 날)이라 토·일·월이 연휴입니다. 토요일 네즈, 일요일 아티존은 평소보다 붐빕니다.</li>
+      <li>11월 23일 월요일이 일본 공휴일(근로감사의 날)이라 토·일·월이 연휴입니다. 토요일 네즈와 은행나무길, 일요일 긴자는 평소보다 붐빕니다.</li>
       <li>츠키지 장외시장은 일요일에 대부분 닫습니다. 이번 일정에선 토요일 아침이 유일한 기회예요.</li>
       <li>현금이 필요한 곳: 츠키지 시장, Little Soul Cafe.</li>
       <li>Bookshelf Fuzkue는 대화 금지에 규칙이 길어요. 가기 전에 홈페이지 안내를 한 번 읽어두세요.</li>
@@ -700,65 +700,69 @@ const DAYS = [
   { key:"wed", wd:"수", dt:"11.18", short:"도착만", date:"2026-11-18", title:"도착", summary:"20시 나리타 착륙, 숙소 도착은 22시 반 전후. 첫날은 비워둡니다.", walk:"이동은 공항에서 숙소까지만",
     stops:[
       {t:"20:00", n:"나리타 공항 도착", kc:"move", k:"이동", note:"인천 18:00 출발편. 입국 심사와 수하물을 지나 21시쯤 나옵니다."},
-      {t:"22:30", n:"숙소 체크인 · SPABLIC INN", kc:"hotel", k:"숙소", hotel:true, note:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지 갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다."},
-      {t:"23:00", n:"곤파치 니시아자부", ja:"権八 西麻布", kc:"food", k:"식당", opt:true, close:"03:30",
-       note:"여력이 있을 때만. 나리타로 들어오면 도착이 늦으니 첫날은 쉬는 쪽을 권합니다.", needId:"gonpachi",
-       q:"権八 西麻布", id:"ChIJEwlemnqLGGARhwMuRpwpkBI", lat:35.6601742, lng:139.7235797}
+      {t:"22:30", n:"숙소 체크인 · SPABLIC INN", kc:"hotel", k:"숙소", hotel:true, note:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지 갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다. 내일 9:30 호쿠사이 미술관부터 시작하니 오늘은 바로 쉬세요."}
     ]},
 
-  { key:"thu", wd:"목", dt:"11.19", short:"리쿠기엔·우에노·스미다", date:"2026-11-19", title:"리쿠기엔에서 스미다로", summary:"아침엔 리쿠기엔 단풍, 낮엔 우에노 미술관 두 곳, 오후엔 호쿠사이와 스카이트리.", walk:"이동이 가장 많은 날",
+  { key:"thu", wd:"목", dt:"11.19", short:"스미다·우에노·리쿠기엔", date:"2026-11-19", title:"스미다에서 우에노, 리쿠기엔까지", summary:"동쪽에서 시작해 시계 방향으로 돕니다. 호쿠사이와 스카이트리, 우에노 박물관, 해 질 녘 리쿠기엔, 이케부쿠로 장어, 요요기 LP바.", walk:"동쪽에서 서쪽으로 한 방향",
     stops:[
-      {t:"9:00", n:"리쿠기엔", ja:"六義園", kc:"leaf", k:"정원, 단풍", ok:"입장료 300엔",
-       leg:{line:"남북선", from:"永田町(赤坂見附와 연결)", to:"駒込", note:"환승 없이 16분", v:true},
-       note:"에도 시대 다이묘 정원. 9시에 열어요(입장 마감 16:30). 정문은 駒込역에서 걸어서 7분, 단풍철엔 역에서 2분인 染井門도 엽니다. 평일 아침이라 한산할 때예요. 야간 라이트업은 이번 일정 뒤에 시작합니다.",
-       q:"六義園", lat:35.73246, lng:139.748314},
-      {t:"10:30", n:"도쿄국립박물관", ja:"東京国立博物館", kc:"art", k:"박물관", closed:"월 휴관",
-       note:"대덕사 개창 700년 특별전(10/14–12/6)과 히로시게전(9/29–12/20)이 함께 열립니다.",
-       ask:"특별전 예약제 여부 확인", needId:"tnm", doneLabel:"확인 완료",
-       leg:{line:"JR 야마노테선", from:"駒込", to:"上野", note:"10분 안팎", v:true},
-       q:"東京国立博物館", id:"ChIJEX3XFIOOGGAR3XdJvRjWLyM", lat:35.7188351, lng:139.7765215},
-      {t:"12:30", n:"국립서양미술관", ja:"国立西洋美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"현장 발권", opt:true,
-       note:"르코르뷔지에가 설계한 세계유산 건물. 건물만 봐도 20분이면 충분합니다.",
-       q:"国立西洋美術館", id:"ChIJf8xB-pyOGGARizzhlNTcI7s", lat:35.7153869, lng:139.7758138},
-      {t:"13:30", n:"ROUTE BOOKS", kc:"book", k:"북카페, 점심",
-       note:"히가시우에노. 카페 안에 서가가 있는 구조.",
-       q:"ROUTE BOOKS", id:"ChIJw1ucnpmOGGAR9Rs5XdSMYL0", lat:35.7139296, lng:139.7807258},
-      {t:"15:15", n:"스미다 호쿠사이 미술관", ja:"すみだ北斎美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"현장 발권",
-       close:"17:30", tight:true,
-       note:"우키요에 목판화 공정을 따로 보여줍니다. 입장 마감은 보통 폐관 30분 전이니 17시 전에 들어가세요.",
+      {t:"9:30", n:"스미다 호쿠사이 미술관", ja:"すみだ北斎美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"현장 발권",
+       leg:{line:"지하철", from:"赤坂見附", to:"両国", note:"21분 안팎, 환승 1번", v:true},
+       note:"9:30에 여는 시간에 맞춰 가면 한산해요. 우키요에 목판화 공정을 따로 보여줍니다. 바로 옆이 2026년 3월에 다시 연 에도도쿄박물관이에요(추천 탭).",
        q:"すみだ北斎美術館", id:"ChIJgRjTtzOJGGARqoKBtB8BAno", lat:35.6963313, lng:139.800414},
-      {t:"17:30", n:"도쿄 스카이트리", ja:"東京スカイツリー", kc:"view", k:"전망대", need:"날짜 지정권", needId:"skytree",
-       note:"해질녘에 올라가면 낮과 야경을 다 봅니다.",
+      {t:"11:00", n:"도쿄 스카이트리", ja:"東京スカイツリー", kc:"view", k:"전망대", need:"날짜 지정권", needId:"skytree",
+       note:"평일은 10시에 엽니다. 해가 16:30쯤 져서 원래 계획한 17:30은 이미 어두운 시간이었어요. 오전의 맑은 공기로 멀리 보고, 해 질 녘은 리쿠기엔에서 봅니다.",
        q:"東京スカイツリー", id:"ChIJ35ov0dCOGGARKvdDH7NPHX0", lat:35.7100627, lng:139.8107004},
-      {t:"19:30", n:"이즈모 이케부쿠로 장어", ja:"いづも 池袋", kc:"food", k:"식당, 저녁", need:"예약", needId:"izumo", close:"22:00",
-       note:"줄이 길어요. 池袋역 서쪽 출구에서 1분. 전 좌석 흡연 가능한 이자카야라 담배 냄새가 밸 수 있어요.",
-       leg:{line:"지하철", from:"押上(스카이트리)", to:"池袋", note:"37분 안팎, 환승 있음", v:true},
+      {t:"12:30", n:"ROUTE BOOKS", kc:"book", k:"북카페, 점심",
+       leg:{line:"아사쿠사선 → 긴자선", from:"押上", to:"稲荷町", note:"10분 안팎, 浅草에서 환승", v:true},
+       note:"히가시우에노. 카페 안에 서가가 있는 구조. 오늘 점심 자리예요.",
+       q:"ROUTE BOOKS", id:"ChIJw1ucnpmOGGAR9Rs5XdSMYL0", lat:35.7139296, lng:139.7807258},
+      {t:"13:30", n:"국립서양미술관", ja:"国立西洋美術館", kc:"art", k:"건축", closed:"월 휴관", opt:true,
+       note:"르코르뷔지에가 설계한 세계유산 건물. 오늘은 안에 들어가지 않고 박물관 가는 길에 밖에서 10분만 봅니다.",
+       q:"国立西洋美術館", id:"ChIJf8xB-pyOGGARizzhlNTcI7s", lat:35.7153869, lng:139.7758138},
+      {t:"13:45", n:"도쿄국립박물관", ja:"東京国立博物館", kc:"art", k:"박물관", closed:"월 휴관",
+       note:"대덕사 개창 700년 특별전(10/14–12/6)과 히로시게전(9/29–12/20)이 함께 열립니다. 리쿠기엔 입장 마감(16:30) 때문에 15:30에는 나오세요.",
+       ask:"특별전 예약제 여부 확인", needId:"tnm", doneLabel:"확인 완료",
+       q:"東京国立博物館", id:"ChIJEX3XFIOOGGAR3XdJvRjWLyM", lat:35.7188351, lng:139.7765215},
+      {t:"16:00", n:"리쿠기엔", ja:"六義園", kc:"leaf", k:"정원, 단풍", ok:"입장료 300엔", close:"16:30", tight:true,
+       leg:{line:"JR 야마노테선", from:"上野", to:"駒込", note:"10분 안팎", v:true},
+       note:"에도 시대 다이묘 정원. 입장은 16:30까지, 17:00에 닫아요. 해가 16:30쯤 지니 노을 속 단풍을 보는 시간입니다. 단풍철엔 駒込역에서 2분인 染井門이 열려서 정문(7분)보다 가까워요. 야간 라이트업은 이번 일정 뒤에 시작합니다.",
+       q:"六義園", lat:35.73246, lng:139.748314},
+      {t:"17:45", n:"이즈모 이케부쿠로 장어", ja:"いづも 池袋", kc:"food", k:"식당, 저녁", need:"예약", needId:"izumo", close:"22:00",
+       leg:{line:"JR 야마노테선", from:"駒込", to:"池袋", note:"환승 없이 7분", v:true},
+       note:"池袋역 서쪽 출구에서 1분. 전 좌석 흡연 가능한 이자카야라 담배 냄새가 밸 수 있어요. 예약은 17:45로.",
        q:"Izumo Ikebukuro UNAGI", id:"ChIJnd726AaNGGARMKFX_acEet4", lat:35.7300224, lng:139.7097689},
-      {t:"21:30", n:"Spincoaster Music Bar", kc:"bar", k:"LP바", close:"02:00",
-       note:"요요기역 옆. 음반 신청 가능.",
+      {t:"19:30", n:"Spincoaster Music Bar", kc:"bar", k:"LP바", close:"02:00",
+       note:"요요기역에서 걸어서 4분, 19시에 열고 일요일 휴무. 17석이라 일찍 가는 게 좋아요. 예약 사이트에선 'Spincoaster Music Bar Shinjuku'로도 나옵니다. 음반 신청 가능.",
        leg:{line:"JR 야마노테선", from:"池袋", to:"代々木", note:"환승 없이 11분, IC 199엔", v:true},
        q:"Spincoaster Music Bar", id:"ChIJAQDUsM-MGGARLXIsEQGf3Ig", lat:35.6852642, lng:139.6992942}
     ]},
 
-  { key:"fri", wd:"금", dt:"11.20", short:"기타노마루·진보초", date:"2026-11-20", title:"기타노마루에서 진보초로", summary:"근대미술관에서 헌책방 거리까지 걸어서 10분. 가장 편한 날.", walk:"도보 약 4km",
+  { key:"fri", wd:"금", dt:"11.20", short:"진보초·교바시·니혼바시", date:"2026-11-20", title:"기타노마루에서 진보초, 니혼바시로", summary:"근대미술관, 카레 점심, 헌책방 거리. 금요일은 아티존이 20시까지 열어서 저녁 스시 전에 넣었습니다.", walk:"진보초 안은 걸어서, 교바시까지 지하철 한 번",
     stops:[
       {t:"10:00", n:"도쿄국립근대미술관", ja:"東京国立近代美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"창구 당일권", close:"20:00",
        note:"다케히사 유메지전(10/23–1/11). 화가이자 시인, 디자이너였던 유메지의 대표작 〈구로후네야〉가 약 40년 만에 나옵니다.",
        q:"東京国立近代美術館", id:"ChIJL0kSfg2MGGARKv5KX53ZZ2Y", lat:35.6905432, lng:139.7546932},
-      {t:"12:15", n:"책거리 CHEKCCORI", ja:"チェッコリ", kc:"book", k:"서점", closed:"월·화·일 휴무",
+      {t:"12:00", n:"구풍 카레 본디", ja:"欧風カレー ボンディ 神保町本店", kc:"food", k:"식당, 점심",
+       note:"진보초 카레의 대표. 간다 고서센터 빌딩 2층, 평일 11:00~22:00, 연중무휴. 점심때 줄이 서니 12시 전에 도착하면 좋아요.",
+       q:"欧風カレー ボンディ 神保町本店", lat:35.6957, lng:139.7582},
+      {t:"13:00", n:"책거리 CHEKCCORI", ja:"チェッコリ", kc:"book", k:"서점", closed:"월·화·일 휴무",
        note:"한국책 전문 서점. 수~토만 엽니다.",
        q:"CHEKCCORI 神保町", id:"ChIJdwtTFhGMGGARWzRaGOwBo6s", lat:35.6957744, lng:139.7589697},
       {t:"13:45", n:"난요도 서점", ja:"南洋堂書店", kc:"book", k:"서점", closed:"목·일 휴무",
        note:"건축 전문 헌책방. 실내 촬영 금지.",
        q:"南洋堂書店", id:"ChIJC6eoXhCMGGARF9F1jKsKGEQ", lat:35.6952013, lng:139.7610973},
-      {t:"15:00", n:"진보초 북센터", ja:"神保町ブックセンター", kc:"book", k:"북카페", close:"19:00",
-       note:"이와나미쇼텐 건물. 산 책 펼쳐보며 커피.",
+      {t:"14:30", n:"진보초 북센터", ja:"神保町ブックセンター", kc:"book", k:"북카페", close:"19:00",
+       note:"이와나미쇼텐 건물. 산 책 펼쳐보며 커피 한 잔 쉬어 가는 자리.",
        q:"神保町ブックセンター", id:"ChIJebJT_ROMGGARV_jAAmMVIFY", lat:35.6957485, lng:139.7575553},
+      {t:"15:45", n:"아티존 미술관", ja:"アーティゾン美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"artizon", close:"20:00",
+       leg:{line:"지하철", from:"神保町", to:"京橋", note:"16분 안팎, 환승 1번", v:true},
+       note:"교바시. 유럽에 간 일본 서양화가들, 후지이 히카루와 소장품의 협업 등 전시 세 개가 동시에 열립니다(10/24–1/31). 금요일은 20:00까지라 여유 있게 보고, 17:10쯤 나와 기쿠스시까지 걸어가면 됩니다.",
+       q:"アーティゾン美術館", id:"ChIJOzAxseKLGGARWxBlxNWWRPs", lat:35.6787634, lng:139.7718919},
       {t:"17:30", n:"기쿠스시", jaTodo:true, kc:"food", k:"식당, 저녁", need:"예약", needId:"kiku",
        note:"니혼바시 가부토초. 토·일 휴무라 이번엔 이날뿐.",
        q:"Kiku Sushi 日本橋", id:"ChIJRX-nulmJGGAR9ynATgff8U0", lat:35.6790868, lng:139.7764141},
       {t:"20:30", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
-       note:"지하 LP바. 8시 넘으면 자리가 찹니다.",
+       note:"지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키지가 7:30이니 너무 늦지 않게.",
        leg:{line:"긴자선", from:"日本橋", to:"渋谷", note:"갈아타지 않음. 日本橋역은 기쿠스시에서 직선 400m쯤", v:true},
        q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841}
     ]},
@@ -799,19 +803,19 @@ const DAYS = [
        q:"Little Soul Cafe 下北沢", id:"ChIJf9tx9WrzGGARqYc7EzjP_3A", lat:35.6632436, lng:139.6692659}
     ]},
 
-  { key:"sun", wd:"일", dt:"11.22", short:"긴자·출국", date:"2026-11-22", title:"긴자, 출국하는 날", summary:"미술관 하나, 서점 둘, 갤러리 하나. 18시 나리타 비행기라 13시 반 전에 긴자를 떠납니다.", walk:"도보 약 3km, 세 곳 모두 걸어서 10분 안쪽",
+  { key:"sun", wd:"일", dt:"11.22", short:"긴자·출국", date:"2026-11-22", title:"긴자, 출국하는 날", summary:"서점 둘, 갤러리 하나, 긴자 양식 점심. 아티존을 금요일로 옮겨 아침이 느긋해졌어요. 18시 나리타 비행기라 13시 반 전에 긴자를 떠납니다.", walk:"긴자 안에서 걸어서만",
     stops:[
-      {t:"10:00", n:"아티존 미술관", ja:"アーティゾン美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"artizon",
-       note:"교바시. 유럽에 간 일본 서양화가들, 후지이 히카루와 소장품의 협업 등 전시 세 개가 동시에 열립니다(10/24–1/31).",
-       q:"アーティゾン美術館", id:"ChIJOzAxseKLGGARWxBlxNWWRPs", lat:35.6787634, lng:139.7718919},
-      {t:"11:30", n:"긴자 츠타야 서점", ja:"銀座 蔦屋書店", kc:"book", k:"서점",
-       note:"GINZA SIX 6층, 10:30에 엽니다. 아트와 사진집 서가가 압권. 짐 부칠 책은 여기서 마지막으로.",
+      {t:"10:30", n:"긴자 츠타야 서점", ja:"銀座 蔦屋書店", kc:"book", k:"서점",
+       note:"GINZA SIX 6층, 10:30에 엽니다. 체크아웃(11:00) 전에 짐을 숙소에 맡기고 나오세요. 아트와 사진집 서가가 압권이고, 짐 부칠 책은 여기서 마지막으로.",
        q:"銀座 蔦屋書店", id:"ChIJH6YwSOaLGGAR_LGfsNivcXE", lat:35.6694161, lng:139.7642674},
-      {t:"12:30", n:"시세이도 갤러리", ja:"資生堂ギャラリー", kc:"art", k:"갤러리", ok:"무료",
-       note:"긴자 지하. 30분이면 됩니다.",
+      {t:"11:30", n:"시세이도 파라 긴자 본점", ja:"資生堂パーラー 銀座本店レストラン", kc:"food", k:"식당, 점심", ask:"예약 권장", needId:"parlour",
+       note:"긴자의 오래된 양식당. 11:30에 열고 월요일 휴무. 시세이도 갤러리와 같은 건물이라 점심 뒤 바로 내려가면 됩니다.",
+       q:"資生堂パーラー 銀座本店レストラン", lat:35.668557, lng:139.7618936},
+      {t:"12:30", n:"시세이도 갤러리", ja:"資生堂ギャラリー", kc:"art", k:"갤러리", ok:"무료", stay:30,
+       note:"같은 건물 지하. 일요일은 11:00~18:00. 30분이면 됩니다.",
        q:"資生堂ギャラリー", id:"ChIJBwTDyeiLGGARuY5n3x3bdCk", lat:35.668557, lng:139.7618936},
-      {t:"13:00", n:"모리오카 서점", ja:"森岡書店 銀座店", kc:"book", k:"서점", closed:"월 휴무",
-       note:"책 한 권만 파는 5평 서점. 13시에 여는데 13:25쯤 긴자를 떠나야 하니 짧게 보세요.",
+      {t:"13:00", n:"모리오카 서점", ja:"森岡書店 銀座店", kc:"book", k:"서점", closed:"월 휴무", stay:15,
+       note:"책 한 권만 파는 5평 서점이라 10~20분이면 충분해요. 13시에 열고, 13:25쯤 긴자를 떠납니다.",
        q:"森岡書店 銀座", id:"ChIJqTpnNOCLGGARzXnKjoTqPyE", lat:35.6720587, lng:139.7718447}
     ]}
 ];
@@ -820,13 +824,13 @@ const DAYS = [
 const RECS = [
   {n:"에도도쿄박물관", ja:"江戸東京博物館", kc:"art", k:"박물관", area:"료고쿠", when:"thu",
    why:"4년 동안 닫혀 있다가 2026년 3월 31일 다시 열었습니다. 에도 거리 재현이 넓어졌고 니혼바시 다리를 실물 크기로 들여놨어요. 스마트폰 다국어 안내가 13개 언어를 지원합니다.",
-   tip:"목요일 호쿠사이 미술관과 같은 료고쿠입니다. 둘 다 보려면 15:15 호쿠사이를 앞당기세요.",
-   q:"江戸東京博物館", src:"https://www.english.metro.tokyo.lg.jp/w/116-101-007403", srcn:"도쿄도 공식", lat:35.6966, lng:139.7957, slot:{day:"thu", t:"14:30"}},
+   tip:"목요일 첫 일정인 호쿠사이 미술관 바로 옆입니다. 넣으려면 호쿠사이 뒤 10:30에 넣고 스카이트리를 한 시간쯤 미루세요.",
+   q:"江戸東京博物館", src:"https://www.english.metro.tokyo.lg.jp/w/116-101-007403", srcn:"도쿄도 공식", lat:35.6966, lng:139.7957, slot:{day:"thu", t:"10:30"}},
 
   {n:"아사쿠사 문화관광센터 전망대", ja:"浅草文化観光センター", kc:"view", k:"전망대, 무료", area:"아사쿠사", when:"thu",
    why:"쿠마 겐고가 설계한 건물이고, 꼭대기 전망대가 무료입니다. 센소지와 스카이트리를 한 프레임에 넣을 수 있어요.",
-   tip:"목요일 스카이트리로 가는 길에 들르면 동선이 맞습니다. 네즈미술관도 쿠마 겐고라 같이 보면 재미있어요.",
-   q:"浅草文化観光センター", src:"https://kr.hotels.com/go/japan/most-instagrammable-places-tokyo", srcn:"Go Guides", lat:35.7108, lng:139.7966, slot:{day:"thu", t:"16:45"}},
+   tip:"목요일 스카이트리에서 우에노로 가는 길(아사쿠사에서 환승)에 들르면 동선이 맞습니다. 네즈미술관도 쿠마 겐고라 같이 보면 재미있어요.",
+   q:"浅草文化観光センター", src:"https://kr.hotels.com/go/japan/most-instagrammable-places-tokyo", srcn:"Go Guides", lat:35.7108, lng:139.7966, slot:{day:"thu", t:"12:15"}},
 
   {n:"도쿄도 사진미술관", ja:"東京都写真美術館", kc:"art", k:"미술관", area:"에비스", when:"sat",
    why:"일본 최초의 사진 전문 미술관입니다. 소장품이 3만 5천 점, 전시실 세 개에서 해마다 스무 번 넘는 전시가 열려요.",
@@ -835,10 +839,11 @@ const RECS = [
 
   {n:"구풍 카레 본디", ja:"欧風カレー ボンディ 神保町本店", kc:"food", k:"식당, 점심", area:"진보초", when:"fri",
    why:"진보초는 카레 격전지예요. 책을 한 손에 들고 먹을 수 있다는 이유로 헌책방 거리에 카레집이 늘었다고 합니다. 본디는 간다에서 두 번째로 오래된 집이고 1회 카레 그랑프리 우승집입니다.",
-   tip:"금요일 점심이 비어 있습니다. 책거리(12:15)와 난요도(13:45) 사이에 넣기 좋아요. 매운 걸 좋아하시면 오차노미즈 쪽 에티오피아도 있습니다.",
+   tip:"금요일 12:00 점심으로 일정에 넣었습니다.",
    q:"欧風カレー ボンディ 神保町本店", src:"https://visit-chiyoda.com/kanda-jimbocho-best-eats-cafe-restaurants/", srcn:"Visit Chiyoda", lat:35.6957, lng:139.7582, slot:{day:"fri", t:"12:45"}},
 
   {n:"수마트라 카레 쿄에이도", ja:"スマトラカレー 共栄堂", kc:"food", k:"식당, 점심", area:"진보초", when:"fri",
+   tip:"본디 대신 가고 싶을 때. 같은 진보초라 금요일 점심 자리를 그대로 바꾸면 됩니다.",
    why:"1924년에 문을 연 집입니다. 밀가루를 쓰지 않고 향신료 스물여섯 가지로 채소와 고기 맛을 졸여서 냅니다. 진보초역에서 야스쿠니도리 쪽으로 1분.",
    q:"スマトラカレー 共栄堂", src:"https://japantravel.navitime.com/ko/area/jp/guide/NTJnews0256-ko/", srcn:"NAVITIME", lat:35.6958, lng:139.7597, slot:{day:"fri", t:"12:45"}},
 
@@ -849,7 +854,7 @@ const RECS = [
 
   {n:"리쿠기엔", ja:"六義園", kc:"leaf", k:"사진 스팟, 정원", area:"고마고메", when:"any",
    why:"에도 시대에 만든 정원입니다. 단풍 드는 나무가 560그루쯤 있어요.",
-   tip:"야간 특별 관람은 11월 28일쯤 시작합니다. 이번 일정(~22일)에는 아직 안 하니 낮에 가세요. 주말이 붐벼서 목요일 9:00 개원 시간에 넣었습니다.",
+   tip:"야간 특별 관람은 11월 28일쯤 시작합니다. 이번 일정(~22일)에는 아직 안 하니 낮에 가세요. 목요일 16:00, 해 질 녘에 일정으로 넣었습니다.",
    q:"六義園", src:"https://www.gotokyo.org/kr/story/guide/autumn-leaves-forecast/index.html", srcn:"GO TOKYO", lat:35.73246, lng:139.748314, slot:{day:"thu", t:"9:00"}}
 ];
 
@@ -897,13 +902,13 @@ const PHRASES = [
 const NORMALS = {hi:16.7, lo:8.8, src:"https://www.tomogo-travel.com/blog/weather-in-japan-in-november", srcn:"일본 기상청 평년값(1991–2020)"};
 
 const CHECKS = [
-  {id:"artizon", t:"아티존 미술관", d:"일요일 10:00 슬롯. 웹 예약이 매진되면 창구 판매가 없어요. 연휴라 가장 먼저."},
+  {id:"artizon", t:"아티존 미술관", d:"금요일 15:45 슬롯. 웹 예약이 매진되면 창구 판매가 없어요."},
   {id:"nezu",    t:"네즈미술관",   d:"토요일 12:00 또는 13:00 슬롯. 구매 후 변경·취소 불가, 카드 결제만."},
   {id:"kiku",    t:"기쿠스시",     d:"금요일 17:30."},
-  {id:"izumo",   t:"이즈모 이케부쿠로", d:"목요일 19:30."},
-  {id:"skytree", t:"스카이트리 날짜 지정권", d:"목요일 17:30 전후."},
-  {id:"tnm",     t:"도쿄국립박물관 대덕사전", d:"일시 지정 예약제인지 공식 사이트에서 확인."},
-  {id:"gonpachi",t:"곤파치 니시아자부", d:"수요일 늦은 저녁, 선택."}
+  {id:"izumo",   t:"이즈모 이케부쿠로", d:"목요일 17:45. 예전 계획(19:30)으로 잡아 뒀다면 바꿔 주세요."},
+  {id:"skytree", t:"스카이트리 날짜 지정권", d:"목요일 11:00 전후."},
+  {id:"parlour", t:"시세이도 파라 긴자 본점", d:"일요일 11:30. 연휴 일요일이라 예약해 두면 편해요."},
+  {id:"tnm",     t:"도쿄국립박물관 대덕사전", d:"일시 지정 예약제인지 공식 사이트에서 확인."}
 ];
 
 const AIRPORTS = {
@@ -929,23 +934,20 @@ const AIRPORTS = {
     ]}
 };
 
-// 도착 공항에 따라 수요일 체크인·곤파치 시각이 달라진다. 수요일 데이터를 이 값으로 덮어쓴다.
+// 도착 공항에 따라 수요일 체크인 시각이 달라진다. 수요일 데이터를 이 값으로 덮어쓴다.
 const ARRIVE = {
-  nrt:{summary:"20시 나리타 착륙, 숙소 도착은 22시 반 전후. 첫날은 비워둡니다.", land:"나리타 공항 도착", checkin:"22:30", late:"23:00",
-       hotelNote:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지 갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다.",
-       lateNote:"여력이 있을 때만. 나리타로 들어오면 도착이 늦으니 첫날은 쉬는 쪽을 권합니다."},
-  hnd:{summary:"20시 하네다 착륙, 숙소 도착은 21시 반 전후. 첫날은 비워둡니다.", land:"하네다 공항 도착", checkin:"21:30", late:"22:00",
-       hotelNote:"게이큐 공항선으로 신바시까지 갈아타지 않고, 신바시에서 긴자선으로 赤坂見附까지. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다.",
-       lateNote:"여력이 있으면 늦은 저녁 한 끼."}
+  nrt:{summary:"20시 나리타 착륙, 숙소 도착은 22시 반 전후. 첫날은 비워둡니다.", land:"나리타 공항 도착", checkin:"22:30",
+       hotelNote:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지 갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다. 내일 9:30 호쿠사이 미술관부터 시작하니 오늘은 바로 쉬세요."},
+  hnd:{summary:"20시 하네다 착륙, 숙소 도착은 21시 반 전후. 첫날은 비워둡니다.", land:"하네다 공항 도착", checkin:"21:30",
+       hotelNote:"게이큐 공항선으로 신바시까지 갈아타지 않고, 신바시에서 긴자선으로 赤坂見附까지. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다. 내일 9:30 호쿠사이 미술관부터 시작하니 오늘은 바로 쉬세요."}
 };
 function applyArrival(ap){
   const A=ARRIVE[ap]||ARRIVE.nrt, d=DAYS.find(x=>x.key==="wed");
   if(!d) return;
   d.summary=A.summary;
-  const land=d.stops.find(s=>s.kc==="move"), hotel=d.stops.find(s=>s.hotel), late=d.stops.find(s=>s.needId==="gonpachi");
+  const land=d.stops.find(s=>s.kc==="move"), hotel=d.stops.find(s=>s.hotel);
   if(land) land.n=A.land;
   if(hotel){ hotel.t=A.checkin; hotel.note=A.hotelNote; }
-  if(late){ late.t=A.late; late.note=A.lateNote; }
 }
 
 // 도쿄 안에서 움직이는 데 필요한 것. 전부 2026년 9월 22일 검색으로 확인했다.
@@ -1729,7 +1731,7 @@ function wireSunday(){
     const leave=pick ? leaveBase-BAGMIN*60000 : leaveBase;           // 긴자를 떠나는 시각
     const sun=DAYS.find(d=>d.key==="sun");
     const clash=sun.stops.filter(s=>at(SUNDATE,s.t)>=leave).map(s=>s.n);
-    const tight=sun.stops.filter(s=>{ const t=at(SUNDATE,s.t); return t<leave && leave-t<45*60000; }).map(s=>s.n);
+    const tight=sun.stops.filter(s=>{ const t=at(SUNDATE,s.t); return t<leave && leave-t<(s.stay||45)*60000; }).map(s=>s.n);   // stay: 그곳에 필요한 분(기본 45)
     const from = pick ? "숙소" : "긴자";
     out.innerHTML=`<p class="big">${hm(leave)}에 긴자 출발</p>
       <p>${esc(A.n)} 공항에 ${hm(arrive)}까지 닿는 계산입니다.</p>
@@ -1739,7 +1741,7 @@ function wireSunday(){
         ${pick?`<li>${hm(leaveBase)}에 숙소에서 공항으로 (긴자에서 숙소까지·짐 찾기 ${BAGMIN}분, 추정)</li>`:""}
         <li>${from}에서 공항까지 ${esc(mv.value)}분 이동(추정) + 여유 15분</li>
       </ul>
-      <p style="margin-top:10px">${clash.length?`이 시각이면 <b>${esc(clash.join(", "))}</b>${eunNeun(clash[clash.length-1])} 못 갑니다.`:"일정 네 곳 모두 들를 수 있습니다."}${tight.length?` ${esc(tight.join(", "))}${eunNeun(tight[tight.length-1])} 45분도 안 남아 빠듯해요.`:""}</p>
+      <p style="margin-top:10px">${clash.length?`이 시각이면 <b>${esc(clash.join(", "))}</b>${eunNeun(clash[clash.length-1])} 못 갑니다.`:`일정 ${sun.stops.length}곳 모두 들를 수 있습니다.`}${tight.length?` ${esc(tight.join(", "))}${eunNeun(tight[tight.length-1])} 볼 시간이 모자라 빠듯해요.`:""}</p>
       <p class="sub" style="margin:8px 0 0">숙소 체크아웃은 ${HOTEL.checkout}입니다. 아침에 나오면서 짐을 맡기세요.</p>
       <div class="acts">
         ${pick?`<a class="btn" target="_blank" rel="noopener" href="${DIRQ(HOTEL.addr,A.q)}">${ico("i-route")}숙소에서 ${esc(A.n)} 길찾기</a>`
