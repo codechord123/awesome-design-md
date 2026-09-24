@@ -1,17 +1,42 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
-    { "source": "/", "destination": "/tokyo-trip/index.html" },
-    { "source": "/:path*", "destination": "/tokyo-trip/:path*" }
+    {
+      "source": "/",
+      "destination": "/tokyo-trip/index.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/tokyo-trip/:path*"
+    }
   ],
   "headers": [
     {
       "source": "/sw.js",
-      "headers": [{ "key": "Cache-Control", "value": "no-cache, must-revalidate" }]
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, must-revalidate"
+        }
+      ]
     },
     {
       "source": "/manifest.webmanifest",
-      "headers": [{ "key": "Content-Type", "value": "application/manifest+json" }]
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/manifest+json"
+        }
+      ]
+    },
+    {
+      "source": "/data/tokyo-trip.ics",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/calendar; charset=utf-8"
+        }
+      ]
     }
   ]
 }

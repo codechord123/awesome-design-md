@@ -1,6 +1,6 @@
 /* 늦가을 도쿄 — 오프라인 캐시
    shell: 설치할 때 한 번에 저장 / tiles·fonts: 본 것만 저장 */
-const VER    = "v9";
+const VER    = "v10";
 const SHELL  = "tokyo-shell-" + VER;
 const TILES  = "tokyo-tiles-v1";
 const FONTS  = "tokyo-fonts-v1";
@@ -24,7 +24,8 @@ const ASSETS = [
   "icons/icon-maskable-512.png",
   "icons/apple-touch-icon.png",
   "icons/leaf.svg",
-  "data/places.csv"
+  "data/places.csv",
+  "data/tokyo-trip.ics"
 ];
 
 self.addEventListener("install", e=>{

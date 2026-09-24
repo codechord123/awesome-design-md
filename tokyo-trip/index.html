@@ -304,6 +304,32 @@ ol.timeline::before{content:"";position:absolute;left:61.5px;top:10px;bottom:10p
 .btn.key:hover{background:var(--ginkgo);filter:brightness(1.06)}
 .btn.key .ki{opacity:1}
 
+/* 체크 그룹 · 긴급 연락처 · 한마디 · 날씨 */
+.grouph{font-family:var(--serif);font-size:17px;font-weight:600;margin:var(--s5) 0 0;display:flex;align-items:baseline;gap:8px}
+.gcount{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--muted)}
+.check .go{margin-top:4px}
+.sos{display:grid;gap:8px;margin-top:var(--s3)}
+.sos a{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;min-height:52px;padding:8px 14px;
+  border:1px solid var(--line);border-radius:14px;text-decoration:none;color:var(--ink);background:var(--paper)}
+.sos a b{font-size:15px;font-weight:600}
+.sos a span{font-size:12px;color:var(--muted);grid-column:1}
+.sos a i{grid-row:1 / span 2;grid-column:2;font-style:normal;font-family:var(--mono);font-size:14px;font-weight:600}
+.phrases{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s3)}
+.phrases button{appearance:none;cursor:pointer;min-height:44px;padding:6px 14px;border-radius:var(--r-tag);
+  border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:14px;font-weight:500;text-align:left}
+.wxnow{display:flex;align-items:baseline;gap:10px;margin:var(--s2) 0 var(--s3)}
+.wxnow b{font-family:var(--serif);font-size:40px;font-weight:800;line-height:1;letter-spacing:-.02em}
+.wxnow span{font-size:15px;color:var(--muted)}
+.wxdays{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:var(--s3) 0}
+.wxd{border:1px solid var(--line);border-radius:12px;padding:8px 4px;text-align:center;background:var(--paper)}
+.wxd.wet{border-color:var(--k-view);background:var(--paper);background:color-mix(in srgb,var(--k-view) 8%,var(--paper))}
+.wxd .w{display:block;font-family:var(--serif);font-weight:800;font-size:16px}
+.wxd .c{display:block;font-size:11.5px;color:var(--muted);margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wxd .t{display:block;font-family:var(--mono);font-size:12px;font-weight:600}
+.wxd .r{display:block;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.wxd.wet .r{color:var(--k-view);font-weight:600}
+.daymeta .wet{color:var(--k-view);font-weight:600}
+
 /* 공항 경로 */
 .aroute{padding:var(--s4) 0}
 .aroute + .aroute{border-top:1px solid var(--line)}
@@ -375,7 +401,8 @@ dialog.ja-dlg::backdrop{background:rgba(10,14,25,.78)}
   text-align:center;border:1px solid var(--line)}
 .ja-card .kicker{justify-content:center;margin:0 0 var(--s4)}
 .ja-card .big{font-family:var(--serif);font-weight:800;font-size:clamp(32px,9vw,50px);line-height:1.2;
-  letter-spacing:-.01em;margin:0 0 var(--s3);word-break:keep-all}
+  letter-spacing:-.01em;margin:0 0 var(--s3);word-break:keep-all;overflow-wrap:anywhere}
+.ja-card .big:lang(ja){word-break:normal;line-break:strict}
 .ja-card .ko{font-size:16px;color:var(--muted);margin:0 0 var(--s2)}
 .ja-card .sub{font-size:14px;color:var(--muted);margin:0 0 var(--s5)}
 .ja-card .ko:empty,.ja-card .sub:empty{display:none}
@@ -457,9 +484,12 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
   <div id="panel"></div>
 
   <section class="block" aria-labelledby="res-h">
-    <h2 id="res-h">예약할 것</h2>
-    <p class="sub">체크하면 일정의 예약 배지가 &ldquo;예약 완료&rdquo;로 바뀝니다. 이 기기에 저장돼요.</p>
+    <h2 id="res-h">예약과 준비</h2>
+    <p class="sub">체크한 항목은 이 기기에 저장됩니다. 예약을 체크하면 일정의 배지가 &ldquo;예약 완료&rdquo;로 바뀌어요.</p>
+    <h3 class="grouph">예약</h3>
     <div id="checklist"></div>
+    <h3 class="grouph">출발 전 준비 <span class="gcount" id="prepcount"></span></h3>
+    <div id="preplist"></div>
   </section>
 
   <section class="block" aria-labelledby="facts-h">
@@ -478,6 +508,23 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
     <h2 id="tr-h">도쿄에서 움직이기</h2>
     <p class="sub">교통카드와 패스, 막차. 2026년 9월에 확인했습니다.</p>
     <div id="transit"></div>
+  </section>
+
+  <section class="block" aria-labelledby="wx-h">
+    <h2 id="wx-h">날씨와 비상시</h2>
+    <p class="sub">날씨는 인터넷이 될 때마다 새로 받고, 끊겨도 마지막으로 받은 값을 보여줍니다.</p>
+    <div class="card-box" id="wx"></div>
+    <div class="card-box">
+      <h3>긴급 연락처</h3>
+      <p>누르면 바로 전화가 걸립니다. 대사관 번호는 출발 전에 한 번 더 확인하세요.</p>
+      <div class="sos" id="sos"></div>
+      <p class="srcline">확인: 2026년 9월 · <a href="https://overseas.mofa.go.kr/jp-ko/wpge/m_1048/contents.do" target="_blank" rel="noopener">주일본 대한민국 대사관</a></p>
+    </div>
+    <div class="card-box">
+      <h3>일본어 한마디</h3>
+      <p>누르면 크게 뜹니다. 점원이나 택시 기사에게 화면을 보여주세요.</p>
+      <div class="phrases" id="phrases"></div>
+    </div>
   </section>
 
   <section class="block" aria-labelledby="off-h">
@@ -531,6 +578,13 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
       <p class="sub" style="margin:0">지금 저장된 지도 조각: <b id="tilecount">확인 중</b></p>
       <div class="acts"><button type="button" class="btn" id="warmbtn">다섯 날짜 지도 한 번에 열기</button></div>
     </div>
+
+    <div class="card-box">
+      <h3>폰 캘린더에 넣기</h3>
+      <p>닷새 일정이 캘린더 일정으로 들어갑니다. 예약이 있는 곳은 한 시간 전, 나머지는 30분 전에 알림이 울려요.</p>
+      <p class="sub" style="margin:0">아이폰은 누르면 &ldquo;모두 추가&rdquo; 화면이 뜹니다. 안드로이드는 받은 파일을 캘린더 앱으로 여세요.</p>
+      <div class="acts"><a class="btn key" id="icsbtn" href="data/tokyo-trip.ics">캘린더에 넣기</a></div>
+    </div>
   </section>
 
   <footer>
@@ -576,12 +630,12 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
 const HOTEL = {lat:35.6721, lng:139.7364, n:"아카사카 숙소", ja:"赤坂"};
 
 const DAYS = [
-  { key:"wed", wd:"수", dt:"11.18", short:"도착만", date:"2026-11-18", title:"도착", summary:"20시 착륙, 숙소 도착은 21시 반쯤. 첫날은 비워둡니다.", walk:"이동은 공항에서 숙소까지만",
+  { key:"wed", wd:"수", dt:"11.18", short:"도착만", date:"2026-11-18", title:"도착", summary:"20시 나리타 착륙, 숙소 도착은 22시 반 전후. 첫날은 비워둡니다.", walk:"이동은 공항에서 숙소까지만",
     stops:[
-      {t:"20:00", n:"공항 도착", kc:"move", k:"이동", note:"아카사카까지 1시간 남짓."},
-      {t:"21:30", n:"아카사카 숙소 체크인", kc:"hotel", k:"숙소", hotel:true},
-      {t:"22:00", n:"곤파치 니시아자부", ja:"権八 西麻布", kc:"food", k:"식당", opt:true, close:"03:30",
-       note:"여력이 있으면 늦은 저녁 한 끼.", needId:"gonpachi",
+      {t:"20:00", n:"나리타 공항 도착", kc:"move", k:"이동", note:"입국 심사와 수하물을 지나 21시쯤 나옵니다."},
+      {t:"22:30", n:"아카사카 숙소 체크인", kc:"hotel", k:"숙소", hotel:true, note:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선으로 아카사카 방면. 기다리는 시간까지 넣은 추정입니다."},
+      {t:"23:00", n:"곤파치 니시아자부", ja:"権八 西麻布", kc:"food", k:"식당", opt:true, close:"03:30",
+       note:"여력이 있을 때만. 나리타로 들어오면 도착이 늦으니 첫날은 쉬는 쪽을 권합니다.", needId:"gonpachi",
        q:"権八 西麻布", id:"ChIJEwlemnqLGGARhwMuRpwpkBI", lat:35.6601742, lng:139.7235797}
     ]},
 
@@ -721,6 +775,47 @@ const RECS = [
    q:"六義園", src:"https://www.gotokyo.org/kr/story/guide/autumn-leaves-forecast/index.html", srcn:"GO TOKYO"}
 ];
 
+// 출발 전 준비. 예약 체크리스트와 같은 저장소(tokyo-checks)를 쓴다. 사실 항목은 2026년 9월 24일 검색으로 확인.
+const PREP = [
+  {id:"vjw", t:"Visit Japan Web 등록", d:"입국 심사와 세관 신고가 QR 하나로 끝납니다. 필수는 아니지만 종이 신고서보다 30분 넘게 빨라질 수 있어요.",
+   src:"https://www.kkday.com/ko/blog/37875/asia-japan-visitjp", srcn:"KKday"},
+  {id:"suica", t:"애플 지갑에 스이카 넣기", d:"아이폰 8 이상이면 출발 전에 바로 됩니다. 공항에서 카드 사려고 줄 설 일이 없어요."},
+  {id:"plug", t:"돼지코 챙기기", d:"일본은 100V에 납작한 11자(A타입) 콘센트입니다. 휴대폰·노트북 충전기는 대부분 100~240V라 어댑터만 있으면 됩니다. 드라이어·고데기처럼 220V 전용인 것은 라벨의 입력 전압을 확인하세요.",
+   src:"https://wise.com/kr/blog/voltage-and-outlet-type-in-japan", srcn:"Wise"},
+  {id:"data", t:"eSIM이나 로밍", d:"길찾기와 구글 장소 카드는 인터넷이 있어야 열립니다. 일정표와 저장한 지도는 없어도 보여요."},
+  {id:"warm", t:"지도 미리 저장", d:"와이파이에서 '다섯 날짜 지도 한 번에 열기'를 한 번 눌러 두세요.", go:"#warmbtn"},
+  {id:"rate", t:"장소 평점 넣기", d:"'구글 장소 정보 가져오기'에서 키 없이 붙여넣기로 넣을 수 있어요.", go:"#gstat"},
+  {id:"train", t:"공항 열차 표 확인", d:"나리타 익스프레스는 전 좌석 지정석입니다. 수요일 밤과 일요일 표를 미리 봐 두세요."},
+  {id:"cal", t:"폰 캘린더에 일정 넣기", d:"예약 있는 곳은 한 시간 전에 알림이 울리게 들어갑니다.", go:"#icsbtn"}
+];
+
+// 긴급 연락처. 대사관 번호는 외교부 주일본대사관 연락처 페이지 기준(2026년 9월 24일 확인). 출발 전에 한 번 더 볼 것.
+const SOS = [
+  {n:"경찰", tel:"110", d:"사건·사고, 분실물"},
+  {n:"화재·구급차", tel:"119", d:"다치거나 아플 때"},
+  {n:"영사안전콜센터", tel:"+82-2-3210-0404", d:"외교부, 24시간 한국어"},
+  {n:"주일 대사관 긴급", tel:"+81-70-2153-5454", d:"휴일과 평일 18시 이후"},
+  {n:"주일 대사관 영사과", tel:"+81-3-3455-2601", d:"평일 근무 시간"}
+];
+
+// 보여주는 용도의 일본어. 누르면 크게 뜬다.
+const PHRASES = [
+  {ko:"이 주소로 가 주세요", ja:"この住所までお願いします"},
+  {ko:"예약했어요. 이름은 ○○입니다", ja:"予約しています。名前は○○です"},
+  {ko:"한 명이에요", ja:"一人です"},
+  {ko:"두 명이에요", ja:"二人です"},
+  {ko:"카드 되나요?", ja:"カードは使えますか？"},
+  {ko:"현금만 되나요?", ja:"現金だけですか？"},
+  {ko:"계산해 주세요", ja:"お会計お願いします"},
+  {ko:"영수증 주세요", ja:"レシートをください"},
+  {ko:"사진 찍어도 되나요?", ja:"写真を撮ってもいいですか？"},
+  {ko:"짐을 맡길 수 있나요?", ja:"荷物を預けられますか？"},
+  {ko:"화장실은 어디예요?", ja:"トイレはどこですか？"}
+];
+
+// 11월 평년값: 일본 기상청 1991–2020. 예보가 없을 때 대신 보여준다.
+const NORMALS = {hi:16.7, lo:8.8, src:"https://www.tomogo-travel.com/blog/weather-in-japan-in-november", srcn:"일본 기상청 평년값(1991–2020)"};
+
 const CHECKS = [
   {id:"artizon", t:"아티존 미술관", d:"일요일 10:00 슬롯. 웹 예약이 매진되면 창구 판매가 없어요. 연휴라 가장 먼저."},
   {id:"nezu",    t:"네즈미술관",   d:"토요일 12:00 또는 13:00 슬롯. 구매 후 변경·취소 불가, 카드 결제만."},
@@ -753,6 +848,25 @@ const AIRPORTS = {
        note:"숙소 앞에 서는 노선이 있으면 짐 들고 갈아탈 일이 없습니다. 노선표를 확인해 보세요."}
     ]}
 };
+
+// 도착 공항에 따라 수요일 체크인·곤파치 시각이 달라진다. 수요일 데이터를 이 값으로 덮어쓴다.
+const ARRIVE = {
+  nrt:{summary:"20시 나리타 착륙, 숙소 도착은 22시 반 전후. 첫날은 비워둡니다.", land:"나리타 공항 도착", checkin:"22:30", late:"23:00",
+       hotelNote:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선으로 아카사카 방면. 기다리는 시간까지 넣은 추정입니다.",
+       lateNote:"여력이 있을 때만. 나리타로 들어오면 도착이 늦으니 첫날은 쉬는 쪽을 권합니다."},
+  hnd:{summary:"20시 하네다 착륙, 숙소 도착은 21시 반 전후. 첫날은 비워둡니다.", land:"하네다 공항 도착", checkin:"21:30", late:"22:00",
+       hotelNote:"게이큐 공항선으로 신바시까지 갈아타지 않고, 긴자선으로 아카사카 방면. 기다리는 시간까지 넣은 추정입니다.",
+       lateNote:"여력이 있으면 늦은 저녁 한 끼."}
+};
+function applyArrival(ap){
+  const A=ARRIVE[ap]||ARRIVE.nrt, d=DAYS.find(x=>x.key==="wed");
+  if(!d) return;
+  d.summary=A.summary;
+  const land=d.stops.find(s=>s.kc==="move"), hotel=d.stops.find(s=>s.hotel), late=d.stops.find(s=>s.needId==="gonpachi");
+  if(land) land.n=A.land;
+  if(hotel){ hotel.t=A.checkin; hotel.note=A.hotelNote; }
+  if(late){ late.t=A.late; late.note=A.lateNote; }
+}
 
 // 도쿄 안에서 움직이는 데 필요한 것. 전부 2026년 9월 22일 검색으로 확인했다.
 const TRANSIT = [
@@ -825,6 +939,9 @@ function tokyoNow(d=new Date()){
 }
 const at = (date,t)=>{const [h,m]=t.split(":");return new Date(`${date}T${String(h).padStart(2,"0")}:${m}:00+09:00`).getTime();};
 const dayMs = 86400000;
+// 새벽 4시 전까지는 전날로 친다. 새벽까지 여는 LP바에서 앱을 열어도 그날 일정이 뜨게.
+const DAYCUT_H = 4;
+const tripYmd = ()=>tokyoNow(new Date(Date.now()-DAYCUT_H*3600e3)).ymd;
 function relText(ms){
   const m=Math.round(ms/60000);
   if(m<=1) return "곧";
@@ -1117,11 +1234,15 @@ function arrivalHTML(d){
 }
 function wireArrival(){
   const sel=$("#a-air"); if(!sel) return;
-  sel.addEventListener("change",()=>{ LS.set("tokyo-air-in",sel.value); renderDay("wed"); });
+  sel.addEventListener("change",()=>{
+    LS.set("tokyo-air-in",sel.value); applyArrival(sel.value);
+    if(LS.get("tokyo-air-manual","")!=="1") LS.set("tokyo-air",sel.value);   // 일요일에서 직접 고르기 전까지는 같이 따라간다
+    renderDay("wed");
+  });
 }
 
 function sundayHTML(){
-  const ap=LS.get("tokyo-air","hnd"), ft=LS.get("tokyo-flight",""), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ap].mins));
+  const ap=LS.get("tokyo-air", LS.get("tokyo-air-in","nrt")), ft=LS.get("tokyo-flight",""), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ap].mins));
   return `<section class="block" aria-labelledby="fly-h">
     <h2 id="fly-h">긴자에서 언제 나설까</h2>
     <p class="sub">비행기 시간을 넣으면 거꾸로 계산합니다. 이동 시간은 추정값이니 출발 전에 실제 경로로 한 번 확인하세요.</p>
@@ -1178,6 +1299,8 @@ function renderDay(key){
         <span><b>${shown.filter(x=>x.lat&&!x.hotel).length}</b>곳</span>
         <span>${esc(span0)}&ndash;${esc(span1)}</span>
         <span>${esc(d.walk)}</span>
+        ${(()=>{ const w=(typeof wxDay==="function")?wxDay(d.date):null; if(!w) return "";
+          return `<span${w.rain>=50?' class="wet"':""}>${esc(WMO(w.code))} ${Math.round(w.hi)}°/${Math.round(w.lo)}°${w.rain!=null?` · 강수 ${w.rain}%`:""}</span>`; })()}
       </div>
       <div class="prog" id="prog" hidden><i></i></div>
     </header>
@@ -1312,7 +1435,7 @@ function applyNow(){
   if(info.phase==="before") txt+=` <span class="sep">·</span> 출발까지 ${left}일`;
   else if(info.phase==="after") txt+=` <span class="sep">·</span> 닷새가 끝났습니다`;
   else{
-    const di=DAYS.findIndex(x=>x.date===tn.ymd);
+    const di=DAYS.findIndex(x=>x.date===tripYmd());
     txt+=` <span class="sep">·</span> ${di>=0?di+1+"일차":"여행 중"}`;
     if(info.next) txt+=` <span class="sep">·</span> 다음은 ${esc(info.next.s.n)} ${relText(info.next.ts-info.now)}`;
   }
@@ -1366,11 +1489,13 @@ function applyNow(){
 function openBig(d,idx){
   const s=d.stops[idx]; if(!s) return;
   const dlg=$("#jadlg");
-  $("#ja-big").textContent = s.ja || s.n;
+  const big=$("#ja-big");
+  big.textContent = s.ja || s.n;
+  if(s.ja) big.setAttribute("lang","ja"); else big.removeAttribute("lang");
   $("#ja-ko").textContent  = s.ja ? s.n : "";
   $("#ja-sub").textContent = s.jaTodo ? "일본어 표기는 아직 확인 전이에요. 지도 화면을 함께 보여주세요." : (s.k||"");
   const a=$("#ja-map");
-  if(s.q||s.n){ a.hidden=false; a.href=MAPS(s.q||s.n,s.id); } else a.hidden=true;
+  if(s.q){ a.hidden=false; a.href=MAPS(s.q,s.id); } else a.hidden=true;   // 문장(한마디)에는 지도 버튼이 없다
   if(typeof dlg.showModal==="function") dlg.showModal(); else dlg.setAttribute("open","");
 }
 (function(){
@@ -1405,7 +1530,7 @@ function wireSunday(){
       <p class="sub" style="margin:8px 0 0">짐은 전날 밤이나 아침에 정리해 두세요.</p>
       <div class="acts"><a class="btn" target="_blank" rel="noopener" href="${DIRQ("銀座駅",A.q)}">${ico("i-route")}긴자에서 ${esc(A.n)} 길찾기</a></div>`;
   };
-  air.addEventListener("change",()=>{ mv.value=AIRPORTS[air.value].mins; calc(); });
+  air.addEventListener("change",()=>{ LS.set("tokyo-air-manual","1"); mv.value=AIRPORTS[air.value].mins; calc(); });
   [tm,bf,mv].forEach(el=>{ el.addEventListener("input",calc); el.addEventListener("change",calc); });
   calc();
 }
@@ -1413,7 +1538,7 @@ function wireSunday(){
 /* ---------- 날짜 탭 ---------- */
 const TABKEYS = ()=>DAYS.map(d=>d.key).concat("recs");
 function renderTabs(active){
-  const today=tokyoNow().ymd;
+  const today=tripYmd();
   tabsEl.innerHTML=DAYS.map(d=>`<button class="tab${d.date===today?" today":""}" role="tab" id="tab-${d.key}" aria-controls="panel"
     aria-selected="${d.key===active}" tabindex="${d.key===active?0:-1}" data-key="${d.key}">
     <span class="wd">${d.wd}</span><span class="dt">${d.dt}</span>${d.date===today?'<span class="sr">오늘</span>':""}</button>`).join("")
@@ -1509,27 +1634,130 @@ function importPasted(text){
   </div>`).join("");
 })();
 
-/* ---------- 예약 목록 ---------- */
+/* ---------- 예약과 준비 ---------- */
 (function(){
-  const el=$("#checklist");
-  el.innerHTML=CHECKS.map(c=>`<div class="check">
+  const row=c=>`<div class="check">
     <input type="checkbox" id="c-${c.id}" data-id="${c.id}" ${CHECKED[c.id]?"checked":""}>
-    <label for="c-${c.id}"><strong>${esc(c.t)}</strong><span>${esc(c.d)}</span></label></div>`).join("");
-  el.addEventListener("change",e=>{
+    <label for="c-${c.id}"><strong>${esc(c.t)}</strong><span>${esc(c.d)}</span>
+      ${c.src?`<span class="srcline" style="display:block;margin-top:4px">확인: 2026년 9월 · <a href="${esc(c.src)}" target="_blank" rel="noopener">${esc(c.srcn)}</a></span>`:""}
+      ${c.go?`<button type="button" class="linkish go" data-go="${esc(c.go)}">바로 가기</button>`:""}
+    </label></div>`;
+  $("#checklist").innerHTML=CHECKS.map(row).join("");
+  $("#preplist").innerHTML=PREP.map(row).join("");
+  const count=()=>{ const n=PREP.filter(c=>CHECKED[c.id]).length; $("#prepcount").textContent=`${n}/${PREP.length}`; };
+  count();
+  const onChange=e=>{
     const id=e.target.dataset.id; if(!id) return;
     CHECKED[id]=e.target.checked;
     LS.set("tokyo-checks",JSON.stringify(CHECKED));
-    applyChecks();
+    applyChecks(); count();
+  };
+  $("#checklist").addEventListener("change",onChange);
+  $("#preplist").addEventListener("change",onChange);
+  $("#preplist").addEventListener("click",e=>{
+    const b=e.target.closest("[data-go]"); if(!b) return;
+    e.preventDefault();
+    const t=$(b.dataset.go); if(!t) return;
+    t.scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"});
   });
 })();
 
+/* ---------- 긴급 연락처 · 일본어 한마디 ---------- */
+(function(){
+  const sos=$("#sos");
+  if(sos) sos.innerHTML=SOS.map(x=>`<a href="tel:${esc(x.tel.replace(/[^+\d]/g,""))}"><b>${esc(x.n)}</b><span>${esc(x.d)}</span><i>${esc(x.tel)}</i></a>`).join("");
+  const ph=$("#phrases");
+  if(ph){
+    ph.innerHTML=PHRASES.map((x,i)=>`<button type="button" data-ph="${i}">${esc(x.ko)}</button>`).join("");
+    ph.addEventListener("click",e=>{
+      const b=e.target.closest("[data-ph]"); if(!b) return;
+      const x=PHRASES[Number(b.dataset.ph)];
+      openBig({stops:[{n:x.ko, ja:x.ja, k:"보여주세요"}]},0);
+    });
+  }
+})();
+
+/* ---------- 날씨 (Open-Meteo, 키 없음) ----------
+   예보는 오늘부터 16일까지만 나온다. 여행 날짜가 그 안에 들어오면 날짜별 예보를,
+   아니면 기상청 평년값을 보여준다. 받은 값은 기기에 저장해 오프라인에서도 보인다. */
+const WX_KEY="tokyo-wx", WX_TTL=60*60e3, WX_STALE=72*3600e3, WX_NOW_STALE=3*3600e3;
+const WMO = c => c===0?"맑음":c===1?"대체로 맑음":c===2?"구름 조금":c===3?"흐림"
+  : (c===45||c===48)?"안개":(c>=51&&c<=57)?"이슬비":c===61?"약한 비":c===63?"비":c===65?"강한 비"
+  : (c===66||c===67)?"어는 비":(c>=71&&c<=77)?"눈":(c>=80&&c<=82)?"소나기":(c===85||c===86)?"눈 소나기"
+  : c>=95?"뇌우":"";
+// 다섯 칸짜리 표에는 두 글자 안쪽으로
+const WMO_SHORT = c => c<=1?"맑음":c===2?"구름":c===3?"흐림":(c===45||c===48)?"안개":(c>=51&&c<=57)?"이슬비"
+  :(c>=61&&c<=67)?"비":(c>=71&&c<=77)?"눈":(c>=80&&c<=82)?"소나기":(c===85||c===86)?"눈":c>=95?"뇌우":"";
+let WX = (()=>{ try{ return JSON.parse(LS.get(WX_KEY,"null")); }catch(e){ return null; } })();
+const wxStale = ()=> !WX || !WX.at || Date.now()-WX.at > WX_STALE;
+function wxDay(date){
+  if(!WX || !WX.daily || !WX.daily.time || wxStale()) return null;
+  const i=WX.daily.time.indexOf(date); if(i<0) return null;
+  const D=WX.daily;
+  return {code:D.weather_code[i], hi:D.temperature_2m_max[i], lo:D.temperature_2m_min[i],
+          rain:D.precipitation_probability_max?D.precipitation_probability_max[i]:null};
+}
+function agoText(ms){
+  const m=Math.round(ms/60000);
+  if(m<2) return "방금"; if(m<60) return m+"분 전";
+  const h=Math.round(m/60); if(h<48) return h+"시간 전";
+  return Math.round(h/24)+"일 전";
+}
+function renderWx(){
+  const el=$("#wx"); if(!el) return;
+  const days=DAYS.map(d=>({d, w:wxDay(d.date)}));
+  const have=days.filter(x=>x.w).length;
+  const inTrip=nowInfo().phase==="during";
+  const cur=WX&&WX.current&&inTrip&&(Date.now()-WX.at<WX_NOW_STALE) ? WX.current : null;
+  const staleNote = WX&&WX.at&&wxStale() ? `<p class="sub" style="margin:0 0 8px">마지막으로 받은 예보가 ${agoText(Date.now()-WX.at)} 것이라 숨겼어요. 인터넷이 되면 다시 받습니다.</p>` : "";
+  const first=new Date(DAYS[0].date+"T00:00:00+09:00"), open=new Date(first.getTime()-16*dayMs);
+  const openTxt=`${open.getMonth()+1}월 ${open.getDate()}일`;
+  el.innerHTML=`<h3>날씨</h3>
+    ${staleNote}
+    ${cur?`<div class="wxnow"><b>${Math.round(cur.temperature_2m)}°</b><span>지금 도쿄 · ${esc(WMO(cur.weather_code))}</span></div>`:""}
+    ${have?`<div class="wxdays">${days.map(({d,w})=>w
+        ?`<div class="wxd${w.rain>=50?" wet":""}"><span class="w">${d.wd}</span><span class="c" title="${esc(WMO(w.code))}">${esc(WMO_SHORT(w.code))}</span><span class="t">${Math.round(w.hi)}°/${Math.round(w.lo)}°</span>${w.rain!=null?`<span class="r">강수 ${w.rain}%</span>`:""}</div>`
+        :`<div class="wxd"><span class="w">${d.wd}</span><span class="c">예보 전</span><span class="t">&ndash;</span></div>`).join("")}</div>`
+      :`<p>아직 여행 날짜의 예보가 나오지 않았어요. 예보는 16일 앞까지만 나와서 <b>${openTxt}쯤</b>부터 날짜별로 채워집니다.</p>`}
+    <p>11월 평년값은 낮 <b>${NORMALS.hi}°C</b>, 밤 <b>${NORMALS.lo}°C</b>입니다. 하순은 달 평균보다 조금 더 쌀쌀해요. 낮엔 니트나 가벼운 겉옷, 밤엔 한 겹 더. 이 일정엔 새벽 두세 시까지 밖에 있는 날이 있으니 목도리를 챙기세요.</p>
+    <p class="srcline">날씨 <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo.com</a>${WX&&WX.at?` · ${agoText(Date.now()-WX.at)} 받음`:""} · 평년값 <a href="${esc(NORMALS.src)}" target="_blank" rel="noopener">${esc(NORMALS.srcn)}</a></p>`;
+}
+async function fetchWx(force){
+  if(navigator.onLine===false) return;
+  if(!force && WX && WX.at && Date.now()-WX.at<WX_TTL) return;
+  const u="https://api.open-meteo.com/v1/forecast?latitude="+HOTEL.lat+"&longitude="+HOTEL.lng
+    +"&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+    +"&current=temperature_2m,weather_code&timezone=Asia%2FTokyo&forecast_days=16";
+  try{
+    const r=await fetch(u); if(!r.ok) return;
+    const j=await r.json();
+    if(!j || !j.daily) return;
+    WX={at:Date.now(), daily:j.daily, current:j.current||null};
+    LS.set(WX_KEY, JSON.stringify(WX));
+    renderWx();
+    if(CURRENT && CURRENT!=="recs") renderDay(CURRENT);
+  }catch(e){}
+}
+renderWx();
+fetchWx();
+document.addEventListener("visibilitychange",()=>{ if(!document.hidden) fetchWx(); });
+window.addEventListener("online",()=>fetchWx(true));
+
 /* ---------- 시작 ---------- */
 (function(){
-  const today=tokyoNow().ymd;
-  let start=(DAYS.find(d=>d.date===today)||{}).key;
+  applyArrival(LS.get("tokyo-air-in","nrt"));
+  const tripDay=(DAYS.find(d=>d.date===tripYmd())||{}).key;
+  let start=tripDay;
   if(!start) start=LS.get("tokyo-day","");
   if(!DAYS.some(d=>d.key===start)) start="wed";
   select(start);
+  // 여행 중이면 열자마자 지금(또는 다음) 일정으로 내려간다. 매번 히어로부터 스크롤하지 않게.
+  if(tripDay){
+    requestAnimationFrame(()=>{
+      const el=panelEl.querySelector(".stop.now")||panelEl.querySelector(".stop.next");
+      if(el) el.scrollIntoView({block:"center"});
+    });
+  }
   if(NOWTIMER) clearInterval(NOWTIMER);
   NOWTIMER=setInterval(applyNow,30000);
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) applyNow(); });
