@@ -11,7 +11,8 @@ DTSTAMP:20260924T000000Z
 DTSTART:20261118T110000Z
 DTEND:20261118T133000Z
 SUMMARY:나리타 공항 도착
-DESCRIPTION:입국 심사와 수하물을 지나 21시쯤 나옵니다.
+DESCRIPTION:인천 18:00 출발편. 입국 심사와 수하물을 지나 21
+ 시쯤 나옵니다.
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:나리타 공항 도착
@@ -23,13 +24,14 @@ UID:tokyo-2026-wed-1@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261118T133000Z
 DTEND:20261118T140000Z
-SUMMARY:아카사카 숙소 체크인
+SUMMARY:숙소 체크인 · SPABLIC INN
 DESCRIPTION:스카이라이너로 게이세이우에노까지 41분\, 우
- 에노에서 긴자선으로 아카사카 방면. 기다리는 시간까
- 지 넣은 추정입니다.
+ 에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지
+  갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시
+ 간까지 넣은 추정입니다.
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:아카사카 숙소 체크인
+DESCRIPTION:숙소 체크인 · SPABLIC INN
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
@@ -483,7 +485,7 @@ BEGIN:VEVENT
 UID:tokyo-2026-sun-0@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261122T010000Z
-DTEND:20261122T030000Z
+DTEND:20261122T023000Z
 SUMMARY:1. 아티존 미술관
 LOCATION:アーティゾン美術館
 DESCRIPTION:アーティゾン美術館\n교바시. 유럽에 간 일본 
@@ -504,9 +506,30 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-sun-1@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261122T030000Z
+DTSTART:20261122T023000Z
+DTEND:20261122T033000Z
+SUMMARY:2. 긴자 츠타야 서점
+LOCATION:銀座 蔦屋書店
+DESCRIPTION:銀座 蔦屋書店\nGINZA SIX 6층\, 10:30에 엽니다. 아
+ 트와 사진집 서가가 압권. 짐 부칠 책은 여기서 마지막
+ 으로.\nhttps://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A
+ 7%20%E8%94%A6%E5%B1%8B%E6%9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaLGGAR_L
+ GfsNivcXE&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%20%E
+ 8%94%A6%E5%B1%8B%E6%9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaLGGAR_LGfsNiv
+ cXE&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:긴자 츠타야 서점
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-sun-2@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261122T033000Z
 DTEND:20261122T040000Z
-SUMMARY:2. 시세이도 갤러리
+SUMMARY:3. 시세이도 갤러리
 LOCATION:資生堂ギャラリー
 DESCRIPTION:資生堂ギャラリー\n긴자 지하. 30분이면 됩니다.
  \nhttps://www.google.com/maps/search/?api=1&query=%E8%B3%87%E7%94%9F%E5%A0
@@ -522,42 +545,23 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sun-2@tokyo-trip
+UID:tokyo-2026-sun-3@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261122T040000Z
-DTEND:20261122T050000Z
-SUMMARY:3. 모리오카 서점
+DTEND:20261122T053000Z
+SUMMARY:4. 모리오카 서점
 LOCATION:森岡書店 銀座店
 DESCRIPTION:森岡書店 銀座店\n책 한 권만 파는 5평 서점. 13
- 시에 엽니다.\nhttps://www.google.com/maps/search/?api=1&query=%E6%A3%
- AE%E5%B2%A1%E6%9B%B8%E5%BA%97%20%E9%8A%80%E5%BA%A7&query_place_id=ChIJqTpn
- NOCLGGARzXnKjoTqPyE&hl=ko
+ 시에 여는데 13:25쯤 긴자를 떠나야 하니 짧게 보세요.\nht
+ tps://www.google.com/maps/search/?api=1&query=%E6%A3%AE%E5%B2%A1%E6%9B%B8%
+ E5%BA%97%20%E9%8A%80%E5%BA%A7&query_place_id=ChIJqTpnNOCLGGARzXnKjoTqPyE&h
+ l=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E6%A3%AE%E5%B2%A1%E6%9
  B%B8%E5%BA%97%20%E9%8A%80%E5%BA%A7&query_place_id=ChIJqTpnNOCLGGARzXnKjoTq
  PyE&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
 DESCRIPTION:모리오카 서점
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:tokyo-2026-sun-3@tokyo-trip
-DTSTAMP:20260924T000000Z
-DTSTART:20261122T050000Z
-DTEND:20261122T063000Z
-SUMMARY:4. 긴자 츠타야 서점
-LOCATION:銀座 蔦屋書店
-DESCRIPTION:銀座 蔦屋書店\nGINZA SIX 6층. 아트와 사진집 서가
- 가 압권. 짐 부칠 책은 여기서 마지막으로.\nhttps://www.goog
- le.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%20%E8%94%A6%E5%B1%8B%E6
- %9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaLGGAR_LGfsNivcXE&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%20%E
- 8%94%A6%E5%B1%8B%E6%9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaLGGAR_LGfsNiv
- cXE&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:긴자 츠타야 서점
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT

@@ -304,6 +304,21 @@ ol.timeline::before{content:"";position:absolute;left:61.5px;top:10px;bottom:10p
 .btn.key:hover{background:var(--ginkgo);filter:brightness(1.06)}
 .btn.key .ki{opacity:1}
 
+/* 안내 탭의 하위 탭 */
+/* 붙는 건 #more 의 직계 자식인 #more-bar. 막대 자체에 sticky 를 걸면 부모가 막대만 해서 붙지 않는다. */
+#more-bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 53px);z-index:5;
+  background:var(--paper);padding:var(--s3) 0 var(--s2);margin-top:var(--s3)}
+.subtabs{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:2px;padding:3px;border:1px solid var(--line);border-radius:16px;
+  background:var(--surface)}
+.subtab{appearance:none;border:0;background:transparent;color:var(--ink);cursor:pointer;border-radius:13px;
+  min-height:44px;font:inherit;font-size:14px;font-weight:600;padding:0 4px;white-space:nowrap;
+  transition:background-color .15s ease,color .15s ease}
+.subtab[aria-selected="true"]{background:var(--ginkgo);color:var(--ginkgo-ink)}
+#more [data-sub][hidden]{display:none}
+#more .block.lead{border-top:0;margin-top:0;padding-top:var(--s5)}
+#sub-recs section.day{padding-top:var(--s5)}
+
 /* 체크 그룹 · 긴급 연락처 · 한마디 · 날씨 */
 .grouph{font-family:var(--serif);font-size:17px;font-weight:600;margin:var(--s5) 0 0;display:flex;align-items:baseline;gap:8px}
 .gcount{font-family:var(--mono);font-size:12px;font-weight:500;color:var(--muted)}
@@ -385,6 +400,8 @@ ul.facts li::before{content:"";width:6px;height:6px;border-radius:50%;background
 .field select,.field input{font:inherit;font-size:16px;min-height:44px;padding:0 12px;border-radius:12px;
   border:1px solid var(--line);background:var(--paper);color:var(--ink)}
 .field select:focus,.field input:focus{border-color:var(--ginkgo);outline:none}
+.bagopt{display:flex;align-items:flex-start;gap:10px;margin:var(--s2) 0 0;font-size:14px;line-height:1.5;cursor:pointer;min-height:44px;padding-top:4px}
+.bagopt input{width:22px;height:22px;margin:0;accent-color:var(--ginkgo);flex:none}
 .result{border-top:1px solid var(--line);margin-top:var(--s4);padding-top:var(--s4)}
 .result .big{font-family:var(--serif);font-size:30px;font-weight:800;line-height:1.1;letter-spacing:-.02em;margin:0 0 var(--s2)}
 .result ul{margin:var(--s3) 0 0;padding:0;list-style:none;font-size:14px;
@@ -483,7 +500,16 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
 <main class="wrap">
   <div id="panel"></div>
 
-  <section class="block" aria-labelledby="res-h">
+  <div id="more" hidden>
+  <div id="more-bar"></div>
+  <div data-sub="recs" id="sub-recs"></div>
+
+  <section class="block" data-sub="prep" aria-labelledby="stay-h">
+    <h2 id="stay-h">숙소</h2>
+    <div class="card-box" id="stay"></div>
+  </section>
+
+  <section class="block" data-sub="prep" aria-labelledby="res-h">
     <h2 id="res-h">예약과 준비</h2>
     <p class="sub">체크한 항목은 이 기기에 저장됩니다. 예약을 체크하면 일정의 배지가 &ldquo;예약 완료&rdquo;로 바뀌어요.</p>
     <h3 class="grouph">예약</h3>
@@ -492,42 +518,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
     <div id="preplist"></div>
   </section>
 
-  <section class="block" aria-labelledby="facts-h">
-    <h2 id="facts-h">알아둘 것</h2>
-    <ul class="facts">
-      <li>11월 23일 월요일이 일본 공휴일(근로감사의 날)이라 토·일·월이 연휴입니다. 토요일 네즈, 일요일 아티존은 평소보다 붐빕니다.</li>
-      <li>츠키지 장외시장은 일요일에 대부분 닫습니다. 이번 일정에선 토요일 아침이 유일한 기회예요.</li>
-      <li>현금이 필요한 곳: 츠키지 시장, Little Soul Cafe.</li>
-      <li>Bookshelf Fuzkue는 대화 금지에 규칙이 길어요. 가기 전에 홈페이지 안내를 한 번 읽어두세요.</li>
-      <li>모리오카 서점은 13시에 엽니다. 일요일 비행기가 이르면 토요일 저녁으로 옮기세요.</li>
-      <li>토요일이 가장 깁니다. 지치면 선택 표시가 붙은 곳부터 빼세요. 날짜 화면의 &ldquo;선택 일정 접기&rdquo;로 한 번에 숨길 수 있어요.</li>
-    </ul>
-  </section>
-
-  <section class="block" aria-labelledby="tr-h">
-    <h2 id="tr-h">도쿄에서 움직이기</h2>
-    <p class="sub">교통카드와 패스, 막차. 2026년 9월에 확인했습니다.</p>
-    <div id="transit"></div>
-  </section>
-
-  <section class="block" aria-labelledby="wx-h">
-    <h2 id="wx-h">날씨와 비상시</h2>
-    <p class="sub">날씨는 인터넷이 될 때마다 새로 받고, 끊겨도 마지막으로 받은 값을 보여줍니다.</p>
-    <div class="card-box" id="wx"></div>
-    <div class="card-box">
-      <h3>긴급 연락처</h3>
-      <p>누르면 바로 전화가 걸립니다. 대사관 번호는 출발 전에 한 번 더 확인하세요.</p>
-      <div class="sos" id="sos"></div>
-      <p class="srcline">확인: 2026년 9월 · <a href="https://overseas.mofa.go.kr/jp-ko/wpge/m_1048/contents.do" target="_blank" rel="noopener">주일본 대한민국 대사관</a></p>
-    </div>
-    <div class="card-box">
-      <h3>일본어 한마디</h3>
-      <p>누르면 크게 뜹니다. 점원이나 택시 기사에게 화면을 보여주세요.</p>
-      <div class="phrases" id="phrases"></div>
-    </div>
-  </section>
-
-  <section class="block" aria-labelledby="off-h">
+  <section class="block" data-sub="prep" aria-labelledby="off-h">
     <h2 id="off-h">가기 전에</h2>
     <p class="sub">도쿄에서 데이터가 없어도 열리게 해두는 준비입니다.</p>
 
@@ -587,6 +578,42 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
     </div>
   </section>
 
+  <section class="block" data-sub="prep" aria-labelledby="facts-h">
+    <h2 id="facts-h">알아둘 것</h2>
+    <ul class="facts">
+      <li>11월 23일 월요일이 일본 공휴일(근로감사의 날)이라 토·일·월이 연휴입니다. 토요일 네즈, 일요일 아티존은 평소보다 붐빕니다.</li>
+      <li>츠키지 장외시장은 일요일에 대부분 닫습니다. 이번 일정에선 토요일 아침이 유일한 기회예요.</li>
+      <li>현금이 필요한 곳: 츠키지 시장, Little Soul Cafe.</li>
+      <li>Bookshelf Fuzkue는 대화 금지에 규칙이 길어요. 가기 전에 홈페이지 안내를 한 번 읽어두세요.</li>
+      <li>일요일은 18시 나리타 비행기에 맞춰 긴자를 13:25쯤 떠나야 합니다. 그래서 13시에 여는 모리오카 서점을 맨 뒤로, 10:30에 여는 긴자 츠타야를 앞으로 옮겼어요.</li>
+      <li>토요일이 가장 깁니다. 지치면 선택 표시가 붙은 곳부터 빼세요. 날짜 화면의 &ldquo;선택 일정 접기&rdquo;로 한 번에 숨길 수 있어요.</li>
+    </ul>
+  </section>
+
+  <section class="block" data-sub="move" aria-labelledby="tr-h">
+    <h2 id="tr-h">도쿄에서 움직이기</h2>
+    <p class="sub">교통카드와 패스, 막차. 2026년 9월에 확인했습니다.</p>
+    <div id="transit"></div>
+  </section>
+
+  <section class="block" data-sub="wx" aria-labelledby="wx-h">
+    <h2 id="wx-h">날씨와 비상시</h2>
+    <p class="sub">날씨는 인터넷이 될 때마다 새로 받고, 끊겨도 마지막으로 받은 값을 보여줍니다.</p>
+    <div class="card-box" id="wx"></div>
+    <div class="card-box">
+      <h3>긴급 연락처</h3>
+      <p>누르면 바로 전화가 걸립니다. 대사관 번호는 출발 전에 한 번 더 확인하세요.</p>
+      <div class="sos" id="sos"></div>
+      <p class="srcline">확인: 2026년 9월 · <a href="https://overseas.mofa.go.kr/jp-ko/wpge/m_1048/contents.do" target="_blank" rel="noopener">주일본 대한민국 대사관</a></p>
+    </div>
+    <div class="card-box">
+      <h3>일본어 한마디</h3>
+      <p>누르면 크게 뜹니다. 점원이나 택시 기사에게 화면을 보여주세요.</p>
+      <div class="phrases" id="phrases"></div>
+    </div>
+  </section>
+  </div>
+
   <footer>
     <p>운영 시간과 휴무는 2026년 9월 기준입니다. 출발 전에 각 장소 공식 사이트에서 한 번 더 확인하세요.</p>
     <p>지도 &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> 기여자. 간단 지도의 회색 고리는 야마노테선입니다.</p>
@@ -621,19 +648,24 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
   <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5s7-7.2 7-11.5a7 7 0 1 0-14 0c0 4.3 7 11.5 7 11.5z"/><circle cx="12" cy="10" r="2.6"/></symbol>
   <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18h5.5a4 4 0 0 0 0-8H9"/><path d="M11.5 7.5 9 10l2.5 2.5"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-6.2"/><path d="M12 15.3c-4.1 0-7.2-3-7.2-6.9 0-2 .9-3.8 2.2-5 3.1 1.1 5 3.9 5 6.9 0-3 1.9-5.8 5-6.9 1.3 1.2 2.2 3 2.2 5 0 3.9-3.1 6.9-7.2 6.9z"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></symbol>
   <symbol id="i-zoom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M8 10.5h5M10.5 8v5"/></symbol>
 </svg>
 
 <script src="vendor/leaflet.js"></script>
 <script>
 /* DATA:START — tools/make-csv.mjs 가 이 블록을 읽어 data/places.csv 를 만듭니다 */
-const HOTEL = {lat:35.6721, lng:139.7364, n:"아카사카 숙소", ja:"赤坂"};
+// 숙소: SPABLIC INN かぷせる旅籠赤坂 (캡슐호텔). 주소·좌표·규정은 2026-09-24 검색으로 확인.
+const HOTEL = {lat:35.676047, lng:139.736752, n:"SPABLIC INN 아카사카", ja:"かぷせる旅籠赤坂 SPABLIC INN",
+  addr:"東京都港区赤坂3-10-4 赤坂月世界ビル 3F", q:"かぷせる旅籠赤坂 SPABLIC INN", stn:"赤坂見附",
+  checkin:"15:00", checkout:"11:00",
+  src:"https://www.hotels.com/ho2980682240/spablic-inn-tokyo-japan/", srcn:"Hotels.com"};
 
 const DAYS = [
   { key:"wed", wd:"수", dt:"11.18", short:"도착만", date:"2026-11-18", title:"도착", summary:"20시 나리타 착륙, 숙소 도착은 22시 반 전후. 첫날은 비워둡니다.", walk:"이동은 공항에서 숙소까지만",
     stops:[
-      {t:"20:00", n:"나리타 공항 도착", kc:"move", k:"이동", note:"입국 심사와 수하물을 지나 21시쯤 나옵니다."},
-      {t:"22:30", n:"아카사카 숙소 체크인", kc:"hotel", k:"숙소", hotel:true, note:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선으로 아카사카 방면. 기다리는 시간까지 넣은 추정입니다."},
+      {t:"20:00", n:"나리타 공항 도착", kc:"move", k:"이동", note:"인천 18:00 출발편. 입국 심사와 수하물을 지나 21시쯤 나옵니다."},
+      {t:"22:30", n:"숙소 체크인 · SPABLIC INN", kc:"hotel", k:"숙소", hotel:true, note:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지 갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다."},
       {t:"23:00", n:"곤파치 니시아자부", ja:"権八 西麻布", kc:"food", k:"식당", opt:true, close:"03:30",
        note:"여력이 있을 때만. 나리타로 들어오면 도착이 늦으니 첫날은 쉬는 쪽을 권합니다.", needId:"gonpachi",
        q:"権八 西麻布", id:"ChIJEwlemnqLGGARhwMuRpwpkBI", lat:35.6601742, lng:139.7235797}
@@ -721,20 +753,20 @@ const DAYS = [
        q:"Little Soul Cafe 下北沢", id:"ChIJf9tx9WrzGGARqYc7EzjP_3A", lat:35.6632436, lng:139.6692659}
     ]},
 
-  { key:"sun", wd:"일", dt:"11.22", short:"긴자·출국", date:"2026-11-22", title:"긴자, 출국하는 날", summary:"미술관 하나, 갤러리 하나, 서점 둘. 비행기 시간에 맞춰 줄이세요.", walk:"도보 약 3km, 세 곳 모두 걸어서 10분 안쪽",
+  { key:"sun", wd:"일", dt:"11.22", short:"긴자·출국", date:"2026-11-22", title:"긴자, 출국하는 날", summary:"미술관 하나, 서점 둘, 갤러리 하나. 18시 나리타 비행기라 13시 반 전에 긴자를 떠납니다.", walk:"도보 약 3km, 세 곳 모두 걸어서 10분 안쪽",
     stops:[
       {t:"10:00", n:"아티존 미술관", ja:"アーティゾン美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"artizon",
        note:"교바시. 유럽에 간 일본 서양화가들, 후지이 히카루와 소장품의 협업 등 전시 세 개가 동시에 열립니다(10/24–1/31).",
        q:"アーティゾン美術館", id:"ChIJOzAxseKLGGARWxBlxNWWRPs", lat:35.6787634, lng:139.7718919},
-      {t:"12:00", n:"시세이도 갤러리", ja:"資生堂ギャラリー", kc:"art", k:"갤러리", ok:"무료",
+      {t:"11:30", n:"긴자 츠타야 서점", ja:"銀座 蔦屋書店", kc:"book", k:"서점",
+       note:"GINZA SIX 6층, 10:30에 엽니다. 아트와 사진집 서가가 압권. 짐 부칠 책은 여기서 마지막으로.",
+       q:"銀座 蔦屋書店", id:"ChIJH6YwSOaLGGAR_LGfsNivcXE", lat:35.6694161, lng:139.7642674},
+      {t:"12:30", n:"시세이도 갤러리", ja:"資生堂ギャラリー", kc:"art", k:"갤러리", ok:"무료",
        note:"긴자 지하. 30분이면 됩니다.",
        q:"資生堂ギャラリー", id:"ChIJBwTDyeiLGGARuY5n3x3bdCk", lat:35.668557, lng:139.7618936},
       {t:"13:00", n:"모리오카 서점", ja:"森岡書店 銀座店", kc:"book", k:"서점", closed:"월 휴무",
-       note:"책 한 권만 파는 5평 서점. 13시에 엽니다.",
-       q:"森岡書店 銀座", id:"ChIJqTpnNOCLGGARzXnKjoTqPyE", lat:35.6720587, lng:139.7718447},
-      {t:"14:00", n:"긴자 츠타야 서점", ja:"銀座 蔦屋書店", kc:"book", k:"서점",
-       note:"GINZA SIX 6층. 아트와 사진집 서가가 압권. 짐 부칠 책은 여기서 마지막으로.",
-       q:"銀座 蔦屋書店", id:"ChIJH6YwSOaLGGAR_LGfsNivcXE", lat:35.6694161, lng:139.7642674}
+       note:"책 한 권만 파는 5평 서점. 13시에 여는데 13:25쯤 긴자를 떠나야 하니 짧게 보세요.",
+       q:"森岡書店 銀座", id:"ChIJqTpnNOCLGGARzXnKjoTqPyE", lat:35.6720587, lng:139.7718447}
     ]}
 ];
 
@@ -785,6 +817,8 @@ const PREP = [
   {id:"data", t:"eSIM이나 로밍", d:"길찾기와 구글 장소 카드는 인터넷이 있어야 열립니다. 일정표와 저장한 지도는 없어도 보여요."},
   {id:"warm", t:"지도 미리 저장", d:"와이파이에서 '다섯 날짜 지도 한 번에 열기'를 한 번 눌러 두세요.", go:"#warmbtn"},
   {id:"rate", t:"장소 평점 넣기", d:"'구글 장소 정보 가져오기'에서 키 없이 붙여넣기로 넣을 수 있어요.", go:"#gstat"},
+  {id:"hotel", t:"숙소 체크인 준비물", d:"사진 있는 신분증(여권)과 신용카드. 도착하면 카드로 보증금 5,000엔을 잡고, 체크아웃 때 시설 확인 뒤 돌려줍니다.",
+   src:"https://www.hotels.com/ho2980682240/spablic-inn-tokyo-japan/", srcn:"Hotels.com"},
   {id:"train", t:"공항 열차 표 확인", d:"나리타 익스프레스는 전 좌석 지정석입니다. 수요일 밤과 일요일 표를 미리 봐 두세요."},
   {id:"cal", t:"폰 캘린더에 일정 넣기", d:"예약 있는 곳은 한 시간 전에 알림이 울리게 들어갑니다.", go:"#icsbtn"}
 ];
@@ -830,7 +864,7 @@ const AIRPORTS = {
   hnd:{n:"하네다", mins:45, q:"羽田空港", last:"게이큐 공항선이 제3터미널 기준 24:13까지 다닙니다.",
     routes:[
       {n:"게이큐 공항선", best:true, d:"시나가와 약 13분", fare:"330엔 (IC 327엔)",
-       note:"도에이 아사쿠사선과 직통이라 신바시까지 갈아타지 않습니다. 신바시에서 긴자선으로 아카사카 방면. 제3터미널 기준 05:26~24:13 운행."},
+       note:"도에이 아사쿠사선과 직통이라 신바시까지 갈아타지 않습니다. 신바시에서 긴자선으로 赤坂見附까지. 제3터미널 기준 05:26~24:13 운행."},
       {n:"도쿄 모노레일", d:"하마마쓰초 13~19분", fare:"520엔",
        note:"하마마쓰초에서 JR 야마노테선이나 오에도선으로 갈아탑니다."},
       {n:"심야 정액 택시", d:"", fare:"7,600엔",
@@ -839,9 +873,9 @@ const AIRPORTS = {
   nrt:{n:"나리타", mins:80, q:"成田空港", last:"스카이라이너 막차가 23:20입니다.",
     routes:[
       {n:"게이세이 스카이라이너", best:true, d:"닛포리 36분 · 게이세이우에노 41분", fare:"2,580엔",
-       note:"가장 빠르고 막차가 23:20으로 가장 늦습니다. 우에노에서 긴자선을 타면 아카사카 방면까지 갈아타지 않아요."},
+       note:"가장 빠르고 막차가 23:20으로 가장 늦습니다. 우에노에서 긴자선을 타면 숙소 앞 赤坂見附까지 갈아타지 않아요."},
       {n:"나리타 익스프레스 (N'EX)", d:"도쿄역 약 53분", fare:"3,070엔 (왕복 5,000엔)",
-       note:"전 좌석 지정석입니다. 막차가 스카이라이너보다 이르니 밤 도착이면 시간표를 먼저 보세요. 도쿄역에서 마루노우치선으로 아카사카 방면."},
+       note:"전 좌석 지정석입니다. 막차가 스카이라이너보다 이르니 밤 도착이면 시간표를 먼저 보세요. 도쿄역에서 마루노우치선으로 赤坂見附까지 한 번에."},
       {n:"에어포트 버스 TYO-NRT", d:"약 1시간", fare:"1,500엔",
        note:"가장 쌉니다. 도쿄역·긴자 방면으로 갑니다."},
       {n:"리무진 버스", d:"약 1시간 30분", fare:"",
@@ -852,10 +886,10 @@ const AIRPORTS = {
 // 도착 공항에 따라 수요일 체크인·곤파치 시각이 달라진다. 수요일 데이터를 이 값으로 덮어쓴다.
 const ARRIVE = {
   nrt:{summary:"20시 나리타 착륙, 숙소 도착은 22시 반 전후. 첫날은 비워둡니다.", land:"나리타 공항 도착", checkin:"22:30", late:"23:00",
-       hotelNote:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선으로 아카사카 방면. 기다리는 시간까지 넣은 추정입니다.",
+       hotelNote:"스카이라이너로 게이세이우에노까지 41분, 우에노에서 긴자선을 타면 赤坂見附(아카사카미쓰케)까지 갈아타지 않습니다. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다.",
        lateNote:"여력이 있을 때만. 나리타로 들어오면 도착이 늦으니 첫날은 쉬는 쪽을 권합니다."},
   hnd:{summary:"20시 하네다 착륙, 숙소 도착은 21시 반 전후. 첫날은 비워둡니다.", land:"하네다 공항 도착", checkin:"21:30", late:"22:00",
-       hotelNote:"게이큐 공항선으로 신바시까지 갈아타지 않고, 긴자선으로 아카사카 방면. 기다리는 시간까지 넣은 추정입니다.",
+       hotelNote:"게이큐 공항선으로 신바시까지 갈아타지 않고, 신바시에서 긴자선으로 赤坂見附까지. 역에서 숙소까지 1분. 기다리는 시간까지 넣은 추정입니다.",
        lateNote:"여력이 있으면 늦은 저녁 한 끼."}
 };
 function applyArrival(ap){
@@ -926,7 +960,7 @@ const KIND = {
 const ico = (id,cls="ki")=>`<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
 
 // 위치가 있는 장소마다 그날의 번호를 매긴다
-DAYS.forEach(d=>{ let i=0; d.stops.forEach(s=>{ if(s.hotel){s.lat=HOTEL.lat;s.lng=HOTEL.lng;} else if(s.lat) s.num=++i; }); });
+DAYS.forEach(d=>{ let i=0; d.stops.forEach(s=>{ if(s.hotel){ Object.assign(s,{lat:HOTEL.lat,lng:HOTEL.lng,q:HOTEL.q,ja:HOTEL.ja,addr:HOTEL.addr}); } else if(s.lat) s.num=++i; }); });
 const ALL = DAYS.flatMap(d=>d.stops.filter(s=>s.lat && !s.hotel));
 
 /* ---------- 도쿄 시각 ---------- */
@@ -1178,9 +1212,7 @@ function stopHTML(d,s,prev){
                       : `<span class="dot" aria-hidden="true"></span>`;
   const ja = s.ja ? `<p class="ja">${esc(s.ja)}${ico("i-zoom","ki zoom")}</p>`
           : s.jaTodo ? `<p class="ja todo">일본어 이름 확인 필요${ico("i-zoom","ki zoom")}</p>` : "";
-  const nameBlock = s.hotel
-    ? `<p class="name">${esc(s.n)}</p>`
-    : `<button type="button" class="namebtn" data-big="${s._idx}"><span class="name">${esc(s.n)}${s.ja?"":ico("i-zoom","ki zoom")}</span>${ja}</button>`;
+  const nameBlock = `<button type="button" class="namebtn" data-big="${s._idx}"><span class="name">${esc(s.n)}${s.ja?"":ico("i-zoom","ki zoom")}</span>${ja}</button>`;
   const leg = s.leg ? `<p class="leg">${ico("i-move")}<span>${esc(s.leg.line)} ${esc(s.leg.from)} → ${esc(s.leg.to)}${s.leg.note?" · "+esc(s.leg.note):""}${s.leg.v?"":" (확인 전)"}</span></p>` : "";
   const acts=[];
   if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q||s.n,s.id)}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
@@ -1224,7 +1256,7 @@ function arrivalHTML(d){
       ${land?`<p class="alertline">${esc(land)} 착륙이면 입국 심사와 수하물을 지나 나오는 건 한 시간쯤 뒤입니다. ${esc(A.last)}</p>`:""}
       ${routes}
       <div class="acts">
-        <a class="btn key" id="a-dir" href="${DIRQ(A.q,"赤坂駅 東京")}" target="_blank" rel="noopener">${ico("i-route")}${esc(A.n)}에서 숙소까지 길찾기</a>
+        <a class="btn key" id="a-dir" href="${DIRQ(A.q,HOTEL.addr)}" target="_blank" rel="noopener">${ico("i-route")}${esc(A.n)}에서 숙소까지 길찾기</a>
       </div>
       <p class="srcline">확인: 2026년 9월 ·
         <a href="https://www.kkday.com/ko/blog/27152/asia-japan-tokyo-limousinebus" target="_blank" rel="noopener">나리타</a> ·
@@ -1242,7 +1274,7 @@ function wireArrival(){
 }
 
 function sundayHTML(){
-  const ap=LS.get("tokyo-air", LS.get("tokyo-air-in","nrt")), ft=LS.get("tokyo-flight",""), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ap].mins));
+  const ap=LS.get("tokyo-air", LS.get("tokyo-air-in","nrt")), ft=LS.get("tokyo-flight","18:00"), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ap].mins));
   return `<section class="block" aria-labelledby="fly-h">
     <h2 id="fly-h">긴자에서 언제 나설까</h2>
     <p class="sub">비행기 시간을 넣으면 거꾸로 계산합니다. 이동 시간은 추정값이니 출발 전에 실제 경로로 한 번 확인하세요.</p>
@@ -1257,8 +1289,9 @@ function sundayHTML(){
           <option value="150"${buf==="150"?" selected":""}>2시간 30분 전</option>
           <option value="180"${buf==="180"?" selected":""}>3시간 전 (연휴 권장)</option>
         </select></label>
-        <label>긴자 → 공항 이동(분)<input type="number" id="f-move" min="10" max="180" step="5" value="${esc(mv)}"></label>
+        <label>숙소·긴자 → 공항 이동(분)<input type="number" id="f-move" min="10" max="180" step="5" value="${esc(mv)}"></label>
       </div>
+      <label class="bagopt"><input type="checkbox" id="f-bag"${LS.get("tokyo-bag","1")==="1"?" checked":""}> 숙소에 짐을 맡기고 나왔어요 (긴자 → 숙소 들렀다 공항)</label>
       <div class="result" id="f-out"></div>
     </div>
   </section>`;
@@ -1371,9 +1404,7 @@ function focusStop(idx){
   }, reduce?0:340);
 }
 function renderRecs(){
-  CURRENT="recs";
-  if(LMAP){ try{LMAP.remove();}catch(e){} LMAP=null; }
-  MARKERS={}; MAPSEL=null;
+  const host=$("#sub-recs"); if(!host) return;
   const label={wed:"수요일",thu:"목요일",fri:"금요일",sat:"토요일",sun:"일요일",any:"아무 날이나"};
   const items=RECS.map(r=>{
     const K=KIND[r.kc]||KIND.move;
@@ -1391,7 +1422,7 @@ function renderRecs(){
         <p class="srcline">확인: 2026년 9월 · <a href="${esc(r.src)}" target="_blank" rel="noopener">${esc(r.srcn)}</a></p>
       </article></li>`;
   }).join("");
-  panelEl.innerHTML=`<section class="day recs" role="tabpanel" aria-labelledby="tab-recs" tabindex="-1">
+  host.innerHTML=`<section class="day recs">
     <header class="dayhead">
       <p class="eyebrow kicker">Extra &middot; 일정 밖</p>
       <h2>더 가볼 만한 곳</h2>
@@ -1400,12 +1431,47 @@ function renderRecs(){
     </header>
     <ol class="reclist">${items}</ol>
   </section>`;
-  $$(".namebtn",panelEl).forEach(b=>b.addEventListener("click",()=>{
+  $$(".namebtn",host).forEach(b=>b.addEventListener("click",()=>{
     const r=RECS.find(x=>x.n===b.dataset.rec); if(!r) return;
     openBig({stops:[{n:r.n, ja:r.ja, k:r.k, q:r.q}]}, 0);
   }));
-  $("#db-wd").textContent="추천"; $("#db-dt").textContent=""; $("#db-title").textContent="일정 밖에서 가볼 만한 곳";
+}
+
+/* ---------- 안내 탭: 추천 · 준비 · 교통 · 날씨·비상 ---------- */
+const SUBS=[{k:"recs",n:"추천"},{k:"prep",n:"준비"},{k:"move",n:"교통"},{k:"wx",n:"날씨·비상"}];
+function renderMore(subKey){
+  CURRENT="more";
+  if(LMAP){ try{LMAP.remove();}catch(e){} LMAP=null; }
+  MARKERS={}; MAPSEL=null;
+  const cur=SUBS.some(x=>x.k===subKey)?subKey:LS.get("tokyo-sub","recs");
+  const active=SUBS.some(x=>x.k===cur)?cur:"recs";
+  LS.set("tokyo-sub",active);
+  panelEl.innerHTML="";
+  const more=$("#more"); more.hidden=false;
+  more.setAttribute("role","tabpanel"); more.setAttribute("aria-labelledby","tab-more");
+  $("#more-bar").innerHTML=`<div class="subtabs" role="tablist" aria-label="안내">${SUBS.map(x=>`<button type="button" class="subtab" role="tab" data-sub-go="${x.k}" aria-selected="${x.k===active}">${x.n}</button>`).join("")}</div>`;
+  let first=true;
+  $$("[data-sub]",more).forEach(el=>{
+    const on=el.dataset.sub===active;
+    el.hidden=!on;
+    el.classList.toggle("lead", on && first && el.classList.contains("block"));
+    if(on) first=false;
+  });
+  if(active==="recs") renderRecs();
+  $$("[data-sub-go]",$("#more-bar")).forEach(b=>b.addEventListener("click",()=>{
+    renderMore(b.dataset.subGo);
+    window.scrollTo({top:Math.max(0,$("#more").offsetTop-64),behavior:reduced()?"auto":"smooth"});
+  }));
+  $("#db-wd").textContent="안내"; $("#db-dt").textContent="";
+  $("#db-title").textContent=(SUBS.find(x=>x.k===active)||{}).n||"";
   applyNow();
+}
+// 다른 탭에 있는 요소로 이동: 그 요소가 든 하위 탭을 먼저 연다
+function goTo(sel){
+  const t=$(sel); if(!t) return;
+  const box=t.closest("[data-sub]");
+  if(box && (CURRENT!=="more" || box.hidden)){ renderTabs("more"); renderMore(box.dataset.sub); }
+  requestAnimationFrame(()=>t.scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}));
 }
 
 function goStop(idx){
@@ -1493,7 +1559,7 @@ function openBig(d,idx){
   big.textContent = s.ja || s.n;
   if(s.ja) big.setAttribute("lang","ja"); else big.removeAttribute("lang");
   $("#ja-ko").textContent  = s.ja ? s.n : "";
-  $("#ja-sub").textContent = s.jaTodo ? "일본어 표기는 아직 확인 전이에요. 지도 화면을 함께 보여주세요." : (s.k||"");
+  $("#ja-sub").textContent = s.addr ? s.addr : s.jaTodo ? "일본어 표기는 아직 확인 전이에요. 지도 화면을 함께 보여주세요." : (s.k||"");
   const a=$("#ja-map");
   if(s.q){ a.hidden=false; a.href=MAPS(s.q,s.id); } else a.hidden=true;   // 문장(한마디)에는 지도 버튼이 없다
   if(typeof dlg.showModal==="function") dlg.showModal(); else dlg.setAttribute("open","");
@@ -1507,48 +1573,62 @@ function openBig(d,idx){
 /* ---------- 일요일 계산 ---------- */
 const SUNDATE = DAYS.find(d=>d.key==="sun").date;
 const hm = ms=>new Intl.DateTimeFormat("ko-KR",{timeZone:TZ,hour:"2-digit",minute:"2-digit",hour12:false}).format(new Date(ms));
+// 받침이 있으면 "은", 없으면 "는". 한글로 끝나지 않으면 "은(는)".
+const eunNeun = w => { const c=String(w).trim().slice(-1).charCodeAt(0);
+  if(c<0xAC00||c>0xD7A3) return "은(는)"; return (c-0xAC00)%28 ? "은" : "는"; };
 function wireSunday(){
-  const air=$("#f-air"), tm=$("#f-time"), bf=$("#f-buf"), mv=$("#f-move"), out=$("#f-out");
+  const air=$("#f-air"), tm=$("#f-time"), bf=$("#f-buf"), mv=$("#f-move"), bag=$("#f-bag"), out=$("#f-out");
   if(!air) return;
   const calc=()=>{
     LS.set("tokyo-air",air.value); LS.set("tokyo-flight",tm.value); LS.set("tokyo-buffer",bf.value); LS.set("tokyo-move",mv.value);
+    LS.set("tokyo-bag", bag&&bag.checked?"1":"0");
     const A=AIRPORTS[air.value];
     if(!tm.value){ out.innerHTML=`<p class="sub" style="margin:0">비행기 출발 시각을 넣으면 계산합니다.</p>`; return; }
+    const BAGMIN=30;   // 긴자선으로 긴자 → 赤坂見附, 짐 찾기까지. 추정.
+    const pick=!!(bag&&bag.checked);
     const fly=at(SUNDATE,tm.value);
     const arrive=fly-Number(bf.value)*60000;
-    const leave=arrive-Number(mv.value||0)*60000-15*60000;
+    const leaveBase=arrive-Number(mv.value||0)*60000-15*60000;      // 숙소(또는 긴자)에서 공항으로 나서는 시각
+    const leave=pick ? leaveBase-BAGMIN*60000 : leaveBase;           // 긴자를 떠나는 시각
     const sun=DAYS.find(d=>d.key==="sun");
     const clash=sun.stops.filter(s=>at(SUNDATE,s.t)>=leave).map(s=>s.n);
+    const tight=sun.stops.filter(s=>{ const t=at(SUNDATE,s.t); return t<leave && leave-t<45*60000; }).map(s=>s.n);
+    const from = pick ? "숙소" : "긴자";
     out.innerHTML=`<p class="big">${hm(leave)}에 긴자 출발</p>
       <p>${esc(A.n)} 공항에 ${hm(arrive)}까지 닿는 계산입니다.</p>
       <ul>
         <li>비행기 ${hm(fly)} 출발</li>
         <li>공항 도착은 ${Math.floor(bf.value/60)}시간${bf.value%60?" "+bf.value%60+"분":""} 전</li>
-        <li>긴자에서 ${esc(mv.value)}분 이동(추정) + 여유 15분</li>
+        ${pick?`<li>${hm(leaveBase)}에 숙소에서 공항으로 (긴자에서 숙소까지·짐 찾기 ${BAGMIN}분, 추정)</li>`:""}
+        <li>${from}에서 공항까지 ${esc(mv.value)}분 이동(추정) + 여유 15분</li>
       </ul>
-      <p style="margin-top:10px">${clash.length?`이 시각이면 ${esc(clash.join(", "))}은(는) 빠듯합니다.`:"일정 네 곳 모두 넉넉합니다."}</p>
-      <p class="sub" style="margin:8px 0 0">짐은 전날 밤이나 아침에 정리해 두세요.</p>
-      <div class="acts"><a class="btn" target="_blank" rel="noopener" href="${DIRQ("銀座駅",A.q)}">${ico("i-route")}긴자에서 ${esc(A.n)} 길찾기</a></div>`;
+      <p style="margin-top:10px">${clash.length?`이 시각이면 <b>${esc(clash.join(", "))}</b>${eunNeun(clash[clash.length-1])} 못 갑니다.`:"일정 네 곳 모두 들를 수 있습니다."}${tight.length?` ${esc(tight.join(", "))}${eunNeun(tight[tight.length-1])} 45분도 안 남아 빠듯해요.`:""}</p>
+      <p class="sub" style="margin:8px 0 0">숙소 체크아웃은 ${HOTEL.checkout}입니다. 아침에 나오면서 짐을 맡기세요.</p>
+      <div class="acts">
+        ${pick?`<a class="btn" target="_blank" rel="noopener" href="${DIRQ(HOTEL.addr,A.q)}">${ico("i-route")}숙소에서 ${esc(A.n)} 길찾기</a>`
+              :`<a class="btn" target="_blank" rel="noopener" href="${DIRQ("銀座駅",A.q)}">${ico("i-route")}긴자에서 ${esc(A.n)} 길찾기</a>`}
+      </div>`;
   };
   air.addEventListener("change",()=>{ LS.set("tokyo-air-manual","1"); mv.value=AIRPORTS[air.value].mins; calc(); });
-  [tm,bf,mv].forEach(el=>{ el.addEventListener("input",calc); el.addEventListener("change",calc); });
+  [tm,bf,mv,bag].filter(Boolean).forEach(el=>{ el.addEventListener("input",calc); el.addEventListener("change",calc); });
   calc();
 }
 
 /* ---------- 날짜 탭 ---------- */
-const TABKEYS = ()=>DAYS.map(d=>d.key).concat("recs");
+const TABKEYS = ()=>DAYS.map(d=>d.key).concat("more");
 function renderTabs(active){
   const today=tripYmd();
   tabsEl.innerHTML=DAYS.map(d=>`<button class="tab${d.date===today?" today":""}" role="tab" id="tab-${d.key}" aria-controls="panel"
     aria-selected="${d.key===active}" tabindex="${d.key===active?0:-1}" data-key="${d.key}">
     <span class="wd">${d.wd}</span><span class="dt">${d.dt}</span>${d.date===today?'<span class="sr">오늘</span>':""}</button>`).join("")
-  + `<button class="tab extra" role="tab" id="tab-recs" aria-controls="panel"
-      aria-selected="${active==="recs"}" tabindex="${active==="recs"?0:-1}" data-key="recs">
-      ${ico("i-leaf")}<span class="dt">추천</span></button>`;
+  + `<button class="tab extra" role="tab" id="tab-more" aria-controls="panel"
+      aria-selected="${active==="more"}" tabindex="${active==="more"?0:-1}" data-key="more">
+      ${ico("i-more")}<span class="dt">안내</span></button>`;
 }
 function select(key,focus){
   renderTabs(key);
-  if(key==="recs") renderRecs(); else { renderDay(key); LS.set("tokyo-day",key); }
+  if(key==="more") renderMore();
+  else { const m=$("#more"); m.hidden=true; m.removeAttribute("role"); renderDay(key); LS.set("tokyo-day",key); }
   if(focus){ const b=$("#tab-"+key); if(b) b.focus(); }
 }
 tabsEl.addEventListener("click",e=>{
@@ -1619,7 +1699,7 @@ function importPasted(text){
     const res=importPasted(ta.value);
     if(res.err){ gStatus(res.err,true); return; }
     ta.value="";
-    renderDay(CURRENT==="recs"?"wed":CURRENT);
+    if(CURRENT!=="more") renderDay(CURRENT);
     gStatus(`${res.hit}곳 넣었습니다.` + (res.miss.length?` 이름이 안 맞은 것: ${res.miss.slice(0,3).join(", ")}${res.miss.length>3?" 외 "+(res.miss.length-3)+"개":""}.`:""));
   });
 })();
@@ -1656,10 +1736,24 @@ function importPasted(text){
   $("#preplist").addEventListener("change",onChange);
   $("#preplist").addEventListener("click",e=>{
     const b=e.target.closest("[data-go]"); if(!b) return;
-    e.preventDefault();
-    const t=$(b.dataset.go); if(!t) return;
-    t.scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"});
+    e.preventDefault(); goTo(b.dataset.go);
   });
+})();
+
+/* ---------- 숙소 ---------- */
+(function(){
+  const el=$("#stay"); if(!el) return;
+  el.innerHTML=`<h3>${esc(HOTEL.n)}</h3>
+    <p class="ja" style="margin:0 0 var(--s3)">${esc(HOTEL.ja)}</p>
+    <div class="rmeta" style="margin:0 0 var(--s3)"><span>체크인 <b>${HOTEL.checkin}</b></span><span>체크아웃 <b>${HOTEL.checkout}</b></span><span>${esc(HOTEL.stn)}역 도보 1분</span></div>
+    <p>캡슐호텔입니다. 도착하면 사진 있는 신분증과 신용카드를 보여주고, 카드로 보증금 5,000엔을 잡습니다. 체크아웃 때 시설 확인 뒤 돌려줘요. 짐 보관이 됩니다.</p>
+    <p>연박이어도 매일 짐을 빼야 하는지는 체크인할 때 물어보세요. 일요일은 체크아웃(${HOTEL.checkout}) 뒤 짐을 맡기고 긴자로 나가는 걸로 출발 시각을 계산해 뒀습니다.</p>
+    <div class="acts">
+      <button type="button" class="btn key" id="stay-big">${ico("i-zoom")}주소 크게 보기</button>
+      <a class="btn" href="${MAPS(HOTEL.q)}" target="_blank" rel="noopener">${ico("i-map")}지도</a>
+    </div>
+    <p class="srcline">확인: 2026년 9월 · <a href="${esc(HOTEL.src)}" target="_blank" rel="noopener">${esc(HOTEL.srcn)}</a></p>`;
+  $("#stay-big").addEventListener("click",()=>openBig({stops:[{n:HOTEL.n, ja:HOTEL.ja, addr:HOTEL.addr, q:HOTEL.q}]},0));
 })();
 
 /* ---------- 긴급 연락처 · 일본어 한마디 ---------- */
@@ -1735,7 +1829,7 @@ async function fetchWx(force){
     WX={at:Date.now(), daily:j.daily, current:j.current||null};
     LS.set(WX_KEY, JSON.stringify(WX));
     renderWx();
-    if(CURRENT && CURRENT!=="recs") renderDay(CURRENT);
+    if(CURRENT && CURRENT!=="more") renderDay(CURRENT);
   }catch(e){}
 }
 renderWx();
@@ -1866,7 +1960,7 @@ $("#warmbtn").addEventListener("click",async e=>{
     await new Promise(r=>setTimeout(r,2800));
   }
   select(back); b.textContent=label; b.disabled=false; countTiles();
-  window.scrollTo({top:document.body.scrollHeight});
+  goTo("#warmbtn");
 });
 function netCheck(){ $("#netbar").hidden=navigator.onLine!==false; }
 window.addEventListener("online",()=>{netCheck();}); window.addEventListener("offline",netCheck); netCheck();
