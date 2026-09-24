@@ -129,7 +129,7 @@ figure.map{margin:0 0 var(--s6)}
   scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
 .mapdays::-webkit-scrollbar{display:none}
 .mapday{flex:0 0 auto;appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);
-  font:inherit;font-size:12.5px;font-weight:600;border-radius:var(--r-tag);padding:0 13px;min-height:34px;
+  font:inherit;font-size:12.5px;font-weight:600;border-radius:var(--r-tag);padding:0 14px;min-height:40px;
   cursor:pointer;white-space:nowrap;
   transition:background-color .15s ease,border-color .15s ease,color .15s ease}
 .mapday.on{background:var(--ginkgo);border-color:var(--ginkgo);color:var(--ginkgo-ink)}
@@ -176,6 +176,7 @@ figcaption{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 14p
 :root[data-theme="dark"] .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.9)}
 .leaflet-container{background:var(--surface);font-family:var(--sans)}
 .leaflet-bar{border:1px solid var(--line);box-shadow:none;border-radius:10px;overflow:hidden}
+.leaflet-touch .leaflet-bar a{width:44px;height:44px;line-height:44px;font-size:20px}
 .leaflet-bar a,.leaflet-bar a:hover{background:var(--surface);color:var(--ink);border-bottom-color:var(--line)}
 .leaflet-bar a:hover{background:var(--faint)}
 .leaflet-bar a.leaflet-disabled{background:var(--faint);color:var(--line)}
@@ -228,6 +229,21 @@ ol.timeline::before{content:"";position:absolute;left:61.5px;top:10px;bottom:10p
   background:var(--surface);background:color-mix(in srgb,var(--kc,var(--surface)) var(--tint),var(--surface));
   border-radius:var(--r-card);padding:var(--s4);transition:background-color .15s ease,border-color .15s ease}
 .stop.opt .card{border-style:dashed}
+/* 카드 밀도 B안(2026-09-24 피그마 비교에서 고름): 메모는 다 보이고 여백만 줄인다. 메모를 한 줄로 자르는 C안은 흡연·현금 같은 경고가 숨어서 뺐다 */
+ol.timeline .card{padding:14px}
+ol.timeline .card .note{margin-top:var(--s2)}
+ol.timeline .card .meta{margin-top:var(--s2)}
+ol.timeline .card .acts{margin-top:var(--s3);flex-wrap:nowrap}
+ol.timeline .card .btn{padding:0 14px}
+ol.timeline .stop{padding-bottom:10px}
+.hop{display:grid;grid-template-columns:42px 20px 1fr;gap:0 10px;margin:-2px 0 10px;align-items:center}
+.hop-t{grid-column:3;margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:13px;line-height:1.45;color:var(--muted);padding:0 var(--s2)}
+.hop-t .num{font-family:var(--mono);font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.hop-how{color:var(--ink)}
+.hop.far .hop-t{border:1px solid var(--line);border-radius:14px;padding:6px 12px;background:var(--surface)}
+.hop.far .hop-t b{font-weight:700;color:var(--k-food)}
+.hop:has(+ .stop.past){opacity:.42}
+.hop:has(+ .stop.past) .hop-how{display:none}
 .stop.past{opacity:.42}
 .stop.past .note,.stop.past .acts,.stop.past .leg{display:none}
 .stop.past .card{padding:var(--s3) var(--s4)}
@@ -438,7 +454,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--paper
   line-height:1.1;min-height:46px;justify-content:center;position:relative;gap:2px;
   transition:background-color .15s ease,color .15s ease}
 .tab .wd{font-family:var(--serif);font-weight:800;font-size:19px}
-.tab .dt{font-family:var(--mono);font-size:9.5px;font-weight:500;letter-spacing:.04em;color:var(--muted)}
+.tab .dt{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.04em;color:var(--muted)}
 .tab .ki{width:17px;height:17px;opacity:.85}
 .tab[aria-selected="true"]{background:var(--ginkgo);color:var(--ginkgo-ink)}
 .tab[aria-selected="true"] .dt{color:var(--ginkgo-ink);opacity:.75}
@@ -691,10 +707,12 @@ const DAYS = [
        note:"해질녘에 올라가면 낮과 야경을 다 봅니다.",
        q:"東京スカイツリー", id:"ChIJ35ov0dCOGGARKvdDH7NPHX0", lat:35.7100627, lng:139.8107004},
       {t:"19:30", n:"이즈모 이케부쿠로 장어", ja:"いづも 池袋", kc:"food", k:"식당, 저녁", need:"예약", needId:"izumo", close:"22:00",
-       note:"줄이 길어요.",
+       note:"줄이 길어요. 池袋역 서쪽 출구에서 1분. 전 좌석 흡연 가능한 이자카야라 담배 냄새가 밸 수 있어요.",
+       leg:{line:"지하철", from:"押上(스카이트리)", to:"池袋", note:"37분 안팎, 환승 있음", v:true},
        q:"Izumo Ikebukuro UNAGI", id:"ChIJnd726AaNGGARMKFX_acEet4", lat:35.7300224, lng:139.7097689},
       {t:"21:30", n:"Spincoaster Music Bar", kc:"bar", k:"LP바", close:"02:00",
        note:"요요기역 옆. 음반 신청 가능.",
+       leg:{line:"JR 야마노테선", from:"池袋", to:"代々木", note:"환승 없이 11분, IC 199엔", v:true},
        q:"Spincoaster Music Bar", id:"ChIJAQDUsM-MGGARLXIsEQGf3Ig", lat:35.6852642, lng:139.6992942}
     ]},
 
@@ -717,6 +735,7 @@ const DAYS = [
        q:"Kiku Sushi 日本橋", id:"ChIJRX-nulmJGGAR9ynATgff8U0", lat:35.6790868, lng:139.7764141},
       {t:"20:30", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
        note:"지하 LP바. 8시 넘으면 자리가 찹니다.",
+       leg:{line:"긴자선", from:"日本橋", to:"渋谷", note:"갈아타지 않음. 日本橋역은 기쿠스시에서 직선 400m쯤", v:true},
        q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841}
     ]},
 
@@ -1204,6 +1223,16 @@ function badgeHTML(s){
   if(s.closed) b.push(`<span class="closed">${esc(s.closed)}</span>`);
   return b.join("");
 }
+const km=(a,b)=>{const r=Math.PI/180,x=(b.lng-a.lng)*r*Math.cos((a.lat+b.lat)/2*r),y=(b.lat-a.lat)*r;return Math.sqrt(x*x+y*y)*6371;};
+const FAR_KM=4;   // 이 이상이면 "먼 이동"으로 표시 (직선거리)
+/* 카드 사이 이동 줄: 직선거리는 좌표로 계산한 사실값, 경로는 확인된 leg만 */
+function hopHTML(prev,s){
+  if(!prev || !s.lat || s.hotel) return "";
+  const d=km(prev,s), far=prev!==HOTEL && d>=FAR_KM;   // 아침 숙소 출발은 원래 멀다
+  const from = prev===HOTEL ? "숙소에서 " : "";
+  const how = s.leg ? `<span class="hop-how">${esc(s.leg.line)} ${esc(s.leg.from)} → ${esc(s.leg.to)}${s.leg.note?" · "+esc(s.leg.note):""}${s.leg.v?"":" (확인 전)"}</span>` : "";
+  return `<li class="hop${far?" far":""}"><span class="hop-line"></span><p class="hop-t">${far?`<b>먼 이동</b>`:""}<span class="num">${from}직선 ${d<1?Math.round(d*1000)+"m":d.toFixed(1)+"km"}</span>${how}</p></li>`;
+}
 function stopHTML(d,s,prev){
   const K=KIND[s.kc]||KIND.move;
   const plain = s.hotel || !s.lat;          // 장소가 아닌 줄은 카드 대신 얇은 규칙선
@@ -1213,10 +1242,10 @@ function stopHTML(d,s,prev){
   const ja = s.ja ? `<p class="ja">${esc(s.ja)}${ico("i-zoom","ki zoom")}</p>`
           : s.jaTodo ? `<p class="ja todo">일본어 이름 확인 필요${ico("i-zoom","ki zoom")}</p>` : "";
   const nameBlock = `<button type="button" class="namebtn" data-big="${s._idx}"><span class="name">${esc(s.n)}${s.ja?"":ico("i-zoom","ki zoom")}</span>${ja}</button>`;
-  const leg = s.leg ? `<p class="leg">${ico("i-move")}<span>${esc(s.leg.line)} ${esc(s.leg.from)} → ${esc(s.leg.to)}${s.leg.note?" · "+esc(s.leg.note):""}${s.leg.v?"":" (확인 전)"}</span></p>` : "";
+  const leg = "";   // 경로는 카드 사이 이동 줄(hopHTML)에 표시
   const acts=[];
   if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q||s.n,s.id)}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
-  if(s.lat && !s.hotel) acts.push(`<a class="btn" href="${DIR(prev,s)}" target="_blank" rel="noopener">${ico("i-route")}여기까지 길찾기</a>`);
+  if(s.lat && !s.hotel) acts.push(`<a class="btn" href="${DIR(prev,s)}" target="_blank" rel="noopener" aria-label="${esc(s.n)}까지 길찾기">${ico("i-route")}길찾기</a>`);
   const meta=badgeHTML(s);
   const P=placeOf(s);
   const thumb = P && P.photo ? `<img class="thumb" src="${esc(P.photo)}" alt="" loading="lazy" decoding="async">` : "";
@@ -1304,7 +1333,7 @@ function renderDay(key){
   const shown = d.stops.filter(s=>!(hide && s.opt));
   const hasOpt = d.stops.some(s=>s.opt);
   let prev=HOTEL;
-  const rows=shown.map(s=>{ s._from=prev; const html=stopHTML(d,s,prev); if(s.lat && !s.hotel) prev=s; return html; }).join("");
+  const rows=shown.map(s=>{ s._from=prev; const html=hopHTML(prev,s)+stopHTML(d,s,prev); if(s.lat && !s.hotel) prev=s; return html; }).join("");
   const seq=[HOTEL,...shown.filter(s=>s.lat && !s.hotel)];
 
   const dayNo=DAYS.indexOf(d)+1;
