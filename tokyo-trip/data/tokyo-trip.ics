@@ -57,9 +57,30 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-thu-0@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T003000Z
-DTEND:20261119T024500Z
-SUMMARY:1. 도쿄국립박물관
+DTSTART:20261119T000000Z
+DTEND:20261119T013000Z
+SUMMARY:1. 리쿠기엔
+LOCATION:六義園
+DESCRIPTION:六義園\n에도 시대 다이묘 정원. 9시에 열어요(
+ 입장 마감 16:30). 정문은 駒込역에서 걸어서 7분\, 단풍철
+ 엔 역에서 2분인 染井門도 엽니다. 평일 아침이라 한산
+ 할 때예요. 야간 라이트업은 이번 일정 뒤에 시작합니다
+ .\nhttps://www.google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9
+ C%92&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E5%85%AD%E7%BE%A9%E5%9
+ C%92&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:리쿠기엔
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-thu-1@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261119T013000Z
+DTEND:20261119T033000Z
+SUMMARY:2. 도쿄국립박물관
 LOCATION:東京国立博物館
 DESCRIPTION:東京国立博物館\n대덕사 개창 700년 특별전(10/14
  –12/6)과 히로시게전(9/29–12/20)이 함께 열립니다.\nhttps:/
@@ -76,11 +97,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-1@tokyo-trip
+UID:tokyo-2026-thu-2@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T024500Z
-DTEND:20261119T041500Z
-SUMMARY:2. 국립서양미술관
+DTSTART:20261119T033000Z
+DTEND:20261119T043000Z
+SUMMARY:3. 국립서양미술관
 LOCATION:国立西洋美術館
 DESCRIPTION:国立西洋美術館\n르코르뷔지에가 설계한 세계
  유산 건물. 건물만 봐도 20분이면 충분합니다.\nhttps://www.
@@ -96,11 +117,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-2@tokyo-trip
+UID:tokyo-2026-thu-3@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T041500Z
+DTSTART:20261119T043000Z
 DTEND:20261119T061500Z
-SUMMARY:3. ROUTE BOOKS
+SUMMARY:4. ROUTE BOOKS
 LOCATION:ROUTE BOOKS
 DESCRIPTION:히가시우에노. 카페 안에 서가가 있는 구조.\nhtt
  ps://www.google.com/maps/search/?api=1&query=ROUTE%20BOOKS&query_place_id=
@@ -114,11 +135,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-3@tokyo-trip
+UID:tokyo-2026-thu-4@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261119T061500Z
 DTEND:20261119T083000Z
-SUMMARY:4. 스미다 호쿠사이 미술관
+SUMMARY:5. 스미다 호쿠사이 미술관
 LOCATION:すみだ北斎美術館
 DESCRIPTION:すみだ北斎美術館\n우키요에 목판화 공정을 따
  로 보여줍니다. 입장 마감은 보통 폐관 30분 전이니 17시 
@@ -135,11 +156,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-4@tokyo-trip
+UID:tokyo-2026-thu-5@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261119T083000Z
 DTEND:20261119T103000Z
-SUMMARY:5. 도쿄 스카이트리
+SUMMARY:6. 도쿄 스카이트리
 LOCATION:東京スカイツリー
 DESCRIPTION:東京スカイツリー\n해질녘에 올라가면 낮과 야
  경을 다 봅니다.\n예약: 날짜 지정권\nhttps://www.google.com/ma
@@ -155,11 +176,11 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-5@tokyo-trip
+UID:tokyo-2026-thu-6@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261119T103000Z
 DTEND:20261119T123000Z
-SUMMARY:6. 이즈모 이케부쿠로 장어
+SUMMARY:7. 이즈모 이케부쿠로 장어
 LOCATION:いづも 池袋
 DESCRIPTION:いづも 池袋\n줄이 길어요. 池袋역 서쪽 출구에
  서 1분. 전 좌석 흡연 가능한 이자카야라 담배 냄새가 밸
@@ -175,11 +196,11 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-thu-6@tokyo-trip
+UID:tokyo-2026-thu-7@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261119T123000Z
 DTEND:20261119T140000Z
-SUMMARY:7. Spincoaster Music Bar
+SUMMARY:8. Spincoaster Music Bar
 LOCATION:Spincoaster Music Bar
 DESCRIPTION:요요기역 옆. 음반 신청 가능.\nhttps://www.google.com
  /maps/search/?api=1&query=Spincoaster%20Music%20Bar&query_place_id=ChIJAQD
@@ -370,7 +391,7 @@ BEGIN:VEVENT
 UID:tokyo-2026-sat-3@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T033000Z
-DTEND:20261121T051500Z
+DTEND:20261121T050000Z
 SUMMARY:4. 네즈미술관과 네즈카페
 LOCATION:根津美術館
 DESCRIPTION:根津美術館\n칠기 전시(10/24–11/23). 쿠마 겐고 
@@ -389,15 +410,38 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-sat-4@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261121T051500Z
-DTEND:20261121T063000Z
-SUMMARY:5. 와타리움 미술관
+DTSTART:20261121T050000Z
+DTEND:20261121T055000Z
+SUMMARY:5. 진구가이엔 은행나무길
+LOCATION:神宮外苑いちょう並木
+DESCRIPTION:神宮外苑いちょう並木\n아오야마도리에서 이어
+ 지는 300m 은행나무 터널. 절정은 11월 하순~12월 상순이라
+  21일은 노랗게 물드는 중일 거예요. 토요일이라 붐비니 
+ 길 가운데보다 양 끝에서 찍으세요. 은행나무 축제가 이
+ 맘때 열리는 해가 많습니다(올해 날짜는 공식 사이트 확
+ 인).\nhttps://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%AE%AE%
+ E5%A4%96%E8%8B%91%E3%81%84%E3%81%A1%E3%82%87%E3%81%86%E4%B8%A6%E6%9C%A8&hl
+ =ko
+URL:https://www.google.com/maps/search/?api=1&query=%E7%A5%9E%E5%AE%AE%E5%A
+ 4%96%E8%8B%91%E3%81%84%E3%81%A1%E3%82%87%E3%81%86%E4%B8%A6%E6%9C%A8&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:진구가이엔 은행나무길
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-sat-5@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261121T055000Z
+DTEND:20261121T065000Z
+SUMMARY:6. 와타리움 미술관
 LOCATION:ワタリウム美術館
 DESCRIPTION:ワタリウム美術館\n마리오 보타 설계. 1층 아트
- 북숍 on Sundays가 사실상 본 무대. 근처 진구가이엔 은행
- 나무길도 이맘때가 제철.\nhttps://www.google.com/maps/search/?api
- =1&query=%E3%83%AF%E3%82%BF%E3%83%AA%E3%82%A6%E3%83%A0%E7%BE%8E%E8%A1%93%E
- 9%A4%A8&query_place_id=ChIJXf9Z6JiMGGARRZ0zg4fFgLU&hl=ko
+ 북숍 on Sundays가 사실상 본 무대. 은행나무길에서 걸어서
+  갈 수 있는 거리예요.\nhttps://www.google.com/maps/search/?api=1&q
+ uery=%E3%83%AF%E3%82%BF%E3%83%AA%E3%82%A6%E3%83%A0%E7%BE%8E%E8%A1%93%E9%A4
+ %A8&query_place_id=ChIJXf9Z6JiMGGARRZ0zg4fFgLU&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E3%83%AF%E3%82%BF%E3%8
  3%AA%E3%82%A6%E3%83%A0%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJXf9Z6
  JiMGGARRZ0zg4fFgLU&hl=ko
@@ -408,11 +452,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-5@tokyo-trip
+UID:tokyo-2026-sat-6@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261121T063000Z
-DTEND:20261121T074500Z
-SUMMARY:6. Utrecht
+DTSTART:20261121T065000Z
+DTEND:20261121T080000Z
+SUMMARY:7. Utrecht
 LOCATION:ユトレヒト
 DESCRIPTION:ユトレヒト\n아트북과 진. 잡화점 2층\, 간판이 
  없어요.\nhttps://www.google.com/maps/search/?api=1&query=Utrecht%20%E7%
@@ -426,11 +470,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-6@tokyo-trip
+UID:tokyo-2026-sat-7@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261121T074500Z
-DTEND:20261121T090000Z
-SUMMARY:7. SPBS 본점
+DTSTART:20261121T080000Z
+DTEND:20261121T091500Z
+SUMMARY:8. SPBS 본점
 LOCATION:SHIBUYA PUBLISHING & BOOKSELLERS
 DESCRIPTION:SHIBUYA PUBLISHING & BOOKSELLERS\n출판사가 직접 운영하
  는 서점.\nhttps://www.google.com/maps/search/?api=1&query=SHIBUYA%20PUB
@@ -445,11 +489,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-7@tokyo-trip
+UID:tokyo-2026-sat-8@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261121T090000Z
+DTSTART:20261121T091500Z
 DTEND:20261121T120000Z
-SUMMARY:8. Bookshelf Fuzkue
+SUMMARY:9. Bookshelf Fuzkue
 LOCATION:本の読める店 fuzkue 初台
 DESCRIPTION:本の読める店 fuzkue 初台\n하츠다이. 조용히 앉
  아 읽는 곳이라 오늘의 휴식 시간이기도 합니다.\nhttps://
@@ -464,11 +508,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-8@tokyo-trip
+UID:tokyo-2026-sat-9@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T120000Z
 DTEND:20261121T133000Z
-SUMMARY:9. Little Soul Cafe
+SUMMARY:10. Little Soul Cafe
 LOCATION:リトルソウルカフェ
 DESCRIPTION:リトルソウルカフェ\n시모키타자와의 소울 LP바
  . 자리값 500엔.\nhttps://www.google.com/maps/search/?api=1&query=Littl

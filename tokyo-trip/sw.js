@@ -1,6 +1,6 @@
 /* 늦가을 도쿄 — 오프라인 캐시
    shell: 설치할 때 한 번에 저장 / tiles·fonts: 본 것만 저장 */
-const VER    = "v12";
+const VER    = "v14";
 const SHELL  = "tokyo-shell-" + VER;
 const TILES  = "tokyo-tiles-v1";
 const FONTS  = "tokyo-fonts-v1";
@@ -13,6 +13,7 @@ const ASSETS = [
   "index.html",
   "manifest.webmanifest",
   "vendor/leaflet.css",
+  "vendor/pretendard/PretendardVariable.subset.woff2",
   "vendor/leaflet.js",
   "vendor/images/marker-icon.png",
   "vendor/images/marker-icon-2x.png",
