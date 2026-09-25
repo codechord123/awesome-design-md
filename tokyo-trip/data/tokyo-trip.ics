@@ -123,12 +123,14 @@ DTSTART:20261119T051500Z
 DTEND:20261119T065000Z
 SUMMARY:5. 스미다 호쿠사이 미술관
 LOCATION:すみだ北斎美術館
-DESCRIPTION:すみだ北斎美術館\n우키요에 목판화 공정을 따
- 로 보여줍니다. 15:30에는 나와야 스카이트리 노을에 맞
- 춰요. 바로 옆이 2026년 3월에 다시 연 에도도쿄박물관이
- 에요(추천 탭).\nhttps://www.google.com/maps/search/?api=1&query=%E3%8
- 1%99%E3%81%BF%E3%81%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_
- place_id=ChIJgRjTtzOJGGARqoKBtB8BAno&hl=ko
+DESCRIPTION:すみだ北斎美術館\n개관 10주년 특별전 '베스트 
+ 오브 스미다 호쿠사이 미술관'(9/15–11/23)이 열리는 중이
+ 라 대표작을 한 번에 봅니다. 15:30에는 나와야 스카이트
+ 리 노을에 맞춰요. 스카이트리까지는 스미다 순환버스(1
+ 00엔)나 택시가 편해요. 바로 옆이 2026년 3월에 다시 연 
+ 에도도쿄박물관(추천 탭).\nhttps://www.google.com/maps/search/?ap
+ i=1&query=%E3%81%99%E3%81%BF%E3%81%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%
+ E9%A4%A8&query_place_id=ChIJgRjTtzOJGGARqoKBtB8BAno&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E3%81%99%E3%81%BF%E3%8
  1%A0%E5%8C%97%E6%96%8E%E7%BE%8E%E8%A1%93%E9%A4%A8&query_place_id=ChIJgRjTt
  zOJGGARqoKBtB8BAno&hl=ko
@@ -332,11 +334,12 @@ DTSTAMP:20260924T000000Z
 DTSTART:20261120T083000Z
 DTEND:20261120T113000Z
 SUMMARY:7. 기쿠스시
-LOCATION:Kiku Sushi 日本橋
-DESCRIPTION:니혼바시 가부토초. 토·일 휴무라 이번엔 이날
- 뿐.\n예약: 예약\nhttps://www.google.com/maps/search/?api=1&query=Kiku
- %20Sushi%20%E6%97%A5%E6%9C%AC%E6%A9%8B&query_place_id=ChIJRX-nulmJGGAR9ynA
- Tgff8U0&hl=ko
+LOCATION:菊寿司
+DESCRIPTION:菊寿司\n니혼바시 가부토초에서 60년 넘게 이어
+ 온 에도마에 스시(日本橋兜町17-1). 저녁 17:00~22:00\, 토·
+ 일·공휴일 휴무라 이번엔 이날뿐.\n예약: 예약\nhttps://www
+ .google.com/maps/search/?api=1&query=Kiku%20Sushi%20%E6%97%A5%E6%9C%AC%E6%
+ A9%8B&query_place_id=ChIJRX-nulmJGGAR9ynATgff8U0&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=Kiku%20Sushi%20%E6%97%A
  5%E6%9C%AC%E6%A9%8B&query_place_id=ChIJRX-nulmJGGAR9ynATgff8U0&hl=ko
 BEGIN:VALARM

@@ -23,7 +23,7 @@
 @font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;
   src:url("vendor/pretendard/PretendardVariable.subset.woff2") format("woff2-variations"),url("vendor/pretendard/PretendardVariable.subset.woff2") format("woff2")}
 :root{
-  --paper:#F2F4F6;--surface:#FFFFFF;--ink:#191F28;--muted:#6B7684;--line:#E5E8EB;--faint:#F2F4F6;--soft:#EBEEF1;
+  --paper:#F2F4F6;--surface:#FFFFFF;--ink:#191F28;--text2:#4E5968;--muted:#6B7684;--line:#E5E8EB;--faint:#F2F4F6;--soft:#EBEEF1;
   --ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#FFF6DA;--pine:#12805C;
   --k-art:#1F7A63;--k-book:#B06A1E;--k-food:#E0503A;--k-bar:#6B4FD8;--k-market:#0B8CA0;--k-view:#2F7CF6;--k-move:#8B95A1;--k-leaf:#6E8B2E;
   --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Hiragino Sans","Noto Sans KR","Noto Sans JP","Malgun Gothic",system-ui,sans-serif;
@@ -37,10 +37,10 @@
   box-sizing:border-box;
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){--paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
+  :root:not([data-theme="light"]){ --paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--text2:#C4CAD3;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
     --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
 }
-:root[data-theme="dark"]{--paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
+:root[data-theme="dark"]{ --paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--text2:#C4CAD3;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
   --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);scroll-padding-bottom:calc(var(--tabh) + 24px)}
@@ -125,16 +125,6 @@ figure.map{margin:0 0 var(--s5)}
   .mapbox{margin:0 calc(-1 * var(--gut));border-radius:0;height:420px}
 }
 #lmap{position:absolute;inset:0;background:var(--surface)}
-.mapdays{position:absolute;top:10px;left:10px;right:56px;z-index:1100;
-  display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;
-  scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-.mapdays::-webkit-scrollbar{display:none}
-.mapday{flex:0 0 auto;appearance:none;border:0;background:var(--surface);color:var(--ink);box-shadow:var(--lift);
-  font:inherit;font-size:13px;font-weight:600;letter-spacing:-.01em;border-radius:999px;padding:0 14px;min-height:40px;
-  cursor:pointer;white-space:nowrap;
-  transition:background-color .15s ease,border-color .15s ease,color .15s ease}
-.mapday.on{background:var(--ink);color:var(--surface)}
-
 /* 지도 아래 장소 카드 — 옆으로 넘기면 지도가 따라간다 */
 .mapcards{position:absolute;left:0;right:0;bottom:22px;z-index:1100;display:flex;gap:8px;
   overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;
@@ -153,7 +143,7 @@ figure.map{margin:0 0 var(--s5)}
 .mc-n{display:block;font-size:15px;font-weight:700;letter-spacing:-.02em;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mc-r{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .mc-r b{font-weight:600;color:var(--ink)}
-.mapbox.fallback .mapdays,.mapbox.fallback .mapcards{display:none}
+.mapbox.fallback .mapcards{display:none}
 .mapbox.fallback #lmap{display:none}
 .svgmap{position:absolute;inset:0;display:none}
 .mapbox.fallback .svgmap{display:block}
@@ -296,9 +286,7 @@ ol.timeline .stop{padding-bottom:10px}
 .ghelp li{margin:0 0 6px}
 .leg{display:flex;gap:6px;align-items:flex-start;font-size:13px;color:var(--muted);margin:var(--s3) 0 0}
 .leg .ki{width:14px;height:14px;flex:none;margin-top:3px}
-.note{margin:var(--s3) 0 0;font-size:15px;line-height:1.6;color:#4E5968}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .note{color:#C4CAD3}}
-:root[data-theme="dark"] .note{color:#C4CAD3}
+.note{margin:var(--s3) 0 0;font-size:15px;line-height:1.6;color:var(--text2)}
 .meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:var(--s3)}
 .badge{display:inline-block;padding:3px 8px;border-radius:6px;border:0;
   font-size:12px;font-weight:700;letter-spacing:-.01em;font-variant-numeric:tabular-nums;
@@ -349,13 +337,17 @@ ol.timeline .stop{padding-bottom:10px}
 .check .go{margin-top:4px}
 .sos{display:grid;gap:8px;margin-top:var(--s3)}
 .sos a{display:grid;grid-template-columns:1fr auto;align-items:center;gap:2px 12px;min-height:52px;padding:8px 14px;
-  border:0;border-radius:14px;text-decoration:none;color:var(--ink);background:var(--faint)}
+  border:0;border-radius:14px;text-decoration:none;color:var(--ink);background:var(--surface)}
 .sos a b{font-size:15px;font-weight:600}
 .sos a span{font-size:12px;color:var(--muted);grid-column:1}
 .sos a i{grid-row:1 / span 2;grid-column:2;font-style:normal;font-size:15px;font-weight:700}
-.phrases{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s3)}
-.phrases button{appearance:none;cursor:pointer;min-height:44px;padding:6px 14px;border-radius:var(--r-btn);
-  border:0;background:var(--faint);color:var(--ink);font:inherit;font-size:15px;font-weight:600;letter-spacing:-.02em;text-align:left}
+.phrases{display:grid;gap:8px;margin-top:var(--s3)}
+.phr{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:stretch}
+.phr-t{appearance:none;border:0;background:var(--surface);border-radius:14px;padding:12px 14px;text-align:left;font:inherit;color:inherit;cursor:pointer;display:grid;gap:2px}
+.phr-t b{font-size:16px;font-weight:700;letter-spacing:-.02em}
+.phr-t span{font-size:14px;color:var(--muted)}
+.phr-say{appearance:none;border:0;background:var(--surface);border-radius:14px;width:56px;display:grid;place-items:center;color:var(--ink);cursor:pointer}
+.phr-say .ki{width:22px;height:22px}
 .wxnow{display:flex;align-items:baseline;gap:10px;margin:var(--s2) 0 var(--s3)}
 .wxnow b{font-size:40px;font-weight:800;line-height:1;letter-spacing:-.04em}
 .wxnow span{font-size:15px;color:var(--muted)}
@@ -465,27 +457,150 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
   background:color-mix(in srgb,var(--surface) 92%,transparent);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-top:1px solid var(--line);
   padding:var(--s2) 0 calc(var(--s2) + env(safe-area-inset-bottom,0px))}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr) 0.78fr;gap:4px;
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;
   background:transparent;border:0;padding:0}
 .tab{appearance:none;border:0;background:transparent;color:var(--muted);border-radius:12px;
   padding:5px 0 4px;cursor:pointer;font:inherit;display:flex;flex-direction:column;align-items:center;
   line-height:1.1;min-height:46px;justify-content:center;position:relative;gap:2px;
   transition:background-color .15s ease,color .15s ease}
-.tab .wd{font-weight:800;font-size:18px;letter-spacing:-.02em}
-.tab .dt{font-size:11px;font-weight:600;color:var(--muted)}
-.tab .ki{width:17px;height:17px;opacity:.85}
-.tab[aria-selected="true"]{background:var(--ink);color:var(--surface)}
-.tab[aria-selected="true"] .dt{color:var(--surface);opacity:.7}
-.tab.extra{border-radius:12px}
-.tab.extra .dt{font-size:11px;color:var(--muted)}
-.tab.extra[aria-selected="true"] .dt{color:var(--surface)}
-.tab.today::after{content:"";position:absolute;top:6px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--ginkgo)}
-.tab[aria-selected="true"].today::after{background:var(--ginkgo)}
+.tab{min-height:52px;gap:3px;color:#9AA3AE}
+.tab .ki{width:23px;height:23px;opacity:1}
+.tab .lb{font-size:11px;font-weight:700;letter-spacing:-.01em}
+.tab[aria-selected="true"]{background:transparent;color:var(--ink)}
+.tab[aria-selected="true"] .ki{stroke-width:2.2}
+
+/* 일정 탭 위쪽: 날짜 고르기 */
+.daybar[hidden]{display:none}
+.dayseg{flex:1;display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:6px 0}
+.dseg{appearance:none;border:0;background:transparent;border-radius:12px;min-height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:var(--muted);cursor:pointer;font:inherit;position:relative;transition:background-color .15s ease,color .15s ease}
+.dseg b{font-size:16px;font-weight:800;line-height:1.1}
+.dseg span{font-size:11px;font-weight:600}
+.dseg[aria-selected="true"]{background:var(--ink);color:var(--surface)}
+.dseg.today::after{content:"";position:absolute;top:5px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--ginkgo)}
+#more-bar[hidden]{display:none}
+
+/* 한국어 제목은 단어 중간에서 끊지 않는다 */
+h1,h2,h3,.dtitle,.name,.tname,.nowname,.rname{word-break:keep-all;overflow-wrap:anywhere}
+.stop.plain .card .btn{background:var(--surface)}
+.card-box .bunk{font-size:14px;line-height:1.55}
+.resv .more{margin:8px 0 0;font-size:13px;color:var(--muted)}
+.home.during .hero{padding:var(--s5) 0 var(--s4)}
+.home.during .hero h1{font-size:26px;margin:0 0 4px}
+.home.during .hero .lede,.home.during .hero .leaf{display:none}
+.nowcard .acts{display:grid;grid-template-columns:1.1fr 1fr 1fr;gap:8px}
+.nowcard .btn{padding:0 8px;font-size:14px;gap:4px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .nowcard{background:var(--surface);color:var(--ink);box-shadow:0 0 0 2px var(--ginkgo)}
+  :root:not([data-theme="light"]) .nowcard .btn:not(.key){color:var(--ink)}}
+:root[data-theme="dark"] .nowcard{background:var(--surface);color:var(--ink);box-shadow:0 0 0 2px var(--ginkgo)}
+:root[data-theme="dark"] .nowcard .btn:not(.key){color:var(--ink)}
+
+/* 홈 */
+.home .hero{padding:var(--s7) 0 var(--s5)}
+.hcard{background:var(--surface);border-radius:var(--r-card);padding:var(--s5) var(--s4);margin:0 0 var(--s4)}
+.hc-top,.hs-top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.hcard h2,.hs-top h2{font-size:20px;font-weight:800;letter-spacing:-.03em;margin:0}
+.hs-top{margin:0 0 var(--s3)}
+.hs-top .sub{font-size:13px;color:var(--muted);margin:0}
+.hc-count{font-size:14px;color:var(--muted)} .hc-count b{font-size:20px;color:var(--ink)}
+.bar{height:8px;border-radius:8px;background:var(--soft);margin:12px 0 14px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ginkgo);border-radius:8px}
+.resv-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.resv-list li{display:grid;gap:2px}
+.resv-list b{font-size:15px;letter-spacing:-.02em}
+.resv-list span{font-size:13px;color:var(--muted);line-height:1.5}
+.hsec{margin:var(--s6) 0 0}
+.dcards{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.dcard{appearance:none;border:0;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--surface);border-radius:var(--r-card);padding:16px;display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;align-items:start;transition:background-color .15s ease}
+.dcard:hover{background:var(--soft)}
+.dcard.today{box-shadow:0 0 0 2px var(--ginkgo)}
+.dnum{display:flex;flex-direction:column;align-items:center;justify-content:center;width:52px;height:60px;border-radius:14px;background:var(--faint)}
+.dnum b{font-size:26px;font-weight:800;line-height:1;letter-spacing:-.04em}
+.dnum span{font-size:12px;font-weight:700;color:var(--muted);margin-top:4px}
+.dcard.today .dnum{background:var(--ginkgo);color:var(--ginkgo-ink)}
+.dcard.today .dnum span{color:var(--ginkgo-ink)}
+.dbody{display:grid;gap:4px;min-width:0}
+.dtop{display:flex;justify-content:space-between;gap:8px;font-size:13px;color:var(--muted);font-weight:600}
+.dtop em{font-style:normal;color:var(--ink)}
+.dwx{display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.dwx.wet{color:var(--k-view)} .dwx .ki{width:14px;height:14px}
+.dtitle{font-size:18px;font-weight:800;letter-spacing:-.035em;line-height:1.3}
+.dstrip{display:flex;gap:3px;margin:4px 0 2px}
+.dstrip i{flex:1;height:5px;border-radius:3px;max-width:44px}
+.dhl{font-size:14px;color:var(--text2);line-height:1.5}
+.dmeta{font-size:12px;color:var(--muted);font-weight:600}
+.tchips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding:2px 0}
+.tchips::-webkit-scrollbar{display:none}
+.tchips.wrapchips{flex-wrap:wrap;overflow:visible}
+.tchip{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px;border-radius:999px;background:var(--surface);color:var(--ink);text-decoration:none;font:inherit;font-size:14px;font-weight:700;letter-spacing:-.02em;border:0;cursor:pointer;white-space:nowrap;flex:none}
+.tchip .ki{width:17px;height:17px;color:var(--kc)}
+.tchip b{color:var(--muted);font-weight:700}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.qbtn{appearance:none;border:0;background:var(--surface);border-radius:16px;min-height:96px;display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;padding:14px;font:inherit;font-size:14px;font-weight:700;letter-spacing:-.02em;line-height:1.35;color:var(--ink);text-align:left;cursor:pointer}
+.qbtn .ki{width:24px;height:24px}
+.nowcard{background:var(--ink);color:var(--surface);border-radius:22px;padding:22px 20px;margin:0 0 var(--s4)}
+.nowtag{display:inline-block;background:var(--ginkgo);color:var(--ginkgo-ink);font-size:12px;font-weight:800;border-radius:6px;padding:3px 8px;margin:0}
+.nowtime{margin:12px 0 2px;font-size:14px;opacity:.72;font-weight:600}
+.nowname{margin:0;font-size:28px;font-weight:800;letter-spacing:-.04em;line-height:1.2}
+.nowja{margin:4px 0 0;opacity:.72;font-size:15px}
+.nownote{margin:10px 0 0;font-size:15px;opacity:.86;line-height:1.55}
+.nowcard .acts{margin-top:16px}
+.nowcard .btn{background:rgba(128,128,128,.22);color:var(--surface)}
+.nowcard .btn.key{background:var(--ginkgo);color:var(--ginkgo-ink)}
+.nownext{margin:14px 0 0;padding-top:12px;border-top:1px solid rgba(128,128,128,.3);font-size:14px;opacity:.86}
+
+/* 테마 */
+.pagehead{padding:var(--s6) 0 var(--s3)}
+.ptitle{font-size:clamp(30px,8.4vw,40px);font-weight:800;letter-spacing:-.04em;margin:6px 0 8px;line-height:1.15}
+.themes .tchips{position:sticky;top:env(safe-area-inset-top,0px);z-index:4;background:var(--paper);padding:10px var(--gut);margin:0 calc(-1 * var(--gut))}
+.theme{margin:var(--s6) 0 0;scroll-margin-top:72px}
+.theme-h{display:flex;gap:12px;align-items:center}
+.theme-ic{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;background:var(--surface);color:var(--kc);flex:none}
+.theme-ic .ki{width:24px;height:24px}
+.theme h2{font-size:24px;font-weight:800;letter-spacing:-.035em;margin:0}
+.theme-n{margin:2px 0 0;font-size:13px;color:var(--muted);font-weight:600}
+.theme-intro{margin:12px 0 14px;font-size:15px;line-height:1.6;color:var(--text2)}
+.tlist{list-style:none;margin:0;padding:0;background:var(--surface);border-radius:var(--r-card);overflow:hidden}
+.tlist li+li .trow{border-top:1px solid var(--line)}
+.trow{appearance:none;border:0;background:transparent;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:12px;padding:14px 16px;align-items:start;transition:background-color .15s ease}
+.trow:hover{background:var(--faint)}
+.tday{display:flex;flex-direction:column;align-items:center;border-radius:10px;background:var(--faint);padding:6px 0;font-size:12px;font-weight:700;color:var(--muted)}
+.tday b{font-size:15px;color:var(--kc);font-weight:800;line-height:1.2}
+.tmain{display:grid;gap:2px;min-width:0}
+.tname{font-size:16px;font-weight:700;letter-spacing:-.02em;line-height:1.35}
+.tname em{font-style:normal;font-size:11px;font-weight:700;border-radius:5px;padding:1px 5px;background:var(--soft);color:var(--muted);vertical-align:2px}
+.tname .tmine{background:var(--ink);color:var(--surface)}
+.tja{font-size:13px;color:var(--muted)}
+.tnote{font-size:13.5px;color:var(--text2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tfee{font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap;padding-top:2px}
+.theme-sub{font-size:15px;font-weight:800;margin:22px 0 10px;color:var(--muted);letter-spacing:-.02em}
+
+/* 예산 */
+.btotal{display:flex;justify-content:space-between;align-items:baseline;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.btotal span{font-size:14px;color:var(--muted);font-weight:600}
+.btotal b{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.bday{padding:12px 0;border-bottom:1px solid var(--line)}
+.bday-h{display:flex;justify-content:space-between;font-size:15px}
+.bday-h span{font-weight:700}
+.bday ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:4px}
+.bday li{display:flex;justify-content:space-between;gap:10px;font-size:14px;color:var(--text2)}
+.bday li em{font-style:normal;color:var(--muted);font-size:12px;margin-left:6px}
+.bday li b{font-weight:600;white-space:nowrap}
+.bunk{margin:12px 0 0;font-size:14px;line-height:1.55}
+.bunk b{color:var(--k-food);margin-right:4px}
+
+/* 비 오는 날 · 넣기 경고 */
+.rainalt{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--faint);font-size:14px;line-height:1.5}
+.rainalt .ki{width:18px;height:18px;flex:none;color:var(--k-view);margin-top:2px}
+.rainalt b{color:var(--k-view)}
+.addwarn{margin:8px 0 0;font-size:13px;font-weight:700;color:var(--k-food);line-height:1.5}
 
 /* 넓은 화면에서는 지도를 왼쪽에 고정하고 그날 장소를 오른쪽에 세운다 */
 @media (min-width:900px){
   .wrap{max-width:1120px}
   .block{max-width:720px}
+  .home,.themes{max-width:760px;margin:0 auto}
+  .dcards{grid-template-columns:1fr 1fr}
+  #more-bar{max-width:720px}
   header.hero{padding:var(--s8) 0 var(--s7)}
   section.day{display:grid;grid-template-columns:minmax(300px,420px) minmax(0,1fr);column-gap:40px;align-items:start}
   .dayhead{grid-column:1 / -1}
@@ -500,35 +615,13 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
 </style>
 </head>
 <body>
-<a class="skip" href="#panel">일정 본문으로 건너뛰기</a>
+<a class="skip" href="#panel">본문으로 건너뛰기</a>
 
 <div class="strip" id="netbar" hidden>오프라인이에요. 저장해 둔 화면으로 보고 있습니다.</div>
 <div class="strip" id="updbar" hidden><span>새 버전이 준비됐어요.</span><button type="button" id="updbtn">새로고침</button></div>
 
-<div class="wrap">
-  <header class="hero">
-    <svg class="leaf" viewBox="0 0 64 64" aria-hidden="true">
-      <path d="M32 46 L32 59" stroke="var(--ginkgo)" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-      <path d="M32 46 L6.5 36 A27 27 0 0 1 29.6 19.6 L32 33 L34.4 19.6 A27 27 0 0 1 57.5 36 Z" fill="var(--ginkgo)"/>
-    </svg>
-    <p class="eyebrow">2026.11.18 &ndash; 11.22</p>
-    <h1>늦가을 도쿄</h1>
-    <div class="rule"></div>
-    <p class="lede">11월 18일 수요일부터 22일 일요일까지. 아카사카에서 출발하는 서점, 미술관, LP바의 닷새.</p>
-    <p class="state" id="state"></p>
-    <div class="stats" id="stats"></div>
-  </header>
-</div>
-
 <div class="daybar" id="daybar">
-  <div class="wrap">
-    <div class="daybar-in">
-      <span class="db-wd" id="db-wd"></span>
-      <span class="db-dt" id="db-dt"></span>
-      <span class="db-title" id="db-title"></span>
-      <button type="button" class="db-now" id="db-now" hidden>지금 일정</button>
-    </div>
-  </div>
+  <div class="wrap"><div class="daybar-in" id="daybar-in"></div></div>
 </div>
 
 <main class="wrap">
@@ -536,14 +629,8 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
 
   <div id="more" hidden>
   <div id="more-bar"></div>
-  <div data-sub="recs" id="sub-recs"></div>
 
-  <section class="block" data-sub="prep" aria-labelledby="stay-h">
-    <h2 id="stay-h">숙소</h2>
-    <div class="card-box" id="stay"></div>
-  </section>
-
-  <section class="block" data-sub="prep" aria-labelledby="res-h">
+  <section class="block" data-sub="todo" aria-labelledby="res-h">
     <h2 id="res-h">예약과 준비</h2>
     <p class="sub">체크한 항목은 이 기기에 저장됩니다. 예약을 체크하면 일정의 배지가 &ldquo;예약 완료&rdquo;로 바뀌어요.</p>
     <h3 class="grouph">예약</h3>
@@ -552,7 +639,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
     <div id="preplist"></div>
   </section>
 
-  <section class="block" data-sub="prep" aria-labelledby="off-h">
+  <section class="block" data-sub="todo" aria-labelledby="off-h">
     <h2 id="off-h">가기 전에</h2>
     <p class="sub">도쿄에서 데이터가 없어도 열리게 해두는 준비입니다.</p>
 
@@ -609,10 +696,28 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
       <p>닷새 일정이 캘린더 일정으로 들어갑니다. 예약이 있는 곳은 한 시간 전, 나머지는 30분 전에 알림이 울려요.</p>
       <p class="sub" style="margin:0">아이폰은 누르면 &ldquo;모두 추가&rdquo; 화면이 뜹니다. 안드로이드는 받은 파일을 캘린더 앱으로 여세요.</p>
       <div class="acts"><a class="btn key" id="icsbtn" href="data/tokyo-trip.ics">캘린더에 넣기</a></div>
+      <div id="icsmine"></div>
     </div>
   </section>
 
-  <section class="block" data-sub="prep" aria-labelledby="facts-h">
+  <section class="block" data-sub="stay" aria-labelledby="stay-h">
+    <h2 id="stay-h">숙소</h2>
+    <div class="card-box" id="stay"></div>
+  </section>
+
+  <section class="block" data-sub="stay" aria-labelledby="tr-h">
+    <h2 id="tr-h">도쿄에서 움직이기</h2>
+    <p class="sub">교통카드와 패스, 막차. 2026년 9월에 확인했습니다.</p>
+    <div id="transit"></div>
+  </section>
+
+  <section class="block" data-sub="budget" aria-labelledby="bud-h">
+    <h2 id="bud-h">입장료와 예산</h2>
+    <p class="sub">공식 사이트·예매처에서 확인한 입장료만 더했어요. 밥값과 교통비는 빠져 있습니다.</p>
+    <div id="budget"></div>
+  </section>
+
+  <section class="block" data-sub="budget" aria-labelledby="facts-h">
     <h2 id="facts-h">알아둘 것</h2>
     <ul class="facts">
       <li>11월 23일 월요일이 일본 공휴일(근로감사의 날)이라 토·일·월이 연휴입니다. 토요일 네즈와 은행나무길, 일요일 긴자는 평소보다 붐빕니다.</li>
@@ -624,27 +729,23 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
     </ul>
   </section>
 
-  <section class="block" data-sub="move" aria-labelledby="tr-h">
-    <h2 id="tr-h">도쿄에서 움직이기</h2>
-    <p class="sub">교통카드와 패스, 막차. 2026년 9월에 확인했습니다.</p>
-    <div id="transit"></div>
+  <section class="block" data-sub="help" aria-labelledby="ph-h">
+    <h2 id="ph-h">일본어 한마디</h2>
+    <p class="sub">문장을 누르면 크게 뜹니다. 🔊를 누르면 폰이 일본어로 읽어줘요(아이폰은 인터넷 없이도 됩니다).</p>
+    <div class="phrases" id="phrases"></div>
   </section>
 
-  <section class="block" data-sub="wx" aria-labelledby="wx-h">
-    <h2 id="wx-h">날씨와 비상시</h2>
-    <p class="sub">날씨는 인터넷이 될 때마다 새로 받고, 끊겨도 마지막으로 받은 값을 보여줍니다.</p>
+  <section class="block" data-sub="help" aria-labelledby="sos-h">
+    <h2 id="sos-h">긴급 연락처</h2>
+    <p class="sub">누르면 바로 전화가 걸립니다. 대사관 번호는 출발 전에 한 번 더 확인하세요.</p>
+    <div class="sos" id="sos"></div>
+    <p class="srcline">확인: 2026년 9월 · <a href="https://overseas.mofa.go.kr/jp-ko/wpge/m_1048/contents.do" target="_blank" rel="noopener">주일본 대한민국 대사관</a></p>
+  </section>
+
+  <section class="block" data-sub="help" aria-labelledby="wx-h">
+    <h2 id="wx-h">날씨</h2>
+    <p class="sub">인터넷이 될 때마다 새로 받고, 끊겨도 마지막으로 받은 값을 보여줍니다.</p>
     <div class="card-box" id="wx"></div>
-    <div class="card-box">
-      <h3>긴급 연락처</h3>
-      <p>누르면 바로 전화가 걸립니다. 대사관 번호는 출발 전에 한 번 더 확인하세요.</p>
-      <div class="sos" id="sos"></div>
-      <p class="srcline">확인: 2026년 9월 · <a href="https://overseas.mofa.go.kr/jp-ko/wpge/m_1048/contents.do" target="_blank" rel="noopener">주일본 대한민국 대사관</a></p>
-    </div>
-    <div class="card-box">
-      <h3>일본어 한마디</h3>
-      <p>누르면 크게 뜹니다. 점원이나 택시 기사에게 화면을 보여주세요.</p>
-      <div class="phrases" id="phrases"></div>
-    </div>
   </section>
   </div>
 
@@ -654,7 +755,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
   </footer>
 </main>
 
-<nav class="days" aria-label="날짜 선택">
+<nav class="days" aria-label="메뉴">
   <div class="wrap"><div class="tabs" role="tablist" id="tabs"></div></div>
 </nav>
 
@@ -664,6 +765,7 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
     <p class="ko" id="ja-ko"></p>
     <p class="sub" id="ja-sub"></p>
     <div class="row">
+      <button type="button" class="btn" id="ja-say" hidden><svg class="ki" aria-hidden="true"><use href="#i-sound"/></svg>소리로 듣기</button>
       <a class="btn key" id="ja-map" href="#" target="_blank" rel="noopener"><svg class="ki" aria-hidden="true"><use href="#i-map"/></svg>지도에서 보기</a>
       <button type="button" class="btn" id="ja-close">닫기</button>
     </div>
@@ -683,6 +785,13 @@ nav.days{position:fixed;left:0;right:0;bottom:0;z-index:8;background:var(--surfa
   <symbol id="i-route" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M8.5 18h5.5a4 4 0 0 0 0-8H9"/><path d="M11.5 7.5 9 10l2.5 2.5"/></symbol>
   <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21.5v-6.2"/><path d="M12 15.3c-4.1 0-7.2-3-7.2-6.9 0-2 .9-3.8 2.2-5 3.1 1.1 5 3.9 5 6.9 0-3 1.9-5.8 5-6.9 1.3 1.2 2.2 3 2.2 5 0 3.9-3.1 6.9-7.2 6.9z"/></symbol>
   <symbol id="i-more" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.6"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.6"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.6"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15.5" rx="3"/><path d="M3.5 10h17M8 3v4M16 3v4"/><path d="M8 14h2M14 14h2M8 17h2"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10.5a3 3 0 0 1 3 3V20L12 16.5 5 20z"/><path d="M9 9h6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3.5" width="16" height="17" rx="3"/><path d="m8 9 1.5 1.5L12.5 7.5M8 15l1.5 1.5 3-3M15 9.5h1.5M15 15.5h1.5"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9 9.5h6M9 12.5h4"/></symbol>
+  <symbol id="i-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+  <symbol id="i-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 0 1 17 0z"/><path d="M12 12v6.5a2 2 0 0 1-4 0"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-zoom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M8 10.5h5M10.5 8v5"/></symbol>
 </svg>
@@ -705,16 +814,17 @@ const DAYS = [
 
   { key:"thu", wd:"목", dt:"11.19", short:"리쿠기엔·우에노·스카이트리", date:"2026-11-19", title:"리쿠기엔에서 스카이트리 노을까지", summary:"아침엔 한산한 리쿠기엔, 낮엔 우에노와 호쿠사이, 해 질 녘엔 스카이트리, 저녁은 아사쿠사 에도 요리, 밤엔 숙소 옆 LP바.", walk:"북쪽에서 동쪽으로, 밤엔 긴자선 한 번에 숙소로",
     stops:[
-      {t:"9:00", n:"리쿠기엔", ja:"六義園", kc:"leaf", k:"정원, 단풍", ok:"입장료 300엔",
+      {t:"9:00", n:"리쿠기엔", ja:"六義園", kc:"leaf", k:"정원, 단풍", ok:"현장 발권", fee:300,
        leg:{line:"남북선", from:"永田町(赤坂見附와 연결)", to:"駒込", note:"환승 없이 16분", v:true},
+       rain:"비가 오면 정원은 짧게 돌고, 추천 탭의 에도도쿄박물관(호쿠사이 옆)을 오후에 넣거나 도쿄국립박물관을 넉넉히 보세요.",
        note:"에도 시대 다이묘 정원. 9시에 열어요. 평일 아침이라 가장 한산한 시간입니다. 단풍철엔 駒込역에서 2분인 染井門이 열려서 정문(7분)보다 가까워요. 야간 라이트업은 이번 일정 뒤에 시작합니다.",
        q:"六義園", lat:35.73246, lng:139.748314},
       {t:"10:30", n:"도쿄국립박물관", ja:"東京国立博物館", kc:"art", k:"박물관", closed:"월 휴관",
        leg:{line:"JR 야마노테선", from:"駒込", to:"上野", note:"10분 안팎", v:true},
        note:"대덕사 개창 700년 특별전(10/14–12/6)과 히로시게전(9/29–12/20)이 함께 열립니다.",
-       ask:"특별전 예약제 여부 확인", needId:"tnm", doneLabel:"확인 완료",
+       ask:"특별전 예약제 여부 확인", needId:"tnm", doneLabel:"확인 완료", fee:2300, feeNote:"대덕사전 당일권(예매 2,100엔)",
        q:"東京国立博物館", id:"ChIJEX3XFIOOGGAR3XdJvRjWLyM", lat:35.7188351, lng:139.7765215},
-      {t:"12:35", n:"국립서양미술관", ja:"国立西洋美術館", kc:"art", k:"건축", closed:"월 휴관", opt:true,
+      {t:"12:35", n:"국립서양미술관", ja:"国立西洋美術館", kc:"art", k:"건축", closed:"월 휴관", opt:true, fee:0, feeNote:"밖에서만 보기",
        note:"르코르뷔지에가 설계한 세계유산 건물. 점심 가는 길에 밖에서 10분만 봅니다.",
        q:"国立西洋美術館", id:"ChIJf8xB-pyOGGARizzhlNTcI7s", lat:35.7153869, lng:139.7758138},
       {t:"12:50", n:"ROUTE BOOKS", kc:"book", k:"북카페, 점심",
@@ -722,9 +832,11 @@ const DAYS = [
        q:"ROUTE BOOKS", id:"ChIJw1ucnpmOGGAR9Rs5XdSMYL0", lat:35.7139296, lng:139.7807258},
       {t:"14:15", n:"스미다 호쿠사이 미술관", ja:"すみだ北斎美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"현장 발권",
        leg:{line:"오에도선", from:"上野御徒町", to:"両国", note:"환승 없이 6분 안팎", v:true},
-       note:"우키요에 목판화 공정을 따로 보여줍니다. 15:30에는 나와야 스카이트리 노을에 맞춰요. 바로 옆이 2026년 3월에 다시 연 에도도쿄박물관이에요(추천 탭).",
+       fee:1500, feeNote:"개관 10주년 특별전",
+       note:"개관 10주년 특별전 '베스트 오브 스미다 호쿠사이 미술관'(9/15–11/23)이 열리는 중이라 대표작을 한 번에 봅니다. 15:30에는 나와야 스카이트리 노을에 맞춰요. 스카이트리까지는 스미다 순환버스(100엔)나 택시가 편해요. 바로 옆이 2026년 3월에 다시 연 에도도쿄박물관(추천 탭).",
        q:"すみだ北斎美術館", id:"ChIJgRjTtzOJGGARqoKBtB8BAno", lat:35.6963313, lng:139.800414},
-      {t:"15:50", n:"도쿄 스카이트리", ja:"東京スカイツリー", kc:"view", k:"전망대, 노을", need:"날짜 지정권", needId:"skytree",
+      {t:"15:50", n:"도쿄 스카이트리", ja:"東京スカイツリー", kc:"view", k:"전망대, 노을", need:"날짜 지정권", needId:"skytree", fee:2600, feeNote:"평일 2,200~2,600엔, 날마다 다름",
+       rain:"흐리거나 비가 오면 노을과 먼 경치가 안 보여요. 입장권을 바꿀 수 있는지 먼저 보고, 안 되면 야경 위주로 즐기세요.",
        note:"11월 19일 도쿄 일몰은 16:32쯤. 16시 전에 올라가 있으면 해 지는 것부터 야경까지 한 번에 봅니다. 노을 시간대는 인기라 입장 시각을 16:00 전으로 예약하세요.",
        q:"東京スカイツリー", id:"ChIJ35ov0dCOGGARKvdDH7NPHX0", lat:35.7100627, lng:139.8107004},
       {t:"17:50", n:"고마카타 도제우", ja:"駒形どぜう 本店", kc:"food", k:"식당, 저녁", ask:"휴무일 확인", needId:"dozeu", close:"20:30",
@@ -754,12 +866,12 @@ const DAYS = [
       {t:"14:30", n:"진보초 북센터", ja:"神保町ブックセンター", kc:"book", k:"북카페", close:"19:00",
        note:"이와나미쇼텐 건물. 산 책 펼쳐보며 커피 한 잔 쉬어 가는 자리.",
        q:"神保町ブックセンター", id:"ChIJebJT_ROMGGARV_jAAmMVIFY", lat:35.6957485, lng:139.7575553},
-      {t:"15:45", n:"아티존 미술관", ja:"アーティゾン美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"artizon", close:"20:00",
+      {t:"15:45", n:"아티존 미술관", ja:"アーティゾン美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"artizon", close:"20:00", fee:1200, feeNote:"웹 예약(창구 1,500엔)",
        leg:{line:"지하철", from:"神保町", to:"京橋", note:"16분 안팎, 환승 1번", v:true},
        note:"교바시. 유럽에 간 일본 서양화가들, 후지이 히카루와 소장품의 협업 등 전시 세 개가 동시에 열립니다(10/24–1/31). 금요일은 20:00까지라 여유 있게 보고, 17:10쯤 나와 기쿠스시까지 걸어가면 됩니다.",
        q:"アーティゾン美術館", id:"ChIJOzAxseKLGGARWxBlxNWWRPs", lat:35.6787634, lng:139.7718919},
-      {t:"17:30", n:"기쿠스시", jaTodo:true, kc:"food", k:"식당, 저녁", need:"예약", needId:"kiku",
-       note:"니혼바시 가부토초. 토·일 휴무라 이번엔 이날뿐.",
+      {t:"17:30", n:"기쿠스시", ja:"菊寿司", kc:"food", k:"식당, 저녁", need:"예약", needId:"kiku",
+       note:"니혼바시 가부토초에서 60년 넘게 이어온 에도마에 스시(日本橋兜町17-1). 저녁 17:00~22:00, 토·일·공휴일 휴무라 이번엔 이날뿐.",
        q:"Kiku Sushi 日本橋", id:"ChIJRX-nulmJGGAR9ynATgff8U0", lat:35.6790868, lng:139.7764141},
       {t:"20:30", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
        note:"지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키지가 7:30이니 너무 늦지 않게.",
@@ -779,11 +891,12 @@ const DAYS = [
        leg:{line:"히비야선", from:"츠키지역", to:"롯폰기역", note:"환승 없이 직통", v:true},
        note:"소장품 없이 기획전만 여는 곳이라 무엇이 걸렸는지 미리 확인하세요.",
        q:"国立新美術館", lat:35.6652, lng:139.7264},
-      {t:"12:30", n:"네즈미술관과 네즈카페", ja:"根津美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"nezu",
+      {t:"12:30", n:"네즈미술관과 네즈카페", ja:"根津美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"nezu", fee:1500, feeNote:"웹 예약, 정원 포함",
        leg:{line:"치요다선", from:"노기자카역", to:"오모테산도역", v:true},
        note:"칠기 전시(10/24–11/23). 쿠마 겐고 건물에 일본 정원, 11월 하순이면 단풍 절정. 정원을 먼저 돌고 카페는 나중에.",
        q:"根津美術館", id:"ChIJxU48-2OLGGARHMtB5RAhytA", lat:35.6622568, lng:139.7170937},
       {t:"14:00", n:"진구가이엔 은행나무길", ja:"神宮外苑いちょう並木", kc:"leaf", k:"사진 스팟, 단풍",
+       rain:"비가 오면 길 끝에서 사진만 찍고, 네즈 카페에서 더 머물거나 선택 일정인 와타리움을 넉넉히 보세요.",
        note:"아오야마도리에서 이어지는 300m 은행나무 터널. 절정은 11월 하순~12월 상순이라 21일은 노랗게 물드는 중일 거예요. 토요일이라 붐비니 길 가운데보다 양 끝에서 찍으세요. 은행나무 축제가 이맘때 열리는 해가 많습니다(올해 날짜는 공식 사이트 확인).",
        q:"神宮外苑いちょう並木", lat:35.6745, lng:139.718},
       {t:"14:50", n:"와타리움 미술관", ja:"ワタリウム美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"현장 발권", opt:true,
@@ -799,6 +912,7 @@ const DAYS = [
        note:"하츠다이. 조용히 앉아 읽는 곳이라 오늘의 휴식 시간이기도 합니다.",
        q:"Bookshelf Fuzkue", id:"ChIJVVVWOTLzGGARtVH01Eyw00c", lat:35.6802894, lng:139.6869601},
       {t:"21:00", n:"Bar Luther 赤坂", ja:"バー ルーサー 赤坂", kc:"bar", k:"LP바", ask:"영업시간 확인",
+       leg:{line:"지하철", from:"初台", to:"赤坂見附", note:"19분 안팎, 환승 1번", v:true},
        note:"숙소 옆 블록 지하(赤坂3-20-2). 70~80년대 소울·블랙 컨템퍼러리·AOR을 아날로그로 트는 바. 일요일 휴무. 영업시간이 출처마다 달라서(19:00~03:30 / 18:00~22:00) 전화(03-6277-8016)로 확인하세요. 긴 토요일의 끝을 숙소 앞에서.",
        q:"Bar Luther Akasaka", lat:35.6754, lng:139.7369}
     ]},
@@ -811,7 +925,7 @@ const DAYS = [
       {t:"11:30", n:"시세이도 파라 긴자 본점", ja:"資生堂パーラー 銀座本店レストラン", kc:"food", k:"식당, 점심", ask:"예약 권장", needId:"parlour",
        note:"긴자의 오래된 양식당. 11:30에 열고 월요일 휴무. 시세이도 갤러리와 같은 건물이라 점심 뒤 바로 내려가면 됩니다.",
        q:"資生堂パーラー 銀座本店レストラン", lat:35.668557, lng:139.7618936},
-      {t:"12:30", n:"시세이도 갤러리", ja:"資生堂ギャラリー", kc:"art", k:"갤러리", ok:"무료", stay:30,
+      {t:"12:30", n:"시세이도 갤러리", ja:"資生堂ギャラリー", kc:"art", k:"갤러리", ok:"무료", fee:0, stay:30,
        note:"같은 건물 지하. 일요일은 11:00~18:00. 30분이면 됩니다.",
        q:"資生堂ギャラリー", id:"ChIJBwTDyeiLGGARuY5n3x3bdCk", lat:35.668557, lng:139.7618936},
       {t:"13:00", n:"모리오카 서점", ja:"森岡書店 銀座店", kc:"book", k:"서점", closed:"월 휴무", stay:15,
@@ -1189,7 +1303,7 @@ function buildMap(d, stops){
   });
 
   // 위에는 일차 칩, 아래에는 장소 카드가 얹혀 있으니 그만큼 비켜서 맞춘다
-  const FIT={paddingTopLeft:[22,56], paddingBottomRight:[22,108], maxZoom:15};
+  const FIT={paddingTopLeft:[22,28], paddingBottomRight:[22,108], maxZoom:15};
   const bounds=L.latLngBounds([[HOTEL.lat,HOTEL.lng],...pts.map(p=>[p.lat,p.lng])]);
   map.fitBounds(bounds,FIT);
   setTimeout(()=>{ try{ map.invalidateSize(); map.fitBounds(bounds,FIT); }catch(e){} },120);
@@ -1293,6 +1407,7 @@ function badgeHTML(s){
   if(s.cash) b.push(`<span class="badge cash">현금</span>`);
   if(s.close) b.push(`<span class="badge close${s.tight?" tight":""}">${esc(s.close)} 마감</span>`);
   if(s.opt) b.push(`<span class="badge opt">선택</span>`);
+  if(s.fee>0) b.push(`<span class="badge fee">${s.fee.toLocaleString("ko-KR")}엔</span>`);
   if(s.closed) b.push(`<span class="closed">${esc(s.closed)}</span>`);
   return b.join("");
 }
@@ -1333,6 +1448,7 @@ function stopHTML(d,s,prev){
       </div>${thumb}</div>
       ${leg}
       ${s.note?`<p class="note">${esc(s.note)}</p>`:""}
+      ${rainAltHTML(d,s)}
       ${meta||s.mine?`<div class="meta">${s.mine?`<span class="badge mine">내가 추가</span>`:""}${meta}</div>`:""}
       ${acts.length?`<div class="acts">${acts.join("")}</div>`:""}
       ${s.mine?`<button type="button" class="linkish unmine" data-unmine="${esc(s.rid)}">일정에서 빼기</button>`:""}
@@ -1409,11 +1525,11 @@ function renderDay(key){
   let prev=HOTEL;
   const rows=shown.map(s=>{ s._from=prev; const html=hopHTML(prev,s)+stopHTML(d,s,prev); if(s.lat && !s.hotel) prev=s; return html; }).join("");
   const seq=[HOTEL,...shown.filter(s=>s.lat && !s.hotel)];
+  const pins=seq.length-1;   // 숙소 말고 지도에 찍을 곳. 0이면(수요일) 지도를 그리지 않는다
 
   const dayNo=DAYS.indexOf(d)+1;
   const pad2=t=>/^\d:/.test(t)?"0"+t:t;
   const times=shown.map(x=>pad2(x.t)), span0=times[0]||"", span1=times[times.length-1]||"";
-  const chips=DAYS.map(x=>`<button type="button" class="mapday${x.key===d.key?" on":""}" data-mapday="${x.key}"${x.key===d.key?' aria-current="true"':""}>${x.wd} &mdash; ${esc(x.short)}</button>`).join("");
   const cards=shown.filter(x=>x.lat && !x.hotel).map(x=>{
     const K=KIND[x.kc]||KIND.move, P=placeOf(x);
     const img = P && P.photo
@@ -1432,7 +1548,7 @@ function renderDay(key){
       <h2>${esc(d.title)}</h2>
       <p class="summary">${esc(d.summary)}</p>
       <div class="daymeta">
-        <span><b>${shown.filter(x=>x.lat&&!x.hotel).length}</b>곳</span>
+        ${pins?`<span><b>${pins}</b>곳</span>`:""}
         <span>${esc(span0)}&ndash;${esc(span1)}</span>
         <span>${esc(d.walk)}</span>
         ${(()=>{ const w=(typeof wxDay==="function")?wxDay(d.date):null; if(!w) return "";
@@ -1440,11 +1556,10 @@ function renderDay(key){
       </div>
       <div class="prog" id="prog" hidden><i></i></div>
     </header>
-    <figure class="map">
+    ${pins?`<figure class="map">
       <div class="mapbox" id="mapbox">
         <div id="lmap"></div>
         <div class="svgmap">${mapSVG(d, shown)}</div>
-        <div class="mapdays" role="tablist" aria-label="일차">${chips}</div>
         <div class="mapcards" id="mapcards" aria-label="이 날의 장소">${cards}</div>
       </div>
       <figcaption>
@@ -1452,7 +1567,7 @@ function renderDay(key){
         <button type="button" class="linkish" id="mapmode">간단 지도로 보기</button>
       </figcaption>
       <div class="acts mapacts"><a class="btn" href="${DAYDIR(seq)}" target="_blank" rel="noopener">${ico("i-route")}하루 동선 구글 지도로 열기</a></div>
-    </figure>
+    </figure>`:""}
     <div class="daylist">
       ${hasOpt?`<div class="dayopts"><button type="button" class="linkish" id="optbtn">${hide?"선택 일정 다시 보기":"선택 일정 접기"}</button></div>`:""}
       <ol class="timeline">${rows}</ol>
@@ -1461,7 +1576,8 @@ function renderDay(key){
     ${d.key==="sun"?sundayHTML():""}
   </section>`;
 
-  buildMap(d, shown);
+  if(pins) buildMap(d, shown);
+  else { if(LMAP){ try{LMAP.remove();}catch(e){} LMAP=null; } MARKERS={}; MAPSEL=null; }
   $$(".svgmap .pin",panelEl).forEach(g=>{
     const go=()=>goStop(Number(g.dataset.idx));
     g.addEventListener("click",go);
@@ -1471,11 +1587,10 @@ function renderDay(key){
     const now = LS.get("tokyo-map","real")==="simple" ? "real" : "simple";
     LS.set("tokyo-map",now); buildMap(d, shown);
   });
-  if(LS.get("tokyo-map","real")==="simple") useSimple(true,"manual");
+  if(pins && LS.get("tokyo-map","real")==="simple") useSimple(true,"manual");
   const ob=$("#optbtn"); if(ob) ob.addEventListener("click",()=>{ LS.set("tokyo-hideopt", hide?"0":"1"); renderDay(d.key); });
   $$(".namebtn",panelEl).forEach(b=>b.addEventListener("click",()=>openBig(d, Number(b.dataset.big))));
   $$("[data-focus]",panelEl).forEach(b=>b.addEventListener("click",()=>focusStop(Number(b.dataset.focus))));
-  $$("[data-mapday]",panelEl).forEach(b=>b.addEventListener("click",()=>select(b.dataset.mapday)));
   $$(".thumb, .mc-img",panelEl).forEach(im=>im.addEventListener("error",()=>{
     if(im.tagName==="IMG") im.remove();
   }));
@@ -1492,7 +1607,6 @@ function renderDay(key){
   })();
   if(d.key==="wed") wireArrival();
   if(d.key==="sun") wireSunday();
-  $("#db-wd").textContent=d.wd; $("#db-dt").textContent=d.dt; $("#db-title").textContent=d.title;
   applyChecks(); applyNow();
 }
 
@@ -1507,6 +1621,7 @@ function focusStop(idx){
   }, reduce?0:340);
 }
 const WD={wed:"수요일",thu:"목요일",fri:"금요일",sat:"토요일",sun:"일요일"};
+const ADDWARN={};
 const pad2t=t=>/^\d:/.test(t)?"0"+t:t;
 // 추천 카드 아래: 이미 일정에 있음 / 내가 넣음 / 넣기 폼
 function recPlanHTML(r){
@@ -1519,6 +1634,7 @@ function recPlanHTML(r){
   }
   const m=getMine().find(x=>x.rid===r.n);
   if(m) return `<p class="planline mine">${WD[m.day]} ${esc(m.t)}에 넣었어요</p>
+      ${ADDWARN[r.n]?`<p class="addwarn">${esc(ADDWARN[r.n])}</p>`:""}
       <div class="acts">${map}<button type="button" class="btn" data-see="${m.day}" data-q="${esc(r.q)}">일정에서 보기</button></div>
       <button type="button" class="linkish unmine" data-unmine="${esc(r.n)}">일정에서 빼기</button>`;
   if(r.lat==null) return `<div class="acts">${map}</div>`;
@@ -1540,7 +1656,7 @@ function seeStop(day,q){
 }
 document.addEventListener("click",e=>{
   const un=e.target.closest("[data-unmine]");
-  if(un){ setMine(getMine().filter(x=>x.rid!==un.dataset.unmine)); if(CURRENT==="more") renderRecs(); else renderDay(CURRENT); return; }
+  if(un){ setMine(getMine().filter(x=>x.rid!==un.dataset.unmine)); refresh(); return; }
   const see=e.target.closest("[data-see]");
   if(see){ seeStop(see.dataset.see, see.dataset.q); return; }
   const op=e.target.closest("[data-addopen]");
@@ -1554,56 +1670,281 @@ document.addEventListener("submit",e=>{
   const t=(f.elements.t.value||"").replace(/^0(\d)/,"$1"), day=f.elements.day.value;
   if(isNaN(toMin(t))) return;
   setMine(getMine().filter(x=>x.rid!==f.dataset.rid).concat({rid:f.dataset.rid, day, t}));
-  renderRecs();
+  // 바로 앞뒤 일정과 30분도 안 떨어져 있으면 알려준다
+  const d=DAYS.find(x=>x.key===day), m=toMin(t);
+  const near=d.stops.filter(x=>!x.mine && Math.abs(toMin(x.t)-m)<30);
+  ADDWARN[f.dataset.rid] = near.length ? `${near.map(x=>`${x.n}(${x.t})`).join(", ")}과 30분도 안 떨어져 있어요. 시간을 조정하거나 한쪽을 선택 일정으로 보세요.` : "";
+  refresh();
 });
 
-function renderRecs(){
-  const host=$("#sub-recs"); if(!host) return;
-  const label={wed:"수요일",thu:"목요일",fri:"금요일",sat:"토요일",sun:"일요일",any:"아무 날이나"};
-  const items=RECS.map(r=>{
-    const K=KIND[r.kc]||KIND.move;
-    return `<li class="rec" style="--kc:${K.c}">
-      <article class="card">
-        <p class="eyebrow ko">${ico(K.i)}<span>${esc(r.k)} · ${esc(r.area)}</span></p>
-        <button type="button" class="namebtn" data-rec="${esc(r.n)}">
-          <span class="name">${esc(r.n)}</span>
-          ${r.ja?`<p class="ja">${esc(r.ja)}${ico("i-zoom","ki zoom")}</p>`:""}
-        </button>
-        <p class="whenchip">${esc(label[r.when]||label.any)}</p>
-        <p class="note">${esc(r.why)}</p>
-        ${r.tip?`<p class="tipline">${esc(r.tip)}</p>`:""}
-        ${recPlanHTML(r)}
-        <p class="srcline">확인: 2026년 9월 · <a href="${esc(r.src)}" target="_blank" rel="noopener">${esc(r.srcn)}</a></p>
-      </article></li>`;
+/* ---------- 일본어 소리 ---------- */
+const canSpeak=()=>"speechSynthesis" in window && typeof SpeechSynthesisUtterance==="function";
+function speakJa(text){
+  if(!canSpeak()||!text) return;
+  try{
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(text); u.lang="ja-JP"; u.rate=0.9;
+    const v=speechSynthesis.getVoices().find(x=>/^ja(-|_|$)/i.test(x.lang)); if(v) u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+
+/* ---------- 비 오는 날 대안 ----------
+   야외 일정(rain 필드)이 있는 날 강수확률이 50% 이상이면 카드에 대안을 띄운다. 예보가 없으면 아무것도 안 보인다. */
+function rainAltHTML(d,s){
+  if(!s.rain || typeof wxDay!=="function") return "";
+  const w=wxDay(d.date); if(!w || w.rain==null || w.rain<50) return "";
+  return `<p class="rainalt">${ico("i-rain")}<span><b>강수 ${w.rain}%</b> · ${esc(s.rain)}</span></p>`;
+}
+
+/* ---------- 테마: 여행 책자처럼 종류별로 ---------- */
+const THEMES=[
+  {k:"art",  n:"미술관·박물관",   kcs:["art"],          ic:"i-art",
+   intro:"이번 여행의 뼈대예요. 11월 셋째 주에 열리는 특별전에 날짜를 맞췄습니다. 대부분 월요일에 쉬어서 수~일 일정과는 겹치지 않아요."},
+  {k:"book", n:"서점·북카페",     kcs:["book"],         ic:"i-book",
+   intro:"진보초 헌책방 거리부터 책 한 권만 파는 긴자 서점까지. 금요일은 사실상 서점의 날이에요."},
+  {k:"bar",  n:"LP바",            kcs:["bar"],          ic:"i-bar",
+   intro:"밤마다 한 곳. 목·토요일은 숙소에서 걸어서 2분이라 막차 걱정이 없어요."},
+  {k:"food", n:"먹을 곳",         kcs:["food","market"],ic:"i-food",
+   intro:"새벽 츠키지부터 1801년에 문을 연 미꾸라지 요리집, 에도마에 스시, 긴자 양식까지. 예약할 곳은 준비 탭에 모아 뒀어요."},
+  {k:"green",n:"정원·단풍·전망",  kcs:["leaf","view"],  ic:"i-leaf",
+   intro:"늦가을이라 넣은 곳들이에요. 은행잎은 절정 직전이고, 해는 16:30쯤 집니다."}
+];
+const firstSentence=t=>{ const m=String(t||"").match(/^.*?[.!?](\s|$)/); return m?m[0].trim():String(t||""); };
+function recCardHTML(r){
+  const K=KIND[r.kc]||KIND.move;
+  return `<li class="rec" style="--kc:${K.c}"><article class="card">
+    <p class="eyebrow ko">${ico(K.i)}<span>${esc(r.k)} · ${esc(r.area)}</span></p>
+    <button type="button" class="namebtn" data-rec="${esc(r.n)}"><span class="name">${esc(r.n)}</span>${r.ja?`<p class="ja">${esc(r.ja)}${ico("i-zoom","ki zoom")}</p>`:""}</button>
+    <p class="note">${esc(r.why)}</p>
+    ${r.tip?`<p class="tipline">${esc(r.tip)}</p>`:""}
+    ${recPlanHTML(r)}
+    <p class="srcline">확인: 2026년 9월 · <a href="${esc(r.src)}" target="_blank" rel="noopener">${esc(r.srcn)}</a></p>
+  </article></li>`;
+}
+function renderThemes(){
+  const all=[]; DAYS.forEach(d=>d.stops.forEach(s=>{ if(s.lat && !s.hotel) all.push({d,s}); }));
+  // 원래 일정에 있는 추천만 추천 목록에서 뺀다. 내가 넣은 추천은 상태(넣은 시각·경고·빼기)를 보여주려고 남겨 둔다
+  const inPlan=r=>DAYS.some(d=>(d.base||d.stops).some(s=>s.q===r.q));
+  const secs=THEMES.map(t=>{
+    const K=KIND[t.kcs[0]]||KIND.move;
+    const items=all.filter(x=>t.kcs.includes(x.s.kc));
+    const recs=RECS.filter(r=>t.kcs.includes(r.kc) && !inPlan(r));
+    const rows=items.map(({d,s})=>`<li><button type="button" class="trow${s.opt?" opt":""}" data-see="${d.key}" data-q="${esc(s.q)}">
+        <span class="tday"><b>${d.wd}</b><span>${esc(s.t)}</span></span>
+        <span class="tmain"><span class="tname">${esc(s.n)}${s.mine?` <em class="tmine">내가 추가</em>`:""}${s.opt?` <em class="topt">선택</em>`:""}</span>
+          ${s.ja?`<span class="tja" lang="ja">${esc(s.ja)}</span>`:""}
+          ${s.note?`<span class="tnote">${esc(firstSentence(s.note))}</span>`:""}</span>
+        ${s.fee>0?`<span class="tfee">${s.fee.toLocaleString("ko-KR")}엔</span>`:""}
+      </button></li>`).join("");
+    return `<section class="theme" id="th-${t.k}" style="--kc:${K.c}">
+      <header class="theme-h"><span class="theme-ic">${ico(t.ic)}</span><div><h2>${esc(t.n)}</h2><p class="theme-n">일정 ${items.length}곳${recs.length?` · 추천 ${recs.length}곳`:""}</p></div></header>
+      <p class="theme-intro">${esc(t.intro)}</p>
+      ${items.length?`<ol class="tlist">${rows}</ol>`:""}
+      ${recs.length?`<h3 class="theme-sub">일정 밖 추천</h3><ol class="reclist">${recs.map(recCardHTML).join("")}</ol>`:""}
+    </section>`;
   }).join("");
-  host.innerHTML=`<section class="day recs">
-    <header class="dayhead">
-      <p class="eyebrow kicker">일정 밖</p>
-      <h2>더 가볼 만한 곳</h2>
-      <p class="summary">지금 일정에는 없지만 동선에서 크게 벗어나지 않는 곳들이에요. 끼워 넣을 자리도 같이 적어뒀습니다.</p>
-      <div class="daymeta"><span><b>${RECS.length}</b>곳</span><span>2026년 9월에 확인</span></div>
+  const chips=THEMES.map(t=>{ const n=all.filter(x=>t.kcs.includes(x.s.kc)).length;
+    return `<a class="tchip" href="#th-${t.k}" style="--kc:${(KIND[t.kcs[0]]||KIND.move).c}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${n}</b></a>`; }).join("");
+  panelEl.innerHTML=`<section class="themes" role="tabpanel" aria-labelledby="nav-themes">
+    <header class="pagehead">
+      <p class="eyebrow">가이드북</p>
+      <h1 class="ptitle">테마로 보는 도쿄</h1>
+      <p class="lede">일정에 넣은 ${all.length}곳과 추천 ${RECS.filter(r=>!inPlan(r)).length}곳을 종류별로 모았어요. 누르면 그날 일정의 그 자리로 갑니다.</p>
     </header>
-    <ol class="reclist">${items}</ol>
+    <nav class="tchips" aria-label="테마 바로 가기">${chips}</nav>
+    ${secs}
   </section>`;
-  $$(".namebtn",host).forEach(b=>b.addEventListener("click",()=>{
+  $$(".tchip",panelEl).forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); const t=$(a.getAttribute("href")); if(t) t.scrollIntoView({behavior:reduced()?"auto":"smooth",block:"start"}); }));
+  $$(".namebtn[data-rec]",panelEl).forEach(b=>b.addEventListener("click",()=>{
     const r=RECS.find(x=>x.n===b.dataset.rec); if(!r) return;
     openBig({stops:[{n:r.n, ja:r.ja, k:r.k, q:r.q}]}, 0);
   }));
 }
 
-/* ---------- 안내 탭: 추천 · 준비 · 교통 · 날씨·비상 ---------- */
-const SUBS=[{k:"recs",n:"추천"},{k:"prep",n:"준비"},{k:"move",n:"교통"},{k:"wx",n:"날씨·비상"}];
-function renderMore(subKey){
-  CURRENT="more";
+/* ---------- 홈 ---------- */
+function dayCardHTML(d){
+  const pins=d.stops.filter(s=>s.lat && !s.hotel);
+  const w=(typeof wxDay==="function")?wxDay(d.date):null;
+  const today=d.date===tripYmd();
+  const strip=pins.map(s=>`<i style="background:${(KIND[s.kc]||KIND.move).c}"></i>`).join("");
+  const hl = pins.length ? pins.slice(0,4).map(s=>esc(s.n)).join(" · ")+(pins.length>4?` 외 ${pins.length-4}곳`:"")
+                         : d.stops.map(s=>`${esc(s.t)} ${esc(s.n)}`).join(" → ");
+  const span = d.stops.length ? `${esc(d.stops[0].t)}–${esc(d.stops[d.stops.length-1].t)}` : "";
+  return `<li><button type="button" class="dcard${today?" today":""}" data-day="${d.key}">
+    <span class="dnum"><b>${DAYS.indexOf(d)+1}</b><span>${d.wd}</span></span>
+    <span class="dbody">
+      <span class="dtop"><span class="ddate">${d.dt} ${d.wd}요일${today?` · <em>오늘</em>`:""}</span>${w?`<span class="dwx${w.rain>=50?" wet":""}">${w.rain>=50?ico("i-rain"):""}${esc(WMO_SHORT(w.code))} ${Math.round(w.hi)}°</span>`:""}</span>
+      <span class="dtitle">${esc(d.title)}</span>
+      ${strip?`<span class="dstrip" aria-hidden="true">${strip}</span>`:""}
+      <span class="dhl">${hl}</span>
+      <span class="dmeta">${pins.length?`${pins.length}곳 · `:""}${span}</span>
+    </span></button></li>`;
+}
+function renderHome(){
+  const done=CHECKS.filter(c=>CHECKED[c.id]).length, left=CHECKS.filter(c=>!CHECKED[c.id]);
+  const phase=nowInfo().phase;
+  const all=[]; DAYS.forEach(d=>d.stops.forEach(s=>{ if(s.lat && !s.hotel) all.push(s); }));
+  const chips=THEMES.map(t=>`<button type="button" class="tchip" data-theme="${t.k}" style="--kc:${(KIND[t.kcs[0]]||KIND.move).c}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${all.filter(x=>t.kcs.includes(x.kc)).length}</b></button>`).join("");
+  panelEl.innerHTML=`<section class="home${phase==="during"?" during":""}" role="tabpanel" aria-labelledby="nav-home">
+    <header class="hero">
+      <svg class="leaf" viewBox="0 0 64 64" aria-hidden="true">
+        <path d="M32 46 L32 59" stroke="var(--ginkgo)" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+        <path d="M32 46 L6.5 36 A27 27 0 0 1 29.6 19.6 L32 33 L34.4 19.6 A27 27 0 0 1 57.5 36 Z" fill="var(--ginkgo)"/>
+      </svg>
+      <p class="eyebrow">2026.11.18 &ndash; 11.22 · 아카사카 출발</p>
+      <h1>늦가을 도쿄</h1>
+      <p class="lede">미술관 아홉, 서점 아홉, LP바 셋. 은행잎이 물드는 닷새.</p>
+      <p class="state" id="state"></p>
+    </header>
+    <div id="homenow"></div>
+    ${left.length && phase!=="after" ? `<section class="hcard resv" aria-labelledby="resv-h">
+      <div class="hc-top"><h2 id="resv-h">예약 현황</h2><span class="hc-count"><b>${done}</b>/${CHECKS.length}</span></div>
+      <div class="bar" aria-hidden="true"><i style="width:${Math.round(done/CHECKS.length*100)}%"></i></div>
+      <ul class="resv-list">${left.slice(0,4).map(c=>`<li><b>${esc(c.t)}</b><span>${esc(c.d)}</span></li>`).join("")}</ul>
+      ${left.length>4?`<p class="more">외 ${left.length-4}건 더</p>`:""}
+      <div class="acts"><button type="button" class="btn key" data-gotab="prep">준비 탭에서 체크하기</button></div>
+    </section>` : ""}
+    <section class="hsec" aria-labelledby="days-h">
+      <div class="hs-top"><h2 id="days-h">닷새 한눈에</h2><span class="sub">누르면 그날 일정</span></div>
+      <ol class="dcards">${DAYS.map(dayCardHTML).join("")}</ol>
+    </section>
+    <section class="hsec" aria-labelledby="th-h">
+      <div class="hs-top"><h2 id="th-h">테마로 보기</h2></div>
+      <div class="tchips wrapchips">${chips}</div>
+    </section>
+    <section class="hsec" aria-labelledby="qk-h">
+      <div class="hs-top"><h2 id="qk-h">길에서 바로</h2></div>
+      <div class="quick">
+        <button type="button" class="qbtn" id="q-addr">${ico("i-hotel")}<span>숙소 주소<br>크게 보기</span></button>
+        <button type="button" class="qbtn" data-gotab="help">${ico("i-sound")}<span>일본어<br>한마디</span></button>
+        <button type="button" class="qbtn" data-goto="#sos">${ico("i-help")}<span>긴급<br>연락처</span></button>
+      </div>
+    </section>
+  </section>`;
+  $$(".dcard",panelEl).forEach(b=>b.addEventListener("click",()=>{ select(b.dataset.day); window.scrollTo({top:0}); }));
+  $$("[data-theme]",panelEl).forEach(b=>b.addEventListener("click",()=>{ go("themes"); window.scrollTo({top:0}); requestAnimationFrame(()=>{ const t=$("#th-"+b.dataset.theme); if(t) t.scrollIntoView({block:"start"}); }); }));
+  $$("[data-gotab]",panelEl).forEach(b=>b.addEventListener("click",()=>{ go(b.dataset.gotab,{sub:"todo"}); window.scrollTo({top:0}); }));
+  $$("[data-goto]",panelEl).forEach(b=>b.addEventListener("click",()=>goTo(b.dataset.goto)));
+  $("#q-addr").addEventListener("click",()=>openBig({stops:[{n:HOTEL.n, ja:HOTEL.ja, addr:HOTEL.addr, q:HOTEL.q}]},0));
+  homeNow(nowInfo());
+}
+// 여행 중 홈 맨 위: 지금 있어야 할 곳(없으면 다음 곳)
+function homeNow(info){
+  const el=$("#homenow"); if(!el) return;
+  if(info.phase!=="during"){ el.innerHTML=""; return; }
+  const it=info.cur||info.next;
+  if(!it){ el.innerHTML=""; return; }
+  const s=it.d.stops[it.i], isNow=it===info.cur;
+  const prev=it.d.stops.slice(0,it.i).reverse().find(x=>x.lat && !x.hotel)||HOTEL;
+  const nx=isNow?info.next:null;
+  el.innerHTML=`<section class="nowcard" aria-label="지금 일정">
+    <p class="nowtag">${isNow?"지금":"다음 · "+relText(it.ts-info.now)}</p>
+    <p class="nowtime">${esc(it.d.wd)}요일 ${esc(s.t)}</p>
+    <h2 class="nowname">${esc(s.n)}</h2>
+    ${s.ja?`<p class="nowja" lang="ja">${esc(s.ja)}</p>`:""}
+    ${s.note?`<p class="nownote">${esc(firstSentence(s.note))}</p>`:""}
+    <div class="acts">
+      ${s.lat&&!s.hotel?`<a class="btn key" href="${DIR(prev,s)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a>`:""}
+      <button type="button" class="btn" id="now-big">${ico("i-zoom")}크게 보기</button>
+      <button type="button" class="btn" id="now-plan">${ico("i-cal")}오늘 일정</button>
+    </div>
+    ${nx?`<p class="nownext">다음 <b>${esc(nx.d.stops[nx.i].n)}</b> · ${esc(nx.d.stops[nx.i].t)} (${relText(nx.ts-info.now)})</p>`:""}
+  </section>`;
+  $("#now-big").onclick=()=>openBig(it.d,it.i);
+  $("#now-plan").onclick=()=>{ select(it.d.key); setTimeout(()=>goStop(it.i),80); };
+}
+
+/* ---------- 입장료와 예산 ---------- */
+const FEESRC=[
+  ["도쿄국립박물관 대덕사전","https://daitokuji2026.exhn.jp/ticket/"],
+  ["스미다 호쿠사이 미술관","https://hokusai-museum.jp/best/"],
+  ["스카이트리","https://www.tokyo-skytree.jp/ticket/individual/"],
+  ["아티존","https://www.artizon.museum/ticket/"],
+  ["네즈미술관","https://www.nezu-muse.or.jp/jp/visit/"],
+  ["리쿠기엔","https://www.tokyo-park.or.jp/park/rikugien/index.html"]
+];
+function renderBudget(){
+  const el=$("#budget"); if(!el) return;
+  let total=0; const unknown=[];
+  const blocks=DAYS.map(d=>{
+    const rows=[]; let sum=0;
+    d.stops.forEach(s=>{
+      if(!s.lat || s.hotel) return;
+      if(typeof s.fee==="number"){ if(s.fee>0){ rows.push(`<li><span>${esc(s.n)}${s.feeNote?`<em>${esc(s.feeNote)}</em>`:""}</span><b>${s.fee.toLocaleString("ko-KR")}엔</b></li>`); sum+=s.fee; } }
+      else if(["art","view","leaf"].includes(s.kc)) unknown.push(`${d.wd} ${s.n}`);
+    });
+    total+=sum;
+    return rows.length?`<div class="bday"><div class="bday-h"><b>${d.wd}요일</b><span>${sum.toLocaleString("ko-KR")}엔</span></div><ul>${rows.join("")}</ul></div>`:"";
+  }).join("");
+  el.innerHTML=`<div class="card-box budget">
+    <div class="btotal"><span>확인된 입장료 합계</span><b>${total.toLocaleString("ko-KR")}엔</b></div>
+    ${blocks}
+    ${unknown.length?`<p class="bunk"><b>확인 전</b> ${unknown.map(esc).join(", ")}. 전시에 따라 달라서 공식 사이트에서 확인하세요.</p>`:""}
+    <p class="sub" style="margin:12px 0 0">스카이트리는 날마다 값이 달라서(평일 2,200~2,600엔) 가장 비싼 값으로 더했어요. 무료인 곳(시세이도 갤러리, 서양미술관 건물 밖)은 빠져 있습니다.</p>
+    <p class="srcline">확인: 2026년 9월 · ${FEESRC.map(([n,u])=>`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(n)}</a>`).join(" · ")}</p>
+  </div>`;
+}
+
+/* ---------- 내가 추가한 곳까지 넣은 캘린더 ----------
+   기본 캘린더(data/tokyo-trip.ics)는 서버 파일이라 내가 추가한 곳이 없다. 추가한 곳이 있을 때만
+   이 기기에서 파일을 만들어 내려받게 한다. 규칙은 tools/make-csv.mjs 와 같다. */
+function icsFor(){
+  const enc=new TextEncoder();
+  const fold=line=>{ const out=[]; let cur="",n=0; for(const ch of line){ const b=enc.encode(ch).length; if(n+b>(out.length?74:75)){ out.push(cur); cur=""; n=0; } cur+=ch; n+=b; } out.push(cur); return out.join("\r\n "); };
+  const utc=ms=>new Date(ms).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const tx=v=>String(v??"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+  const ev=[];
+  DAYS.forEach(d=>d.stops.forEach((s,i)=>{
+    const start=at(d.date,s.t), nx=d.stops[i+1];
+    let end=nx?at(d.date,nx.t):start+90*60e3;
+    if(end<=start) end=start+60*60e3;
+    if(end-start>3*3600e3) end=start+3*3600e3;
+    const url=s.q?MAPS(s.q,s.id):"";
+    const desc=[s.ja,s.note,s.need?"예약: "+s.need:"",s.mine?"내가 추가한 곳":"",url].filter(Boolean).join("\n");
+    ev.push("BEGIN:VEVENT",`UID:tokyo-2026-${d.key}-${s.mine?"m-"+encodeURIComponent(s.rid):i}@tokyo-trip`,"DTSTAMP:20260924T000000Z",
+      `DTSTART:${utc(start)}`,`DTEND:${utc(end)}`,`SUMMARY:${tx((s.num?s.num+". ":"")+s.n)}`,
+      ...(s.ja||s.q?[`LOCATION:${tx(s.ja||s.q)}`]:[]), ...(desc?[`DESCRIPTION:${tx(desc)}`]:[]), ...(url?[`URL:${url}`]:[]),
+      "BEGIN:VALARM","ACTION:DISPLAY",`DESCRIPTION:${tx(s.n)}`,`TRIGGER:-PT${s.need?60:30}M`,"END:VALARM","END:VEVENT");
+  }));
+  return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//tokyo-trip//KO","CALSCALE:GREGORIAN","METHOD:PUBLISH",
+    "X-WR-CALNAME:늦가을 도쿄","X-WR-TIMEZONE:Asia/Tokyo",...ev,"END:VCALENDAR"].map(fold).join("\r\n")+"\r\n";
+}
+function renderIcsMine(){
+  const el=$("#icsmine"); if(!el) return;
+  const n=getMine().length;
+  if(!n){ el.innerHTML=""; return; }
+  el.innerHTML=`<p class="sub" style="margin:12px 0 0">추천에서 직접 넣은 ${n}곳은 위 캘린더에 없어요. 아래 파일에는 다 들어 있습니다. 아이폰에서 바로 안 열리면 파일 앱에 저장한 뒤 눌러 여세요. 이미 위 캘린더를 넣었다면 겹치니 한 가지만 쓰세요.</p>
+    <div class="acts"><button type="button" class="btn" id="icsminebtn">${ico("i-cal")}내가 추가한 곳까지 넣은 캘린더 받기</button></div>`;
+  $("#icsminebtn").addEventListener("click",()=>{
+    const blob=new Blob([icsFor()],{type:"text/calendar;charset=utf-8"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="tokyo-trip-mine.ics";
+    document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+  });
+}
+
+/* ---------- 준비 · 도움 탭: 정적 섹션을 data-sub 로 골라 보여준다 ---------- */
+const PREPSUBS=[{k:"todo",n:"할 일"},{k:"stay",n:"숙소·교통"},{k:"budget",n:"예산·팁"}];
+function renderMore(tab, subKey){
+  CURRENT=tab;
   if(LMAP){ try{LMAP.remove();}catch(e){} LMAP=null; }
   MARKERS={}; MAPSEL=null;
-  const cur=SUBS.some(x=>x.k===subKey)?subKey:LS.get("tokyo-sub","recs");
-  const active=SUBS.some(x=>x.k===cur)?cur:"recs";
-  LS.set("tokyo-sub",active);
   panelEl.innerHTML="";
   const more=$("#more"); more.hidden=false;
-  more.setAttribute("role","tabpanel"); more.setAttribute("aria-labelledby","tab-more");
-  $("#more-bar").innerHTML=`<div class="subtabs" role="tablist" aria-label="안내">${SUBS.map(x=>`<button type="button" class="subtab" role="tab" data-sub-go="${x.k}" aria-selected="${x.k===active}">${x.n}</button>`).join("")}</div>`;
+  more.setAttribute("role","tabpanel"); more.setAttribute("aria-labelledby","nav-"+tab);
+  const bar=$("#more-bar");
+  let active="help";
+  if(tab==="prep"){
+    const cur=PREPSUBS.some(x=>x.k===subKey)?subKey:LS.get("tokyo-sub","todo");
+    active=PREPSUBS.some(x=>x.k===cur)?cur:"todo";
+    LS.set("tokyo-sub",active);
+    bar.hidden=false;
+    bar.innerHTML=`<div class="subtabs" role="tablist" aria-label="준비" style="grid-template-columns:repeat(${PREPSUBS.length},1fr)">${PREPSUBS.map(x=>`<button type="button" class="subtab" role="tab" data-sub-go="${x.k}" aria-selected="${x.k===active}">${x.n}</button>`).join("")}</div>`;
+    $$("[data-sub-go]",bar).forEach(b=>b.addEventListener("click",()=>{
+      go("prep",{sub:b.dataset.subGo});
+      window.scrollTo({top:0,behavior:reduced()?"auto":"smooth"});
+    }));
+  } else { bar.hidden=true; bar.innerHTML=""; }
   let first=true;
   $$("[data-sub]",more).forEach(el=>{
     const on=el.dataset.sub===active;
@@ -1611,20 +1952,18 @@ function renderMore(subKey){
     el.classList.toggle("lead", on && first && el.classList.contains("block"));
     if(on) first=false;
   });
-  if(active==="recs") renderRecs();
-  $$("[data-sub-go]",$("#more-bar")).forEach(b=>b.addEventListener("click",()=>{
-    renderMore(b.dataset.subGo);
-    window.scrollTo({top:Math.max(0,$("#more").offsetTop-64),behavior:reduced()?"auto":"smooth"});
-  }));
-  $("#db-wd").textContent="안내"; $("#db-dt").textContent="";
-  $("#db-title").textContent=(SUBS.find(x=>x.k===active)||{}).n||"";
+  if(active==="budget") renderBudget();
+  if(active==="todo") renderIcsMine();
   applyNow();
 }
-// 다른 탭에 있는 요소로 이동: 그 요소가 든 하위 탭을 먼저 연다
+// 다른 탭에 있는 요소로 이동: 그 요소가 든 탭·하위 탭을 먼저 연다
 function goTo(sel){
   const t=$(sel); if(!t) return;
   const box=t.closest("[data-sub]");
-  if(box && (CURRENT!=="more" || box.hidden)){ renderTabs("more"); renderMore(box.dataset.sub); }
+  if(box){
+    const tab=box.dataset.sub==="help"?"help":"prep";
+    if(CURTAB!==tab || box.hidden) go(tab,{sub:box.dataset.sub});
+  }
   requestAnimationFrame(()=>t.scrollIntoView({behavior:reduced()?"auto":"smooth",block:"center"}));
 }
 
@@ -1659,7 +1998,7 @@ function applyNow(){
     txt+=` <span class="sep">·</span> ${di>=0?di+1+"일차":"여행 중"}`;
     if(info.next) txt+=` <span class="sep">·</span> 다음은 ${esc(info.next.s.n)} ${relText(info.next.ts-info.now)}`;
   }
-  stateEl.innerHTML=txt;
+  if(stateEl) stateEl.innerHTML=txt;
 
   const statEl=$("#stats");
   if(statEl && !statEl.dataset.done){
@@ -1672,8 +2011,9 @@ function applyNow(){
   }
 
   const btn=$("#db-now");
-  btn.hidden = info.phase!=="during";
-  btn.onclick=()=>{ const it=info.cur||info.next; if(!it) return; if(it.d.key!==CURRENT) select(it.d.key); setTimeout(()=>goStop(it.i),60); };
+  if(btn){ btn.hidden = info.phase!=="during";
+  btn.onclick=()=>{ const it=info.cur||info.next; if(!it) return; if(it.d.key!==CURRENT || CURTAB!=="plan") select(it.d.key); setTimeout(()=>goStop(it.i),60); }; }
+  if(CURTAB==="home") homeNow(info);
 
   const d=DAYS.find(x=>x.key===CURRENT); if(!d) return;
   const prog=$("#prog");
@@ -1716,6 +2056,7 @@ function openBig(d,idx){
   $("#ja-sub").textContent = s.addr ? s.addr : s.jaTodo ? "일본어 표기는 아직 확인 전이에요. 지도 화면을 함께 보여주세요." : (s.k||"");
   const a=$("#ja-map");
   if(s.q){ a.hidden=false; a.href=MAPS(s.q,s.id); } else a.hidden=true;   // 문장(한마디)에는 지도 버튼이 없다
+  const sp=$("#ja-say"); sp.hidden=!(s.ja && canSpeak()); sp.onclick=()=>speakJa(s.ja);
   if(typeof dlg.showModal==="function") dlg.showModal(); else dlg.setAttribute("open","");
 }
 (function(){
@@ -1768,38 +2109,85 @@ function wireSunday(){
   calc();
 }
 
-/* ---------- 날짜 탭 ---------- */
-const TABKEYS = ()=>DAYS.map(d=>d.key).concat("more");
-function renderTabs(active){
-  const today=tripYmd();
-  tabsEl.innerHTML=DAYS.map(d=>`<button class="tab${d.date===today?" today":""}" role="tab" id="tab-${d.key}" aria-controls="panel"
-    aria-selected="${d.key===active}" tabindex="${d.key===active?0:-1}" data-key="${d.key}">
-    <span class="wd">${d.wd}</span><span class="dt">${d.dt}</span>${d.date===today?'<span class="sr">오늘</span>':""}</button>`).join("")
-  + `<button class="tab extra" role="tab" id="tab-more" aria-controls="panel"
-      aria-selected="${active==="more"}" tabindex="${active==="more"?0:-1}" data-key="more">
-      ${ico("i-more")}<span class="dt">안내</span></button>`;
+/* ---------- 아래 탭: 홈 · 일정 · 테마 · 준비 · 도움 ----------
+   날짜는 "일정" 탭 위쪽 막대에서 고른다. 날짜 버튼 id는 tab-<요일키>. */
+const TABS=[{k:"home",n:"홈",i:"i-home"},{k:"plan",n:"일정",i:"i-cal"},{k:"themes",n:"테마",i:"i-compass"},{k:"prep",n:"준비",i:"i-check"},{k:"help",n:"도움",i:"i-help"}];
+let CURTAB="home";
+const isDay=k=>DAYS.some(d=>d.key===k);
+function startDay(){
+  const t=(DAYS.find(d=>d.date===tripYmd())||{}).key;
+  if(t) return t;
+  const last=LS.get("tokyo-day","");
+  return isDay(last)?last:"thu";
 }
-function select(key,focus){
-  renderTabs(key);
-  if(key==="more") renderMore();
-  else { const m=$("#more"); m.hidden=true; m.removeAttribute("role"); renderDay(key); LS.set("tokyo-day",key); }
-  if(focus){ const b=$("#tab-"+key); if(b) b.focus(); }
+function renderTabs(active){
+  tabsEl.innerHTML=TABS.map(t=>`<button class="tab" role="tab" id="nav-${t.k}" aria-controls="panel"
+    aria-selected="${t.k===active}" tabindex="${t.k===active?0:-1}" data-key="${t.k}">${ico(t.i)}<span class="lb">${t.n}</span></button>`).join("");
+}
+function renderBar(){
+  const bar=$("#daybar-in");
+  $("#daybar").hidden = CURTAB==="home";
+  if(CURTAB==="plan"){
+    const today=tripYmd();
+    bar.innerHTML=`<div class="dayseg" role="tablist" aria-label="날짜">${DAYS.map(d=>`<button type="button" role="tab" class="dseg${d.date===today?" today":""}" id="tab-${d.key}" data-day="${d.key}" aria-selected="${d.key===CURRENT}"><b>${d.wd}</b><span>${d.dt}</span></button>`).join("")}</div>
+      <button type="button" class="db-now" id="db-now" hidden>지금</button>`;
+  } else {
+    const t=TABS.find(x=>x.k===CURTAB)||TABS[0];
+    const sub = CURTAB==="prep" ? (PREPSUBS.find(x=>x.k===LS.get("tokyo-sub","todo"))||{}).n||"" : "";
+    bar.innerHTML=`<span class="db-wd">${esc(t.n)}</span><span class="db-title" id="db-title">${esc(sub)}</span>
+      <button type="button" class="db-now" id="db-now" hidden>지금 일정</button>`;
+  }
+}
+function go(tab,opt={}){
+  if(!TABS.some(t=>t.k===tab)) tab="home";
+  CURTAB=tab; LS.set("tokyo-tab",tab);
+  renderTabs(tab);
+  const more=$("#more");
+  if(tab==="prep"||tab==="help"){ renderMore(tab,opt.sub); renderBar(); applyNow(); }
+  else{
+    more.hidden=true; more.removeAttribute("role");
+    if(tab==="plan"){
+      const day=isDay(opt.day)?opt.day:(isDay(CURRENT)?CURRENT:startDay());
+      CURRENT=day; LS.set("tokyo-day",day);
+      renderBar(); renderDay(day);
+    }else{
+      if(LMAP){ try{LMAP.remove();}catch(e){} LMAP=null; }
+      MARKERS={}; MAPSEL=null; CURRENT=tab;
+      renderBar();
+      if(tab==="home") renderHome(); else renderThemes();
+      applyNow();
+    }
+  }
+  if(opt.focus){ const b=$("#nav-"+tab); if(b) b.focus(); }
+}
+function select(key,focus){ go("plan",{day:key,focus}); }
+// 지금 보는 화면을 데이터 그대로 다시 그린다(장소 정보·날씨·내가 추가한 장소가 바뀌었을 때)
+function refresh(){
+  if(CURTAB==="plan") renderDay(CURRENT);
+  else if(CURTAB==="home") renderHome();
+  else if(CURTAB==="themes") renderThemes();
+  else if(CURTAB==="prep"||CURTAB==="help") renderMore(CURTAB);
+  applyNow();
 }
 tabsEl.addEventListener("click",e=>{
   const b=e.target.closest(".tab"); if(!b) return;
-  select(b.dataset.key);
-  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
-  window.scrollTo({top:Math.max(0,panelEl.offsetTop-64),behavior:reduce?"auto":"smooth"});
+  go(b.dataset.key);
+  window.scrollTo({top:0,behavior:"auto"});
 });
 tabsEl.addEventListener("keydown",e=>{
-  const keys=TABKEYS();
+  const keys=TABS.map(t=>t.k);
   const i=keys.indexOf(document.activeElement?.dataset?.key); if(i<0) return;
   let n=null;
   if(e.key==="ArrowRight") n=(i+1)%keys.length;
   if(e.key==="ArrowLeft")  n=(i-1+keys.length)%keys.length;
   if(e.key==="Home") n=0;
   if(e.key==="End")  n=keys.length-1;
-  if(n!==null){ e.preventDefault(); select(keys[n],true); }
+  if(n!==null){ e.preventDefault(); go(keys[n],{focus:true}); }
+});
+$("#daybar").addEventListener("click",e=>{
+  const b=e.target.closest("[data-day]"); if(!b) return;
+  select(b.dataset.day);
+  window.scrollTo({top:0,behavior:"auto"});
 });
 
 /* ---------- 키 없이 붙여넣기 ---------- */
@@ -1853,7 +2241,7 @@ function importPasted(text){
     const res=importPasted(ta.value);
     if(res.err){ gStatus(res.err,true); return; }
     ta.value="";
-    if(CURRENT!=="more") renderDay(CURRENT);
+    refresh();
     gStatus(`${res.hit}곳 넣었습니다.` + (res.miss.length?` 이름이 안 맞은 것: ${res.miss.slice(0,3).join(", ")}${res.miss.length>3?" 외 "+(res.miss.length-3)+"개":""}.`:""));
   });
 })();
@@ -1916,8 +2304,9 @@ function importPasted(text){
   if(sos) sos.innerHTML=SOS.map(x=>`<a href="tel:${esc(x.tel.replace(/[^+\d]/g,""))}"><b>${esc(x.n)}</b><span>${esc(x.d)}</span><i>${esc(x.tel)}</i></a>`).join("");
   const ph=$("#phrases");
   if(ph){
-    ph.innerHTML=PHRASES.map((x,i)=>`<button type="button" data-ph="${i}">${esc(x.ko)}</button>`).join("");
+    ph.innerHTML=PHRASES.map((x,i)=>`<div class="phr"><button type="button" class="phr-t" data-ph="${i}"><b>${esc(x.ko)}</b><span lang="ja">${esc(x.ja)}</span></button>${canSpeak()?`<button type="button" class="phr-say" data-say="${i}" aria-label="${esc(x.ko)} 일본어로 듣기">${ico("i-sound")}</button>`:""}</div>`).join("");
     ph.addEventListener("click",e=>{
+      const sb=e.target.closest("[data-say]"); if(sb){ speakJa(PHRASES[Number(sb.dataset.say)].ja); return; }
       const b=e.target.closest("[data-ph]"); if(!b) return;
       const x=PHRASES[Number(b.dataset.ph)];
       openBig({stops:[{n:x.ko, ja:x.ja, k:"보여주세요"}]},0);
@@ -1983,7 +2372,7 @@ async function fetchWx(force){
     WX={at:Date.now(), daily:j.daily, current:j.current||null};
     LS.set(WX_KEY, JSON.stringify(WX));
     renderWx();
-    if(CURRENT && CURRENT!=="more") renderDay(CURRENT);
+    if(CURRENT) refresh();
   }catch(e){}
 }
 renderWx();
@@ -1991,21 +2380,13 @@ fetchWx();
 document.addEventListener("visibilitychange",()=>{ if(!document.hidden) fetchWx(); });
 window.addEventListener("online",()=>fetchWx(true));
 
-/* ---------- 시작 ---------- */
+/* ---------- 시작 ----------
+   여행 중이면 홈(지금·다음 카드)부터, 아니면 마지막으로 보던 탭. */
 (function(){
   applyArrival(LS.get("tokyo-air-in","nrt"));
+  CURRENT=startDay();
   const tripDay=(DAYS.find(d=>d.date===tripYmd())||{}).key;
-  let start=tripDay;
-  if(!start) start=LS.get("tokyo-day","");
-  if(!DAYS.some(d=>d.key===start)) start="wed";
-  select(start);
-  // 여행 중이면 열자마자 지금(또는 다음) 일정으로 내려간다. 매번 히어로부터 스크롤하지 않게.
-  if(tripDay){
-    requestAnimationFrame(()=>{
-      const el=panelEl.querySelector(".stop.now")||panelEl.querySelector(".stop.next");
-      if(el) el.scrollIntoView({block:"center"});
-    });
-  }
+  go(tripDay ? "home" : LS.get("tokyo-tab","home"));
   if(NOWTIMER) clearInterval(NOWTIMER);
   NOWTIMER=setInterval(applyNow,30000);
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden) applyNow(); });
@@ -2086,14 +2467,14 @@ function gStatus(msg,bad){
       PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)};
       try{ LS.set("tokyo-places",JSON.stringify(PSTORE)); }
       catch(e){ gStatus("기기 저장 공간이 모자라 일부만 저장됐어요.",true); }
-      renderDay(CURRENT);
+      refresh();
     }
     if(res.fail) gStatus(`${got}곳 받았고 ${res.fail}곳은 실패했어요. ${res.firstErr}`, got===0);
     else gStatus();
   });
   clr.addEventListener("click",()=>{
     PSTORE={}; try{ localStorage.removeItem("tokyo-places"); }catch(e){}
-    renderDay(CURRENT); gStatus();
+    refresh(); gStatus();
   });
 })();
 
@@ -2106,14 +2487,15 @@ async function countTiles(){
   catch(e){ el.textContent="확인할 수 없음"; }
 }
 $("#warmbtn").addEventListener("click",async e=>{
-  const b=e.currentTarget, back=CURRENT, label=b.textContent;
+  const b=e.currentTarget, backTab=CURTAB, backDay=CURRENT, label=b.textContent;
   b.disabled=true;
   for(const d of DAYS){
     b.textContent=`${d.wd}요일 지도를 여는 중…`;
     select(d.key);
     await new Promise(r=>setTimeout(r,2800));
   }
-  select(back); b.textContent=label; b.disabled=false; countTiles();
+  go(backTab,{sub:"todo"}); if(isDay(backDay)) CURRENT=backDay;
+  b.textContent=label; b.disabled=false; countTiles();
   goTo("#warmbtn");
 });
 function netCheck(){ $("#netbar").hidden=navigator.onLine!==false; }
