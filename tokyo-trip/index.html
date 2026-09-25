@@ -25,7 +25,7 @@
 :root{
   --paper:#F2F4F6;--surface:#FFFFFF;--ink:#191F28;--text2:#4E5968;--muted:#6B7684;--line:#E5E8EB;--faint:#F2F4F6;--soft:#EBEEF1;
   --ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#FFF6DA;--pine:#12805C;
-  --k-art:#1F7A63;--k-book:#B06A1E;--k-food:#E0503A;--k-bar:#6B4FD8;--k-market:#0B8CA0;--k-view:#2F7CF6;--k-move:#8B95A1;--k-leaf:#6E8B2E;
+  --k-art:#1F7A63;--k-book:#B06A1E;--k-food:#E0503A;--k-bar:#6B4FD8;--k-market:#0B8CA0;--k-view:#2F7CF6;--k-move:#8B95A1;--k-leaf:#6E8B2E;--k-photo:#D0457A;
   --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Hiragino Sans","Noto Sans KR","Noto Sans JP","Malgun Gothic",system-ui,sans-serif;
   --serif:var(--sans);--mono:var(--sans);
   --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
@@ -38,10 +38,10 @@
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){ --paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--text2:#C4CAD3;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
-    --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
+    --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--k-photo:#F07AA6;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
 }
 :root[data-theme="dark"]{ --paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--text2:#C4CAD3;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
-  --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
+  --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--k-photo:#F07AA6;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);scroll-padding-bottom:calc(var(--tabh) + 24px)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;letter-spacing:-.01em;
@@ -588,6 +588,44 @@ h1,h2,h3,.dtitle,.name,.tname,.nowname,.rname{word-break:keep-all;overflow-wrap:
 .bunk{margin:12px 0 0;font-size:14px;line-height:1.55}
 .bunk b{color:var(--k-food);margin-right:4px}
 
+/* 사진 · 필름 */
+.archline{display:flex;gap:6px;align-items:center;margin:6px 0 0;font-size:13px;font-weight:600;color:var(--muted)}
+.archline .ki{width:14px;height:14px;flex:none;color:var(--k-photo)}
+.photobox{margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--faint)}
+.shot{display:flex;gap:8px;align-items:flex-start;margin:0;font-size:14px;line-height:1.55;color:var(--text2)}
+.shot .ki{width:18px;height:18px;flex:none;color:var(--k-photo);margin-top:2px}
+.sights{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.sights li{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center}
+.sights a{display:grid;gap:1px;padding:8px 10px;border-radius:10px;background:var(--surface);text-decoration:none;color:var(--ink)}
+.sights a b{font-size:14px} .sights a span{font-size:12px;color:var(--muted)}
+.tagbtn{appearance:none;border:0;background:var(--surface);color:var(--k-photo);font:inherit;font-size:18px;font-weight:800;width:44px;height:44px;border-radius:10px;cursor:pointer}
+.tagcopy{min-height:36px;font-size:13px;color:var(--k-photo);padding:0}
+.lightline{display:flex;gap:6px;align-items:center;margin:0 0 var(--s3);font-size:13px;color:var(--muted)}
+.lightline .ki{width:16px;height:16px;flex:none;color:var(--ginkgo)}
+.lightline b{color:var(--ink);font-weight:700}
+.lightgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 14px}
+.lightgrid span{background:var(--surface);border-radius:12px;padding:8px 6px;font-size:12px;line-height:1.5;color:var(--muted);text-align:center}
+.lightgrid b{color:var(--ink);font-size:14px}
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;padding-right:10px}
+.tlist li.srow+li.srow{border-top:1px solid var(--line)}
+.srow .trow{text-decoration:none}
+.tlist li+li.srow .trow{border-top:0}
+.filmbox .film-top{display:grid;grid-template-columns:1fr 92px;gap:10px}
+.filmbox label{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:600;color:var(--muted)}
+.filmbox input,.filmbox select{font:inherit;font-size:16px;font-weight:600;min-height:48px;padding:0 12px;border-radius:12px;border:0;background:var(--faint);color:var(--ink);width:100%}
+.film-count{display:flex;align-items:baseline;gap:6px;margin:16px 0 0}
+.film-count b{font-size:48px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.film-count span{font-size:18px;color:var(--muted);font-weight:700}
+.film-acts{display:grid;grid-template-columns:1.4fr 1fr 1fr}
+.btn[disabled]{opacity:.4;cursor:default}
+.filmlog{white-space:pre-wrap;font:inherit;font-size:13px;line-height:1.6;color:var(--text2);margin:8px 0 0}
+.quick{grid-template-columns:repeat(2,1fr)}
+.qbtn{min-height:84px}
+.qbtn.film .ki{color:var(--k-photo)}
+.qbtn em{font-style:normal;color:var(--k-photo)}
+.toast{position:fixed;left:50%;bottom:calc(var(--tabh) + 20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,20px);opacity:0;z-index:50;background:var(--ink);color:var(--surface);font-size:14px;font-weight:700;padding:10px 16px;border-radius:12px;pointer-events:none;transition:opacity .2s ease,transform .2s ease;max-width:90vw}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
 /* 비 오는 날 · 넣기 경고 */
 .rainalt{display:flex;gap:8px;align-items:flex-start;margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--faint);font-size:14px;line-height:1.5}
 .rainalt .ki{width:18px;height:18px;flex:none;color:var(--k-view);margin-top:2px}
@@ -729,6 +767,12 @@ h1,h2,h3,.dtitle,.name,.tname,.nowname,.rname{word-break:keep-all;overflow-wrap:
     </ul>
   </section>
 
+  <section class="block" data-sub="help" aria-labelledby="film-h">
+    <h2 id="film-h">필름 기록</h2>
+    <p class="sub">셔터를 누를 때 "한 컷"을 누르면 몇 번째 컷을 어디서 찍었는지 남아요. 홈의 "필름 한 컷"도 같은 기록입니다. 기기에만 저장돼요.</p>
+    <div id="film"></div>
+  </section>
+
   <section class="block" data-sub="help" aria-labelledby="ph-h">
     <h2 id="ph-h">일본어 한마디</h2>
     <p class="sub">문장을 누르면 크게 뜹니다. 🔊를 누르면 폰이 일본어로 읽어줘요(아이폰은 인터넷 없이도 됩니다).</p>
@@ -792,6 +836,8 @@ h1,h2,h3,.dtitle,.name,.tname,.nowname,.rname{word-break:keep-all;overflow-wrap:
   <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v8a2.5 2.5 0 0 1-2.5 2.5H10l-4.5 3.5V17A2.5 2.5 0 0 1 4 14.5z"/><path d="M9 9.5h6M9 12.5h4"/></symbol>
   <symbol id="i-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
   <symbol id="i-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 0 1 17 0z"/><path d="M12 12v6.5a2 2 0 0 1-4 0"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5A2 2 0 0 1 5.5 6.5h2l1.5-2h6l1.5 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.8"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 17.5h18"/><path d="M6.5 17.5a5.5 5.5 0 0 1 11 0"/><path d="M12 5v2.5M5.2 9.2l1.7 1.7M18.8 9.2l-1.7 1.7"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-zoom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M8 10.5h5M10.5 8v5"/></symbol>
 </svg>
@@ -815,27 +861,35 @@ const DAYS = [
   { key:"thu", wd:"목", dt:"11.19", short:"리쿠기엔·우에노·스카이트리", date:"2026-11-19", title:"리쿠기엔에서 스카이트리 노을까지", summary:"아침엔 한산한 리쿠기엔, 낮엔 우에노와 호쿠사이, 해 질 녘엔 스카이트리, 저녁은 아사쿠사 에도 요리, 밤엔 숙소 옆 LP바.", walk:"북쪽에서 동쪽으로, 밤엔 긴자선 한 번에 숙소로",
     stops:[
       {t:"9:00", n:"리쿠기엔", ja:"六義園", kc:"leaf", k:"정원, 단풍", ok:"현장 발권", fee:300,
+       shot:"연못 둘레 소나무와 돌다리, 단풍. 오전 순광에 물이 잔잔할 때 반영이 좋아요.",
        leg:{line:"남북선", from:"永田町(赤坂見附와 연결)", to:"駒込", note:"환승 없이 16분", v:true},
        rain:"비가 오면 정원은 짧게 돌고, 추천 탭의 에도도쿄박물관(호쿠사이 옆)을 오후에 넣거나 도쿄국립박물관을 넉넉히 보세요.",
        note:"에도 시대 다이묘 정원. 9시에 열어요. 평일 아침이라 가장 한산한 시간입니다. 단풍철엔 駒込역에서 2분인 染井門이 열려서 정문(7분)보다 가까워요. 야간 라이트업은 이번 일정 뒤에 시작합니다.",
        q:"六義園", lat:35.73246, lng:139.748314},
       {t:"10:30", n:"도쿄국립박물관", ja:"東京国立博物館", kc:"art", k:"박물관", closed:"월 휴관",
+       arch:{by:"渡辺仁", year:1937, note:"제관양식 본관"},
+       shot:"정문에서 본관을 정면 대칭으로. 본관 가운데 대계단도 유명한 장면이에요. 같은 부지 안 법륭사보물관(다니구치 요시오)은 연못에 비친 수평 입면을 노리세요.",
        leg:{line:"JR 야마노테선", from:"駒込", to:"上野", note:"10분 안팎", v:true},
        note:"대덕사 개창 700년 특별전(10/14–12/6)과 히로시게전(9/29–12/20)이 함께 열립니다.",
        ask:"특별전 예약제 여부 확인", needId:"tnm", doneLabel:"확인 완료", fee:2300, feeNote:"대덕사전 당일권(예매 2,100엔)",
        q:"東京国立博物館", id:"ChIJEX3XFIOOGGAR3XdJvRjWLyM", lat:35.7188351, lng:139.7765215},
       {t:"12:35", n:"국립서양미술관", ja:"国立西洋美術館", kc:"art", k:"건축", closed:"월 휴관", opt:true, fee:0, feeNote:"밖에서만 보기",
+       arch:{by:"ル・コルビュジエ", note:"세계유산"},
+       shot:"필로티 아래 그늘과 앞마당 로댕 조각을 함께. 바로 맞은편이 제자 마에카와 구니오의 도쿄문화회관이라 스승과 제자 건물을 한 장씩.",
        note:"르코르뷔지에가 설계한 세계유산 건물. 점심 가는 길에 밖에서 10분만 봅니다.",
        q:"国立西洋美術館", id:"ChIJf8xB-pyOGGARizzhlNTcI7s", lat:35.7153869, lng:139.7758138},
       {t:"12:50", n:"ROUTE BOOKS", kc:"book", k:"북카페, 점심",
        note:"히가시우에노. 카페 안에 서가가 있는 구조. 오늘 점심 자리예요.",
        q:"ROUTE BOOKS", id:"ChIJw1ucnpmOGGAR9Rs5XdSMYL0", lat:35.7139296, lng:139.7807258},
       {t:"14:15", n:"스미다 호쿠사이 미술관", ja:"すみだ北斎美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"현장 발권",
+       arch:{by:"妹島和世", year:2016},
+       shot:"알루미늄 패널 외관이 하늘색을 비춰요. 건물을 가르는 틈(슬릿) 사이로 반대편 동네가 보이는 구도가 이 건물의 포인트.",
        leg:{line:"오에도선", from:"上野御徒町", to:"両国", note:"환승 없이 6분 안팎", v:true},
        fee:1500, feeNote:"개관 10주년 특별전",
        note:"개관 10주년 특별전 '베스트 오브 스미다 호쿠사이 미술관'(9/15–11/23)이 열리는 중이라 대표작을 한 번에 봅니다. 15:30에는 나와야 스카이트리 노을에 맞춰요. 스카이트리까지는 스미다 순환버스(100엔)나 택시가 편해요. 바로 옆이 2026년 3월에 다시 연 에도도쿄박물관(추천 탭).",
        q:"すみだ北斎美術館", id:"ChIJgRjTtzOJGGARqoKBtB8BAno", lat:35.6963313, lng:139.800414},
       {t:"15:50", n:"도쿄 스카이트리", ja:"東京スカイツリー", kc:"view", k:"전망대, 노을", need:"날짜 지정권", needId:"skytree", fee:2600, feeNote:"평일 2,200~2,600엔, 날마다 다름",
+       shot:"타워 위에선 창에 렌즈를 붙여 반사를 막으세요. 필름으로 타워 자체를 찍고 싶으면 추천 탭의 짓켄바시(역스카이트리)를 보세요.",
        rain:"흐리거나 비가 오면 노을과 먼 경치가 안 보여요. 입장권을 바꿀 수 있는지 먼저 보고, 안 되면 야경 위주로 즐기세요.",
        note:"11월 19일 도쿄 일몰은 16:32쯤. 16시 전에 올라가 있으면 해 지는 것부터 야경까지 한 번에 봅니다. 노을 시간대는 인기라 입장 시각을 16:00 전으로 예약하세요.",
        q:"東京スカイツリー", id:"ChIJ35ov0dCOGGARKvdDH7NPHX0", lat:35.7100627, lng:139.8107004},
@@ -849,9 +903,18 @@ const DAYS = [
        q:"bar all 赤坂", lat:35.6755, lng:139.7372}
     ]},
 
-  { key:"fri", wd:"금", dt:"11.20", short:"진보초·교바시·니혼바시", date:"2026-11-20", title:"기타노마루에서 진보초, 니혼바시로", summary:"근대미술관, 카레 점심, 헌책방 거리. 금요일은 아티존이 20시까지 열어서 저녁 스시 전에 넣었습니다.", walk:"진보초 안은 걸어서, 교바시까지 지하철 한 번",
+  { key:"fri", wd:"금", dt:"11.20", short:"나카메구로·진보초·니혼바시", date:"2026-11-20", title:"나카메구로에서 진보초, 니혼바시로", summary:"나카메구로 스타벅스 로스터리 아침, 근대미술관, 카레 점심, 헌책방 거리. 금요일은 아티존이 20시까지 열어서 저녁 스시 전에 넣었습니다.", walk:"아침만 멀리, 진보초 안은 걸어서",
     stops:[
-      {t:"10:00", n:"도쿄국립근대미술관", ja:"東京国立近代美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"창구 당일권", close:"20:00",
+      {t:"8:00", n:"스타벅스 리저브 로스터리 도쿄", ja:"スターバックス リザーブ ロースタリー 東京", kc:"food", k:"카페, 아침",
+       leg:{line:"지하철", from:"赤坂見附", to:"中目黒", note:"19분 안팎, 환승 있음", v:true},
+       arch:{by:"隈研吾(외관)", year:2019},
+       shot:"4층까지 뚫린 천장에 17m 구리 캐스크와 벚꽃 모양 종이접기 천장. 1층 바 앞에서 위로 올려 찍고, 밖에선 메구로강 다리 위에서 삼나무 판자 외관을 정면으로. 아침 역광이 부드러워요.",
+       note:"2019년에 연 세계 다섯 번째 로스터리. 7:00~22:00. 주말엔 번호표(Airウェイト)가 필요할 만큼 붐벼서 평일 아침으로 잡았어요. 1층 베이커리 프린치에서 아침을 먹습니다.",
+       q:"スターバックス リザーブ ロースタリー 東京", lat:35.6495, lng:139.6941},
+      {t:"10:15", n:"도쿄국립근대미술관", ja:"東京国立近代美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"창구 당일권", close:"20:00",
+       arch:{by:"谷口吉郎", year:1969},
+       shot:"굵은 기둥이 받치는 필로티와 물결치는 보. 해자(기타노마루) 쪽에서 건물 전체를.",
+       leg:{line:"지하철", from:"中目黒", to:"竹橋", note:"30분 안팎, 환승 2번", v:true},
        note:"다케히사 유메지전(10/23–1/11). 화가이자 시인, 디자이너였던 유메지의 대표작 〈구로후네야〉가 약 40년 만에 나옵니다.",
        q:"東京国立近代美術館", id:"ChIJL0kSfg2MGGARKv5KX53ZZ2Y", lat:35.6905432, lng:139.7546932},
       {t:"12:00", n:"구풍 카레 본디", ja:"欧風カレー ボンディ 神保町本店", kc:"food", k:"식당, 점심",
@@ -882,24 +945,32 @@ const DAYS = [
   { key:"sat", wd:"토", dt:"11.21", short:"츠키지·롯폰기·시부야", date:"2026-11-21", title:"츠키지, 롯폰기, 아오야마, 시부야", summary:"새벽 시장에서 은행나무길 거쳐, 밤엔 숙소 옆 LP바에서 마무리. 가장 긴 하루예요.", walk:"도보 약 11km",
     stops:[
       {t:"7:30", n:"츠키지 장외시장", ja:"築地場外市場", kc:"market", k:"시장", cash:true,
+       shot:"이른 아침 좁은 골목과 간판, 가게 사람들. 가게 앞 촬영은 한마디 묻고(도움 탭 한마디).",
        note:"9시 넘으면 몸싸움. 일요일엔 대부분 닫아 오늘이 유일합니다.",
        q:"築地場外市場", id:"ChIJW2cLzSGLGGARXAKXv6EkbqI", lat:35.6647703, lng:139.7702515},
       {t:"8:00", n:"우니토라 나카도리점", ja:"うに虎 中通り店", kc:"food", k:"식당, 아침",
        note:"7시부터. 시장 한복판이라 따로 움직일 필요 없음.",
        q:"うに虎 中通り店", id:"ChIJ7QgKJ9-LGGAR-CG9wwEzMG0", lat:35.6655762, lng:139.7704993},
       {t:"10:00", n:"국립신미술관", ja:"国立新美術館", kc:"art", k:"미술관", closed:"화 휴관", ok:"당일권",
+       arch:{by:"黒川紀章", year:2007},
+       shot:"물결치는 유리 커튼월과 아트리움의 거대한 역원뿔 두 개. 관내 공용 공간은 개인 촬영 가능(전시실은 전시마다 다름). 창가 빛이 바닥에 떨어지는 오전이 좋아요.",
        leg:{line:"히비야선", from:"츠키지역", to:"롯폰기역", note:"환승 없이 직통", v:true},
        note:"소장품 없이 기획전만 여는 곳이라 무엇이 걸렸는지 미리 확인하세요.",
        q:"国立新美術館", lat:35.6652, lng:139.7264},
       {t:"12:30", n:"네즈미술관과 네즈카페", ja:"根津美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"nezu", fee:1500, feeNote:"웹 예약, 정원 포함",
+       arch:{by:"隈研吾", year:2009},
+       shot:"입구에서 본관까지 대나무 벽 사이 진입로가 대표 장면. 사람이 없을 때 소실점으로. 정원 쪽에서 얇은 큰 지붕을.",
        leg:{line:"치요다선", from:"노기자카역", to:"오모테산도역", v:true},
        note:"칠기 전시(10/24–11/23). 쿠마 겐고 건물에 일본 정원, 11월 하순이면 단풍 절정. 정원을 먼저 돌고 카페는 나중에.",
        q:"根津美術館", id:"ChIJxU48-2OLGGARHMtB5RAhytA", lat:35.6622568, lng:139.7170937},
       {t:"14:00", n:"진구가이엔 은행나무길", ja:"神宮外苑いちょう並木", kc:"leaf", k:"사진 스팟, 단풍",
+       shot:"아오야마도리 쪽 입구에서 길 끝 회화관까지 원근감으로. 차도 가운데는 위험하니 보도에서. 노란 잎은 역광일 때 빛나요.",
        rain:"비가 오면 길 끝에서 사진만 찍고, 네즈 카페에서 더 머물거나 선택 일정인 와타리움을 넉넉히 보세요.",
        note:"아오야마도리에서 이어지는 300m 은행나무 터널. 절정은 11월 하순~12월 상순이라 21일은 노랗게 물드는 중일 거예요. 토요일이라 붐비니 길 가운데보다 양 끝에서 찍으세요. 은행나무 축제가 이맘때 열리는 해가 많습니다(올해 날짜는 공식 사이트 확인).",
        q:"神宮外苑いちょう並木", lat:35.6745, lng:139.718},
       {t:"14:50", n:"와타리움 미술관", ja:"ワタリウム美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"현장 발권", opt:true,
+       arch:{by:"マリオ・ボッタ"},
+       shot:"좁은 삼각형 땅에 선 줄무늬 외관. 길 건너편에서 모서리를 정면으로.",
        note:"마리오 보타 설계. 1층 아트북숍 on Sundays가 사실상 본 무대. 은행나무길에서 걸어서 갈 수 있는 거리예요.",
        q:"ワタリウム美術館", id:"ChIJXf9Z6JiMGGARRZ0zg4fFgLU", lat:35.6707251, lng:139.7133581},
       {t:"15:50", n:"Utrecht", ja:"ユトレヒト", kc:"book", k:"서점", closed:"월 휴무",
@@ -932,6 +1003,32 @@ const DAYS = [
        note:"책 한 권만 파는 5평 서점이라 10~20분이면 충분해요. 13시에 열고, 13:25쯤 긴자를 떠납니다.",
        q:"森岡書店 銀座", id:"ChIJqTpnNOCLGGARzXnKjoTqPyE", lat:35.6720587, lng:139.7718447}
     ]}
+];
+
+// 지나가며 찍는 건축. 시간 칸 없이 가까운 일정(near = 그 장소의 q) 카드에 붙는다. 2026-09-25 확인.
+// 좌표는 주소 기준 대략값이다. 지도·길찾기 버튼은 이름(q)으로 검색한다.
+const SIGHTS = [
+  {n:"도쿄문화회관", ja:"東京文化会館", day:"thu", near:"国立西洋美術館", by:"前川國男", year:1961,
+   why:"코르뷔지에의 제자 마에카와 구니오의 모더니즘 대표작. 스승의 서양미술관과 마주 보고 있어요.",
+   q:"東京文化会館", lat:35.7129, lng:139.7751, src:"https://artplaza.geidai.ac.jp/sights/11992/", srcn:"藝大アートプラザ"},
+  {n:"법륭사보물관", ja:"法隆寺宝物館", day:"thu", near:"東京国立博物館", by:"谷口吉生",
+   why:"도쿄국립박물관 부지 안. 얕은 연못 너머 유리와 금속의 수평 입면이 조용하게 비쳐요.",
+   q:"法隆寺宝物館", lat:35.7192, lng:139.7744, src:"https://archi-graphy.com/%E6%B3%95%E9%9A%86%E5%AF%BA%E5%AE%9D%E7%89%A9%E9%A4%A8/", srcn:"ARCHI-GRAPHY"},
+  {n:"프라다 아오야마", ja:"プラダ 青山店", day:"sat", near:"根津美術館", by:"Herzog & de Meuron", year:2003,
+   why:"마름모 격자에 볼록한 유리를 끼운 건물. 네즈미술관 앞 미유키도리에 있어요.",
+   q:"プラダ 青山店", lat:35.6627, lng:139.7148, src:"https://architecturephoto.net/syasin/005/h005.htm", srcn:"architecturephoto"},
+  {n:"디올 오모테산도", ja:"ディオール表参道", day:"sat", near:"Utrecht 神宮前", by:"SANAA(妹島和世+西沢立衛)",
+   why:"유리 안쪽에 아크릴 막을 겹쳐 흰 드레이프처럼 보이는 외관. 와타리움에서 Utrecht로 걷는 오모테산도 길에.",
+   q:"ディオール表参道", lat:35.6668, lng:139.7085, src:"https://www.tozai-as.or.jp/mytech/04/04_sejima01.html", srcn:"東西アスファルト"},
+  {n:"TOD'S 오모테산도", ja:"TOD'S表参道ビル", day:"sat", near:"Utrecht 神宮前", by:"伊東豊雄", year:2004,
+   why:"느티나무 가로수를 닮은 나뭇가지 모양 콘크리트 외관. 디올과 같은 길이라 한 번에.",
+   q:"TOD'S表参道ビル", lat:35.6679, lng:139.7093, src:"https://www.tozai-as.or.jp/mytech/06/06_ito04.html", srcn:"東西アスファルト"},
+  {n:"메종 에르메스", ja:"銀座メゾンエルメス", day:"sun", near:"資生堂ギャラリー", by:"Renzo Piano", year:2001,
+   why:"45cm 유리블록 1만 5천 개로 감싼 건물. 낮엔 반투명한 벽, 흐린 날엔 더 부드럽게 찍혀요.",
+   q:"銀座メゾンエルメス", lat:35.6717, lng:139.7632, src:"https://jbpress.ismedia.jp/articles/-/86591?page=2", srcn:"JBpress"},
+  {n:"미키모토 긴자 2", ja:"MIKIMOTO Ginza 2", day:"sun", near:"森岡書店 銀座", by:"伊東豊雄", year:2005,
+   why:"치즈 구멍 같은 불규칙한 창이 여러 층에 걸쳐 뚫린 분홍빛 외관. 모리오카 서점 가는 길 마로니에도리에.",
+   q:"MIKIMOTO Ginza 2", lat:35.6739, lng:139.7678, src:"https://www.asahi-mullion.com/column/article/tatemono/3407", srcn:"朝日マリオン"}
 ];
 
 // 일정 밖 추천. 2026년 9월 22일 검색으로 확인한 것만 넣는다. 출처 없는 항목은 넣지 말 것.
@@ -981,6 +1078,16 @@ const RECS = [
    tip:"원래 목요일 밤 자리였는데 아사쿠사에서 멀고 숙소와도 반대 방향이라 bar all로 바꿨습니다.",
    q:"Spincoaster Music Bar", src:"https://www.hotpepper.jp/strJ001170751/", srcn:"핫페퍼", lat:35.6852642, lng:139.6992942, slot:{day:"thu", t:"19:45"}},
 
+  {n:"짓켄바시 역스카이트리", ja:"十間橋", kc:"photo", k:"사진 스팟", area:"오시아게", when:"thu",
+   why:"기타짓켄강 작은 다리. 물에 비친 거꾸로 선 스카이트리를 타워와 함께 찍는 유명한 자리예요. 스카이트리에서 걸어서 7~10분, 해 질 무렵이 좋아요.",
+   tip:"목요일엔 해 질 때 타워 위에 있어서 둘 다는 어려워요. 필름으로 타워를 찍고 싶으면 입장을 한 시간 당기고 16:40쯤 여기로 오세요(블루아워는 17시 전까지). 타워와 반영을 다 넣으려면 광각(18mm쯤)으로 세로.",
+   q:"十間橋", src:"https://yakei.jp/japan/spot.php?i=jyukken", srcn:"夜景INFO", lat:35.7093, lng:139.8196, slot:{day:"thu", t:"16:40"}},
+
+  {n:"카메라노 키타무라 시부야점", ja:"カメラのキタムラ 渋谷店", kc:"photo", k:"필름 현상", area:"시부야", when:"sat",
+   why:"컬러 네거티브·일회용 카메라 현상을 1층에서 받아요. 빠르면 당일에 끝나고 스마트폰으로 받는 데이터도 돼요.",
+   tip:"토요일 SPBS 가는 길에 목·금에 찍은 롤을 맡기면 여행 중에 결과를 볼 수 있어요. 당일 완료 여부와 마감 시각은 매장에서 확인하세요.",
+   q:"カメラのキタムラ 渋谷店", src:"https://x.com/kitamura_8308/status/1786320543064670325", srcn:"키타무라 시부야점 X", lat:35.6597, lng:139.7005, slot:{day:"sat", t:"16:45"}},
+
   {n:"다이코쿠야 덴푸라", ja:"大黒家天麩羅 本店", kc:"food", k:"식당, 저녁", area:"아사쿠사", when:"thu",
    why:"아사쿠사의 오래된 튀김집. 진한 양념에 담근 새우튀김 덮밥이 간판이에요. 11:00~20:30(토·공휴일 21:00), 정기 휴일 없음.",
    tip:"고마카타 도제우가 쉬는 날이거나 미꾸라지가 부담스러우면 목요일 저녁을 이쪽으로 바꾸세요. 줄이 길 수 있어요.",
@@ -1000,6 +1107,8 @@ const PREP = [
   {id:"hotel", t:"숙소 체크인 준비물", d:"사진 있는 신분증(여권)과 신용카드. 도착하면 카드로 보증금 5,000엔을 잡고, 체크아웃 때 시설 확인 뒤 돌려줍니다.",
    src:"https://www.hotels.com/ho2980682240/spablic-inn-tokyo-japan/", srcn:"Hotels.com"},
   {id:"train", t:"공항 열차 표 확인", d:"나리타 익스프레스는 전 좌석 지정석입니다. 수요일 밤과 일요일 표를 미리 봐 두세요."},
+  {id:"film", t:"필름은 기내 가방에", d:"맡기는 짐의 CT 검사는 현상 전 필름을 흐리게 할 수 있어요. 필름은 기내 가방에 넣고, 보안검색대에서 손 검사를 부탁하세요. 나리타도 요청하면 손으로 검사해 줍니다. 일본어 문장은 도움 탭에 있어요.",
+   src:"https://asset.fujifilm.com/www/jp/files/2020-02/4ea03c30a569b6b817ec39e034dbdb9c/20200227_01.pdf", srcn:"후지필름 안내"},
   {id:"cal", t:"폰 캘린더에 일정 넣기", d:"예약 있는 곳은 한 시간 전에 알림이 울리게 들어갑니다.", go:"#icsbtn"}
 ];
 
@@ -1023,6 +1132,7 @@ const PHRASES = [
   {ko:"계산해 주세요", ja:"お会計お願いします"},
   {ko:"영수증 주세요", ja:"レシートをください"},
   {ko:"사진 찍어도 되나요?", ja:"写真を撮ってもいいですか？"},
+  {ko:"필름이에요. 엑스레이 말고 손으로 검사해 주세요", ja:"フィルムなので、X線を通さずに手で検査していただけますか？"},
   {ko:"짐을 맡길 수 있나요?", ja:"荷物を預けられますか？"},
   {ko:"화장실은 어디예요?", ja:"トイレはどこですか？"}
 ];
@@ -1132,7 +1242,8 @@ const KIND = {
   view:  {c:"var(--k-view)",   i:"i-view"},
   hotel: {c:"var(--ink)",      i:"i-hotel"},
   move:  {c:"var(--k-move)",   i:"i-move"},
-  leaf:  {c:"var(--k-leaf)",   i:"i-leaf"}
+  leaf:  {c:"var(--k-leaf)",   i:"i-leaf"},
+  photo: {c:"var(--k-photo)",  i:"i-camera"}
 };
 const ico = (id,cls="ki")=>`<svg class="${cls}" aria-hidden="true"><use href="#${id}"/></svg>`;
 
@@ -1429,7 +1540,8 @@ function stopHTML(d,s,prev){
                       : `<span class="dot" aria-hidden="true"></span>`;
   const ja = s.ja ? `<p class="ja">${esc(s.ja)}${ico("i-zoom","ki zoom")}</p>`
           : s.jaTodo ? `<p class="ja todo">일본어 이름 확인 필요${ico("i-zoom","ki zoom")}</p>` : "";
-  const nameBlock = `<button type="button" class="namebtn" data-big="${s._idx}"><span class="name">${esc(s.n)}${s.ja?"":ico("i-zoom","ki zoom")}</span>${ja}</button>`;
+  const nameBlock = `<button type="button" class="namebtn" data-big="${s._idx}"><span class="name">${esc(s.n)}${s.ja?"":ico("i-zoom","ki zoom")}</span>${ja}</button>`
+    + (s.arch?`<p class="archline">${ico("i-art")}<span>${esc(s.arch.by)}${s.arch.year?` · ${s.arch.year}`:""}${s.arch.note?` · ${esc(s.arch.note)}`:""}</span></p>`:"");
   const leg = "";   // 경로는 카드 사이 이동 줄(hopHTML)에 표시
   const acts=[];
   if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q||s.n,s.id)}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
@@ -1448,6 +1560,7 @@ function stopHTML(d,s,prev){
       </div>${thumb}</div>
       ${leg}
       ${s.note?`<p class="note">${esc(s.note)}</p>`:""}
+      ${photoHTML(d,s)}
       ${rainAltHTML(d,s)}
       ${meta||s.mine?`<div class="meta">${s.mine?`<span class="badge mine">내가 추가</span>`:""}${meta}</div>`:""}
       ${acts.length?`<div class="acts">${acts.join("")}</div>`:""}
@@ -1554,6 +1667,7 @@ function renderDay(key){
         ${(()=>{ const w=(typeof wxDay==="function")?wxDay(d.date):null; if(!w) return "";
           return `<span${w.rain>=50?' class="wet"':""}>${esc(WMO(w.code))} ${Math.round(w.hi)}°/${Math.round(w.lo)}°${w.rain!=null?` · 강수 ${w.rain}%`:""}</span>`; })()}
       </div>
+      ${lightHTML(d)}
       <div class="prog" id="prog" hidden><i></i></div>
     </header>
     ${pins?`<figure class="map">
@@ -1677,6 +1791,118 @@ document.addEventListener("submit",e=>{
   refresh();
 });
 
+/* ---------- 사진: 빛 시각 ----------
+   NOAA 태양 위치 근사식. 골든아워는 해 높이 6°→0°(일몰), 블루아워는 일몰→해 높이 -6°(시민박명 끝)로 잡는다. 1~2분 오차. */
+function sunAt(date, zenith, rising){
+  const [y,m,d]=date.split("-").map(Number);
+  const N=Math.round((Date.UTC(y,m-1,d)-Date.UTC(y,0,1))/864e5)+1;
+  const g=2*Math.PI/365*(N-1);
+  const eqt=229.18*(0.000075+0.001868*Math.cos(g)-0.032077*Math.sin(g)-0.014615*Math.cos(2*g)-0.040849*Math.sin(2*g));
+  const decl=0.006918-0.399912*Math.cos(g)+0.070257*Math.sin(g)-0.006758*Math.cos(2*g)+0.000907*Math.sin(2*g)-0.002697*Math.cos(3*g)+0.00148*Math.sin(3*g);
+  const lat=HOTEL.lat*Math.PI/180, lng=HOTEL.lng;
+  const ha=Math.acos(Math.cos(zenith*Math.PI/180)/(Math.cos(lat)*Math.cos(decl))-Math.tan(lat)*Math.tan(decl))*180/Math.PI;
+  const min=720-4*(lng+(rising?ha:-ha))-eqt+9*60;     // 도쿄 시각(분)
+  const h=Math.floor(min/60), mm=Math.round(min%60);
+  return (mm===60?h+1:h)+":"+String(mm===60?0:mm).padStart(2,"0");
+}
+function lightOf(date){
+  return {rise:sunAt(date,90.833,true), gold:sunAt(date,84,false), set:sunAt(date,90.833,false), blue:sunAt(date,96,false)};
+}
+function lightHTML(d){
+  const L=lightOf(d.date);
+  return `<p class="lightline">${ico("i-sun")}<span>해 뜸 <b>${L.rise}</b> · 골든아워 <b>${L.gold}–${L.set}</b> · 블루아워 <b>~${L.blue}</b></span></p>`;
+}
+
+/* ---------- 사진: 카드 안 촬영 팁 · 근처 건축 · 해시태그 ---------- */
+const tagWord=t=>"#"+String(t||"").replace(/[\s・·()（）'’.,/&+-]/g,"");
+function tagsFor(x){
+  const t=[x.ja||x.n];
+  if(x.arch||x.by) t.push("東京建築");
+  t.push("東京","filmphotography","フィルムカメラ","tokyotrip");
+  return [...new Set(t.map(tagWord))].join(" ");
+}
+function sightsNear(s){ return SIGHTS.filter(g=>g.near===s.q); }
+function photoHTML(d,s){
+  const near=sightsNear(s);
+  if(!s.shot && !near.length && !s.arch) return "";
+  return `<div class="photobox">
+    ${s.shot?`<p class="shot">${ico("i-camera")}<span>${esc(s.shot)}</span></p>`:""}
+    ${near.length?`<ul class="sights">${near.map(g=>`<li><a href="${MAPS(g.q)}" target="_blank" rel="noopener"><b>${esc(g.n)}</b><span>${esc(g.by)}${g.year?` · ${g.year}`:""}</span></a><button type="button" class="tagbtn" data-tags="${esc(tagsFor(g))}" aria-label="${esc(g.n)} 해시태그 복사">#</button></li>`).join("")}</ul>`:""}
+    <button type="button" class="linkish tagcopy" data-tags="${esc(tagsFor(s))}">해시태그 복사</button>
+  </div>`;
+}
+async function copyText(t){
+  try{ await navigator.clipboard.writeText(t); return true; }
+  catch(e){ try{ const ta=document.createElement("textarea"); ta.value=t; document.body.appendChild(ta); ta.select(); const ok=document.execCommand("copy"); ta.remove(); return ok; }catch(e2){ return false; } }
+}
+function toast(msg){
+  let el=$("#toast"); if(!el){ el=document.createElement("div"); el.id="toast"; el.className="toast"; el.setAttribute("role","status"); document.body.appendChild(el); }
+  el.textContent=msg; el.classList.add("on"); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove("on"),1800);
+}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-tags]"); if(!b) return;
+  e.preventDefault(); e.stopPropagation();
+  toast(await copyText(b.dataset.tags) ? "해시태그를 복사했어요" : "복사가 막혀 있어요: "+b.dataset.tags);
+});
+
+/* ---------- 필름 기록 ----------
+   롤마다 컷을 센다. 한 컷 누를 때 그 시각과 "지금(없으면 다음) 일정"을 같이 적어 두면
+   나중에 스캔본에 장소를 붙이기 쉽다. tokyo-film = {rolls:[{id,film,exp,frames:[{n,ts,place,day}]}]} */
+const FILM_KEY="tokyo-film";
+function filmGet(){ try{ const v=JSON.parse(LS.get(FILM_KEY,"null")); if(v&&Array.isArray(v.rolls)&&v.rolls.length) return v; }catch(e){} return {rolls:[{id:1,film:"",exp:36,frames:[]}]}; }
+function filmSet(v){ LS.set(FILM_KEY,JSON.stringify(v)); }
+const curRoll=v=>v.rolls[v.rolls.length-1];
+function nowPlace(){
+  const info=nowInfo(); const it=info.cur||(info.phase==="during"?info.next:null);
+  if(!it) return {place:"", day:""};
+  const s=it.d.stops[it.i]; return {place:s.n, ja:s.ja||"", day:it.d.key};
+}
+function filmShot(delta){
+  const v=filmGet(), r=curRoll(v);
+  if(delta>0){ if(r.frames.length>=r.exp) { toast("이 롤은 다 찍었어요. 새 롤을 시작하세요"); return; }
+    const p=nowPlace(); r.frames.push({n:r.frames.length+1, ts:Date.now(), place:p.place, ja:p.ja, day:p.day}); }
+  else r.frames.pop();
+  filmSet(v); renderFilm(); homeFilm();
+}
+function filmText(){
+  const v=filmGet(), fmt=new Intl.DateTimeFormat("ko-KR",{timeZone:TZ,month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit",hour12:false});
+  return v.rolls.filter(r=>r.frames.length).map(r=>[`■ 롤 ${r.id}${r.film?" · "+r.film:""}`,
+    ...r.frames.map(f=>`#${f.n}  ${fmt.format(new Date(f.ts))}  ${f.place||"-"}${f.ja?" ("+f.ja+")":""}`)].join("\n")).join("\n\n");
+}
+function renderFilm(){
+  const el=$("#film"); if(!el) return;
+  const v=filmGet(), r=curRoll(v), n=r.frames.length, last=r.frames[n-1];
+  el.innerHTML=`<div class="card-box filmbox">
+    <div class="film-top">
+      <label class="film-name">롤 ${r.id} 필름<input type="text" id="film-name" value="${esc(r.film)}" placeholder="예: Kodak Portra 400" autocomplete="off"></label>
+      <label class="film-exp">컷 수<select id="film-exp">${[12,24,27,36,39].map(x=>`<option${x===r.exp?" selected":""}>${x}</option>`).join("")}</select></label>
+    </div>
+    <div class="film-count"><b>${n}</b><span>/ ${r.exp}</span></div>
+    <div class="bar" aria-hidden="true"><i style="width:${Math.round(n/r.exp*100)}%"></i></div>
+    <p class="sub" style="margin:0 0 12px">${last?`마지막 컷 #${last.n} · ${esc(last.place||"장소 없음")}`:"한 컷 찍을 때마다 누르면 시각과 그때 일정이 같이 적혀요."}</p>
+    <div class="acts film-acts">
+      <button type="button" class="btn key" id="film-plus">${ico("i-camera")}한 컷</button>
+      <button type="button" class="btn" id="film-minus"${n?"":" disabled"}>되돌리기</button>
+      <button type="button" class="btn" id="film-new">새 롤</button>
+    </div>
+    ${v.rolls.some(x=>x.frames.length)?`<div class="acts"><button type="button" class="btn" id="film-copy">기록 전체 복사</button></div>
+    <details class="ghelp"><summary>지금까지 기록 보기</summary><pre class="filmlog">${esc(filmText())}</pre></details>`:""}
+  </div>`;
+  $("#film-plus").onclick=()=>filmShot(1);
+  $("#film-minus").onclick=()=>filmShot(-1);
+  $("#film-new").onclick=()=>{ const v=filmGet(), r=curRoll(v);
+    if(!r.frames.length){ toast("아직 빈 롤이에요"); return; }
+    v.rolls.push({id:r.id+1, film:r.film, exp:r.exp, frames:[]}); filmSet(v); renderFilm(); homeFilm(); toast(`롤 ${r.id+1} 시작`); };
+  $("#film-name").onchange=e=>{ const v=filmGet(); curRoll(v).film=e.target.value.trim(); filmSet(v); };
+  $("#film-exp").onchange=e=>{ const v=filmGet(); curRoll(v).exp=Number(e.target.value); filmSet(v); renderFilm(); homeFilm(); };
+  const cp=$("#film-copy"); if(cp) cp.onclick=async()=>toast(await copyText(filmText())?"기록을 복사했어요":"복사가 막혀 있어요");
+}
+function homeFilm(){
+  const b=$("#q-film"); if(!b) return;
+  const r=curRoll(filmGet());
+  b.querySelector(".qcount").textContent=`${r.frames.length}/${r.exp}`;
+}
+
 /* ---------- 일본어 소리 ---------- */
 const canSpeak=()=>"speechSynthesis" in window && typeof SpeechSynthesisUtterance==="function";
 function speakJa(text){
@@ -1699,6 +1925,8 @@ function rainAltHTML(d,s){
 
 /* ---------- 테마: 여행 책자처럼 종류별로 ---------- */
 const THEMES=[
+  {k:"photo", n:"건축·사진",     kcs:["photo"],        ic:"i-camera",
+   intro:"필름으로 남길 건물과 장면. 일정 속 건축가의 건물, 가는 길에 지나치는 건물, 사진 스팟을 모았어요. 해시태그는 누르면 복사돼요."},
   {k:"art",  n:"미술관·박물관",   kcs:["art"],          ic:"i-art",
    intro:"이번 여행의 뼈대예요. 11월 셋째 주에 열리는 특별전에 날짜를 맞췄습니다. 대부분 월요일에 쉬어서 수~일 일정과는 겹치지 않아요."},
   {k:"book", n:"서점·북카페",     kcs:["book"],         ic:"i-book",
@@ -1728,23 +1956,33 @@ function renderThemes(){
   const inPlan=r=>DAYS.some(d=>(d.base||d.stops).some(s=>s.q===r.q));
   const secs=THEMES.map(t=>{
     const K=KIND[t.kcs[0]]||KIND.move;
-    const items=all.filter(x=>t.kcs.includes(x.s.kc));
+    const items = t.k==="photo" ? all.filter(x=>x.s.arch||x.s.shot) : all.filter(x=>t.kcs.includes(x.s.kc));
     const recs=RECS.filter(r=>t.kcs.includes(r.kc) && !inPlan(r));
+    const sights = t.k==="photo" ? SIGHTS : [];
     const rows=items.map(({d,s})=>`<li><button type="button" class="trow${s.opt?" opt":""}" data-see="${d.key}" data-q="${esc(s.q)}">
         <span class="tday"><b>${d.wd}</b><span>${esc(s.t)}</span></span>
         <span class="tmain"><span class="tname">${esc(s.n)}${s.mine?` <em class="tmine">내가 추가</em>`:""}${s.opt?` <em class="topt">선택</em>`:""}</span>
           ${s.ja?`<span class="tja" lang="ja">${esc(s.ja)}</span>`:""}
           ${s.note?`<span class="tnote">${esc(firstSentence(s.note))}</span>`:""}</span>
-        ${s.fee>0?`<span class="tfee">${s.fee.toLocaleString("ko-KR")}엔</span>`:""}
+        ${t.k==="photo"?(s.arch?`<span class="tfee">${esc(s.arch.by)}</span>`:""):s.fee>0?`<span class="tfee">${s.fee.toLocaleString("ko-KR")}엔</span>`:""}
       </button></li>`).join("");
+    const srows=sights.map(g=>{ const d=DAYS.find(x=>x.key===g.day);
+      return `<li class="srow"><a class="trow" href="${MAPS(g.q)}" target="_blank" rel="noopener">
+        <span class="tday"><b>${d.wd}</b><span>가는 길</span></span>
+        <span class="tmain"><span class="tname">${esc(g.n)}</span><span class="tja" lang="ja">${esc(g.ja)}</span><span class="tnote">${esc(g.why)}</span></span>
+        <span class="tfee">${esc(g.by)}${g.year?`<br>${g.year}`:""}</span></a>
+        <button type="button" class="tagbtn" data-tags="${esc(tagsFor(g))}" aria-label="${esc(g.n)} 해시태그 복사">#</button></li>`; }).join("");
+    if(t.k==="photo") t._n=items.length+sights.length;
     return `<section class="theme" id="th-${t.k}" style="--kc:${K.c}">
-      <header class="theme-h"><span class="theme-ic">${ico(t.ic)}</span><div><h2>${esc(t.n)}</h2><p class="theme-n">일정 ${items.length}곳${recs.length?` · 추천 ${recs.length}곳`:""}</p></div></header>
+      <header class="theme-h"><span class="theme-ic">${ico(t.ic)}</span><div><h2>${esc(t.n)}</h2><p class="theme-n">일정 ${items.length}곳${sights.length?` · 가는 길 ${sights.length}곳`:""}${recs.length?` · 추천 ${recs.length}곳`:""}</p></div></header>
       <p class="theme-intro">${esc(t.intro)}</p>
+      ${t.k==="photo"?`<div class="lightgrid">${DAYS.slice(1).map(d=>{ const L=lightOf(d.date); return `<span><b>${d.wd}</b> 골든 ${L.gold}–${L.set}<br>블루 ~${L.blue}</span>`; }).join("")}</div>`:""}
       ${items.length?`<ol class="tlist">${rows}</ol>`:""}
+      ${srows?`<h3 class="theme-sub">가는 길에 지나치는 건축</h3><ol class="tlist">${srows}</ol>`:""}
       ${recs.length?`<h3 class="theme-sub">일정 밖 추천</h3><ol class="reclist">${recs.map(recCardHTML).join("")}</ol>`:""}
     </section>`;
   }).join("");
-  const chips=THEMES.map(t=>{ const n=all.filter(x=>t.kcs.includes(x.s.kc)).length;
+  const chips=THEMES.map(t=>{ const n = t.k==="photo" ? all.filter(x=>x.s.arch||x.s.shot).length+SIGHTS.length : all.filter(x=>t.kcs.includes(x.s.kc)).length;
     return `<a class="tchip" href="#th-${t.k}" style="--kc:${(KIND[t.kcs[0]]||KIND.move).c}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${n}</b></a>`; }).join("");
   panelEl.innerHTML=`<section class="themes" role="tabpanel" aria-labelledby="nav-themes">
     <header class="pagehead">
@@ -1785,7 +2023,7 @@ function renderHome(){
   const done=CHECKS.filter(c=>CHECKED[c.id]).length, left=CHECKS.filter(c=>!CHECKED[c.id]);
   const phase=nowInfo().phase;
   const all=[]; DAYS.forEach(d=>d.stops.forEach(s=>{ if(s.lat && !s.hotel) all.push(s); }));
-  const chips=THEMES.map(t=>`<button type="button" class="tchip" data-theme="${t.k}" style="--kc:${(KIND[t.kcs[0]]||KIND.move).c}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${all.filter(x=>t.kcs.includes(x.kc)).length}</b></button>`).join("");
+  const chips=THEMES.map(t=>`<button type="button" class="tchip" data-theme="${t.k}" style="--kc:${(KIND[t.kcs[0]]||KIND.move).c}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${t.k==="photo"?all.filter(x=>x.arch||x.shot).length+SIGHTS.length:all.filter(x=>t.kcs.includes(x.kc)).length}</b></button>`).join("");
   panelEl.innerHTML=`<section class="home${phase==="during"?" during":""}" role="tabpanel" aria-labelledby="nav-home">
     <header class="hero">
       <svg class="leaf" viewBox="0 0 64 64" aria-hidden="true">
@@ -1819,6 +2057,7 @@ function renderHome(){
         <button type="button" class="qbtn" id="q-addr">${ico("i-hotel")}<span>숙소 주소<br>크게 보기</span></button>
         <button type="button" class="qbtn" data-gotab="help">${ico("i-sound")}<span>일본어<br>한마디</span></button>
         <button type="button" class="qbtn" data-goto="#sos">${ico("i-help")}<span>긴급<br>연락처</span></button>
+        <button type="button" class="qbtn film" id="q-film">${ico("i-camera")}<span>필름 한 컷<br><em class="qcount"></em></span></button>
       </div>
     </section>
   </section>`;
@@ -1827,6 +2066,8 @@ function renderHome(){
   $$("[data-gotab]",panelEl).forEach(b=>b.addEventListener("click",()=>{ go(b.dataset.gotab,{sub:"todo"}); window.scrollTo({top:0}); }));
   $$("[data-goto]",panelEl).forEach(b=>b.addEventListener("click",()=>goTo(b.dataset.goto)));
   $("#q-addr").addEventListener("click",()=>openBig({stops:[{n:HOTEL.n, ja:HOTEL.ja, addr:HOTEL.addr, q:HOTEL.q}]},0));
+  $("#q-film").addEventListener("click",()=>filmShot(1));
+  homeFilm();
   homeNow(nowInfo());
 }
 // 여행 중 홈 맨 위: 지금 있어야 할 곳(없으면 다음 곳)
@@ -1954,6 +2195,7 @@ function renderMore(tab, subKey){
   });
   if(active==="budget") renderBudget();
   if(active==="todo") renderIcsMine();
+  if(active==="help") renderFilm();
   applyNow();
 }
 // 다른 탭에 있는 요소로 이동: 그 요소가 든 탭·하위 탭을 먼저 연다

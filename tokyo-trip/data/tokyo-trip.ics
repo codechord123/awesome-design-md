@@ -207,9 +207,34 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-fri-0@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261120T010000Z
+DTSTART:20261119T230000Z
+DTEND:20261120T011500Z
+SUMMARY:1. 스타벅스 리저브 로스터리 도쿄
+LOCATION:スターバックス リザーブ ロースタリー 東京
+DESCRIPTION:スターバックス リザーブ ロースタリー 東京\n2
+ 019년에 연 세계 다섯 번째 로스터리. 7:00~22:00. 주말엔 번
+ 호표(Airウェイト)가 필요할 만큼 붐벼서 평일 아침으로 
+ 잡았어요. 1층 베이커리 프린치에서 아침을 먹습니다.\nh
+ ttps://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC
+ %E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%AA%E3%82%B6%E3%83%BC%E3%83%9
+ 6%20%E3%83%AD%E3%83%BC%E3%82%B9%E3%82%BF%E3%83%AA%E3%83%BC%20%E6%9D%B1%E4%
+ BA%AC&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%8
+ 3%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%AA%E3%82%B6%E3%83%BC%E3%
+ 83%96%20%E3%83%AD%E3%83%BC%E3%82%B9%E3%82%BF%E3%83%AA%E3%83%BC%20%E6%9D%B1
+ %E4%BA%AC&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:스타벅스 리저브 로스터리 도쿄
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-fri-1@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261120T011500Z
 DTEND:20261120T030000Z
-SUMMARY:1. 도쿄국립근대미술관
+SUMMARY:2. 도쿄국립근대미술관
 LOCATION:東京国立近代美術館
 DESCRIPTION:東京国立近代美術館\n다케히사 유메지전(10/23–
  1/11). 화가이자 시인\, 디자이너였던 유메지의 대표작 〈
@@ -227,11 +252,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-1@tokyo-trip
+UID:tokyo-2026-fri-2@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T030000Z
 DTEND:20261120T040000Z
-SUMMARY:2. 구풍 카레 본디
+SUMMARY:3. 구풍 카레 본디
 LOCATION:欧風カレー ボンディ 神保町本店
 DESCRIPTION:欧風カレー ボンディ 神保町本店\n진보초 카레
  의 대표. 간다 고서센터 빌딩 2층\, 평일 11:00~22:00\, 연중
@@ -249,11 +274,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-2@tokyo-trip
+UID:tokyo-2026-fri-3@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T040000Z
 DTEND:20261120T044500Z
-SUMMARY:3. 책거리 CHEKCCORI
+SUMMARY:4. 책거리 CHEKCCORI
 LOCATION:チェッコリ
 DESCRIPTION:チェッコリ\n한국책 전문 서점. 수~토만 엽니다.
  \nhttps://www.google.com/maps/search/?api=1&query=CHEKCCORI%20%E7%A5%9E%E4
@@ -267,11 +292,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-3@tokyo-trip
+UID:tokyo-2026-fri-4@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T044500Z
 DTEND:20261120T053000Z
-SUMMARY:4. 난요도 서점
+SUMMARY:5. 난요도 서점
 LOCATION:南洋堂書店
 DESCRIPTION:南洋堂書店\n건축 전문 헌책방. 실내 촬영 금지.
  \nhttps://www.google.com/maps/search/?api=1&query=%E5%8D%97%E6%B4%8B%E5%A0
@@ -285,11 +310,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-4@tokyo-trip
+UID:tokyo-2026-fri-5@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T053000Z
 DTEND:20261120T064500Z
-SUMMARY:5. 진보초 북센터
+SUMMARY:6. 진보초 북센터
 LOCATION:神保町ブックセンター
 DESCRIPTION:神保町ブックセンター\n이와나미쇼텐 건물. 산 
  책 펼쳐보며 커피 한 잔 쉬어 가는 자리.\nhttps://www.google.
@@ -306,11 +331,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-5@tokyo-trip
+UID:tokyo-2026-fri-6@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T064500Z
 DTEND:20261120T083000Z
-SUMMARY:6. 아티존 미술관
+SUMMARY:7. 아티존 미술관
 LOCATION:アーティゾン美術館
 DESCRIPTION:アーティゾン美術館\n교바시. 유럽에 간 일본 
  서양화가들\, 후지이 히카루와 소장품의 협업 등 전시 
@@ -329,11 +354,11 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-6@tokyo-trip
+UID:tokyo-2026-fri-7@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T083000Z
 DTEND:20261120T113000Z
-SUMMARY:7. 기쿠스시
+SUMMARY:8. 기쿠스시
 LOCATION:菊寿司
 DESCRIPTION:菊寿司\n니혼바시 가부토초에서 60년 넘게 이어
  온 에도마에 스시(日本橋兜町17-1). 저녁 17:00~22:00\, 토·
@@ -349,11 +374,11 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-7@tokyo-trip
+UID:tokyo-2026-fri-8@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T113000Z
 DTEND:20261120T130000Z
-SUMMARY:8. THE MUSIC BAR CAVE SHIBUYA
+SUMMARY:9. THE MUSIC BAR CAVE SHIBUYA
 LOCATION:THE MUSIC BAR CAVE SHIBUYA
 DESCRIPTION:지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키
  지가 7:30이니 너무 늦지 않게.\nhttps://www.google.com/maps/searc
