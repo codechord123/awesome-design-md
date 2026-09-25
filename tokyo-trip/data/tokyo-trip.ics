@@ -357,7 +357,7 @@ BEGIN:VEVENT
 UID:tokyo-2026-fri-7@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T083000Z
-DTEND:20261120T113000Z
+DTEND:20261120T095000Z
 SUMMARY:8. 기쿠스시
 LOCATION:菊寿司
 DESCRIPTION:菊寿司\n니혼바시 가부토초에서 60년 넘게 이어
@@ -376,9 +376,29 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-fri-8@tokyo-trip
 DTSTAMP:20260924T000000Z
+DTSTART:20261120T095000Z
+DTEND:20261120T113000Z
+SUMMARY:9. KITOKI · 평화 도부로쿠 양조소
+LOCATION:KITOKI 平和どぶろく兜町醸造所
+DESCRIPTION:KITOKI 平和どぶろく兜町醸造所\n기쿠스시와 같
+ 은 가부토초라 걸어서 몇 분. 1층 양조소에서 도부로쿠(
+ 탁주) 한 잔. 평일 13:00~22:30. CAVE로 가려면 40분쯤만 있다
+ 가 나오세요.\nhttps://www.google.com/maps/search/?api=1&query=KITOKI%
+ 20%E5%85%9C%E7%94%BA&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=KITOKI%20%E5%85%9C%E7%9
+ 4%BA&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:KITOKI · 평화 도부로쿠 양조소
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-fri-9@tokyo-trip
+DTSTAMP:20260924T000000Z
 DTSTART:20261120T113000Z
 DTEND:20261120T130000Z
-SUMMARY:9. THE MUSIC BAR CAVE SHIBUYA
+SUMMARY:10. THE MUSIC BAR CAVE SHIBUYA
 LOCATION:THE MUSIC BAR CAVE SHIBUYA
 DESCRIPTION:지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키
  지가 7:30이니 너무 늦지 않게.\nhttps://www.google.com/maps/searc
@@ -595,16 +615,61 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-sun-0@tokyo-trip
 DTSTAMP:20260924T000000Z
+DTSTART:20261121T234000Z
+DTEND:20261122T004000Z
+SUMMARY:1. 스타벅스 황궁외원 와다쿠라 분수공원점
+LOCATION:スターバックス コーヒー 皇居外苑 和田倉噴水公
+ 園店
+DESCRIPTION:スターバックス コーヒー 皇居外苑 和田倉噴水
+ 公園店\n7:00~21:00. 체크아웃하고 짐을 숙소에 맡긴 뒤 8시
+ 쯤 나오세요. 도쿄역 마루노우치 역사를 지나 국제포럼\
+ , 긴자까지 걸어 내려갑니다.\nhttps://www.google.com/maps/search
+ /?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82
+ %B9%20%E7%9A%87%E5%B1%85%E5%A4%96%E8%8B%91%20%E5%92%8C%E7%94%B0%E5%80%89%E
+ 5%99%B4%E6%B0%B4%E5%85%AC%E5%9C%92%E5%BA%97&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%8
+ 3%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E7%9A%87%E5%B1%85%E5%A4%96%E8%
+ 8B%91%20%E5%92%8C%E7%94%B0%E5%80%89%E5%99%B4%E6%B0%B4%E5%85%AC%E5%9C%92%E5
+ %BA%97&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:스타벅스 황궁외원 와다쿠라 분수공원점
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-sun-1@tokyo-trip
+DTSTAMP:20260924T000000Z
+DTSTART:20261122T004000Z
+DTEND:20261122T013000Z
+SUMMARY:2. 긴자 트리콜로르 본점
+LOCATION:銀座トリコロール 本店
+DESCRIPTION:銀座トリコロール 本店\n긴자 5초메\, 1936년 개
+ 업. 8:00~19:00(영업시간은 공식 인스타 @tricolore_koushiki에서
+  다시 확인). 츠타야(GINZA SIX)까지 걸어서 몇 분.\nhttps://ww
+ w.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%83%88%E3%83%AA
+ %E3%82%B3%E3%83%AD%E3%83%BC%E3%83%AB%20%E6%9C%AC%E5%BA%97&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%E3%8
+ 3%88%E3%83%AA%E3%82%B3%E3%83%AD%E3%83%BC%E3%83%AB%20%E6%9C%AC%E5%BA%97&hl=
+ ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:긴자 트리콜로르 본점
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-sun-2@tokyo-trip
+DTSTAMP:20260924T000000Z
 DTSTART:20261122T013000Z
 DTEND:20261122T023000Z
-SUMMARY:1. 긴자 츠타야 서점
+SUMMARY:3. 긴자 츠타야 서점
 LOCATION:銀座 蔦屋書店
-DESCRIPTION:銀座 蔦屋書店\nGINZA SIX 6층\, 10:30에 엽니다. 체
- 크아웃(11:00) 전에 짐을 숙소에 맡기고 나오세요. 아트와
-  사진집 서가가 압권이고\, 짐 부칠 책은 여기서 마지막
- 으로.\nhttps://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A
- 7%20%E8%94%A6%E5%B1%8B%E6%9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaLGGAR_L
- GfsNivcXE&hl=ko
+DESCRIPTION:銀座 蔦屋書店\nGINZA SIX 6층\, 10:30에 엽니다. 아
+ 트와 사진집 서가가 압권이고\, 짐 부칠 책은 여기서 마
+ 지막으로.\nhttps://www.google.com/maps/search/?api=1&query=%E9%8A%80%E
+ 5%BA%A7%20%E8%94%A6%E5%B1%8B%E6%9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaL
+ GGAR_LGfsNivcXE&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=%E9%8A%80%E5%BA%A7%20%E
  8%94%A6%E5%B1%8B%E6%9B%B8%E5%BA%97&query_place_id=ChIJH6YwSOaLGGAR_LGfsNiv
  cXE&hl=ko
@@ -615,11 +680,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sun-1@tokyo-trip
+UID:tokyo-2026-sun-3@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261122T023000Z
 DTEND:20261122T033000Z
-SUMMARY:2. 시세이도 파라 긴자 본점
+SUMMARY:4. 시세이도 파라 긴자 본점
 LOCATION:資生堂パーラー 銀座本店レストラン
 DESCRIPTION:資生堂パーラー 銀座本店レストラン\n긴자의 
  오래된 양식당. 11:30에 열고 월요일 휴무. 시세이도 갤러
@@ -637,11 +702,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sun-2@tokyo-trip
+UID:tokyo-2026-sun-4@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261122T033000Z
 DTEND:20261122T040000Z
-SUMMARY:3. 시세이도 갤러리
+SUMMARY:5. 시세이도 갤러리
 LOCATION:資生堂ギャラリー
 DESCRIPTION:資生堂ギャラリー\n같은 건물 지하. 일요일은 11
  :00~18:00. 30분이면 됩니다.\nhttps://www.google.com/maps/search/?api
@@ -657,11 +722,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sun-3@tokyo-trip
+UID:tokyo-2026-sun-5@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261122T040000Z
 DTEND:20261122T053000Z
-SUMMARY:4. 모리오카 서점
+SUMMARY:6. 모리오카 서점
 LOCATION:森岡書店 銀座店
 DESCRIPTION:森岡書店 銀座店\n책 한 권만 파는 5평 서점이라
   10~20분이면 충분해요. 13시에 열고\, 13:25쯤 긴자를 떠납

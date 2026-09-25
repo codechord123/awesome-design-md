@@ -394,6 +394,8 @@ ol.reclist{list-style:none;margin:0;padding:0;display:grid;gap:var(--s3)}
 .addform .btn.key{background:var(--ink)}
 .addhint{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
 .badge.mine{background:var(--ink);color:var(--surface)}
+.badge.dig{background:var(--k-photo);color:var(--surface)}
+.tdig,.tname .tdig{font-style:normal;font-size:11px;font-weight:700;border-radius:5px;padding:1px 5px;background:var(--k-photo);color:var(--surface);vertical-align:2px}
 .unmine{margin-top:var(--s1);color:var(--muted)}
 .btn[hidden]{display:none}
 .srcline a{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;text-decoration-color:var(--line)}
@@ -838,6 +840,7 @@ h1,h2,h3,.dtitle,.name,.tname,.nowname,.rname{word-break:keep-all;overflow-wrap:
   <symbol id="i-rain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12a8.5 8.5 0 0 1 17 0z"/><path d="M12 12v6.5a2 2 0 0 1-4 0"/></symbol>
   <symbol id="i-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 8.5A2 2 0 0 1 5.5 6.5h2l1.5-2h6l1.5 2h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.8"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 17.5h18"/><path d="M6.5 17.5a5.5 5.5 0 0 1 11 0"/><path d="M12 5v2.5M5.2 9.2l1.7 1.7M18.8 9.2l-1.7 1.7"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"><path d="M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0 1 12 7.3a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20z"/></symbol>
   <symbol id="i-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></symbol>
   <symbol id="i-zoom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 21 21"/><path d="M8 10.5h5M10.5 8v5"/></symbol>
 </svg>
@@ -866,7 +869,7 @@ const DAYS = [
        rain:"비가 오면 정원은 짧게 돌고, 추천 탭의 에도도쿄박물관(호쿠사이 옆)을 오후에 넣거나 도쿄국립박물관을 넉넉히 보세요.",
        note:"에도 시대 다이묘 정원. 9시에 열어요. 평일 아침이라 가장 한산한 시간입니다. 단풍철엔 駒込역에서 2분인 染井門이 열려서 정문(7분)보다 가까워요. 야간 라이트업은 이번 일정 뒤에 시작합니다.",
        q:"六義園", lat:35.73246, lng:139.748314},
-      {t:"10:30", n:"도쿄국립박물관", ja:"東京国立博物館", kc:"art", k:"박물관", closed:"월 휴관",
+      {t:"10:30", n:"도쿄국립박물관", ja:"東京国立博物館", kc:"art", k:"박물관", closed:"월 휴관", dig:"@hi_dongwon", 
        arch:{by:"渡辺仁", year:1937, note:"제관양식 본관"},
        shot:"정문에서 본관을 정면 대칭으로. 본관 가운데 대계단도 유명한 장면이에요. 같은 부지 안 법륭사보물관(다니구치 요시오)은 연못에 비친 수평 입면을 노리세요.",
        leg:{line:"JR 야마노테선", from:"駒込", to:"上野", note:"10분 안팎", v:true},
@@ -905,7 +908,7 @@ const DAYS = [
 
   { key:"fri", wd:"금", dt:"11.20", short:"나카메구로·진보초·니혼바시", date:"2026-11-20", title:"나카메구로에서 진보초, 니혼바시로", summary:"나카메구로 스타벅스 로스터리 아침, 근대미술관, 카레 점심, 헌책방 거리. 금요일은 아티존이 20시까지 열어서 저녁 스시 전에 넣었습니다.", walk:"아침만 멀리, 진보초 안은 걸어서",
     stops:[
-      {t:"8:00", n:"스타벅스 리저브 로스터리 도쿄", ja:"スターバックス リザーブ ロースタリー 東京", kc:"food", k:"카페, 아침",
+      {t:"8:00", n:"스타벅스 리저브 로스터리 도쿄", ja:"スターバックス リザーブ ロースタリー 東京", kc:"food", k:"카페, 아침", dig:"@daytripkorea", 
        leg:{line:"지하철", from:"赤坂見附", to:"中目黒", note:"19분 안팎, 환승 있음", v:true},
        arch:{by:"隈研吾(외관)", year:2019},
        shot:"4층까지 뚫린 천장에 17m 구리 캐스크와 벚꽃 모양 종이접기 천장. 1층 바 앞에서 위로 올려 찍고, 밖에선 메구로강 다리 위에서 삼나무 판자 외관을 정면으로. 아침 역광이 부드러워요.",
@@ -936,9 +939,14 @@ const DAYS = [
       {t:"17:30", n:"기쿠스시", ja:"菊寿司", kc:"food", k:"식당, 저녁", need:"예약", needId:"kiku",
        note:"니혼바시 가부토초에서 60년 넘게 이어온 에도마에 스시(日本橋兜町17-1). 저녁 17:00~22:00, 토·일·공휴일 휴무라 이번엔 이날뿐.",
        q:"Kiku Sushi 日本橋", id:"ChIJRX-nulmJGGAR9ynATgff8U0", lat:35.6790868, lng:139.7764141},
+      {t:"18:50", n:"KITOKI · 평화 도부로쿠 양조소", ja:"KITOKI 平和どぶろく兜町醸造所", kc:"photo", k:"건축, 한 잔", opt:true, close:"22:30", dig:"@daytripkorea", 
+       arch:{by:"ADX", year:2022, note:"일본 첫 목조 하이브리드 빌딩"},
+       shot:"10층 건물을 콘크리트 큰 틀 안에 나무로 채운 외관. 해가 진 뒤라 1층 불빛이 나무 사이로 새어 나올 때, 길 건너에서 세로로 한 장.",
+       note:"기쿠스시와 같은 가부토초라 걸어서 몇 분. 1층 양조소에서 도부로쿠(탁주) 한 잔. 평일 13:00~22:30. CAVE로 가려면 40분쯤만 있다가 나오세요.",
+       q:"KITOKI 兜町", lat:35.6809, lng:139.7781},
       {t:"20:30", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
        note:"지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키지가 7:30이니 너무 늦지 않게.",
-       leg:{line:"긴자선", from:"日本橋", to:"渋谷", note:"갈아타지 않음. 日本橋역은 기쿠스시에서 직선 400m쯤", v:true},
+       leg:{line:"긴자선", from:"日本橋", to:"渋谷", note:"갈아타지 않음", v:true},
        q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841}
     ]},
 
@@ -951,15 +959,15 @@ const DAYS = [
       {t:"8:00", n:"우니토라 나카도리점", ja:"うに虎 中通り店", kc:"food", k:"식당, 아침",
        note:"7시부터. 시장 한복판이라 따로 움직일 필요 없음.",
        q:"うに虎 中通り店", id:"ChIJ7QgKJ9-LGGAR-CG9wwEzMG0", lat:35.6655762, lng:139.7704993},
-      {t:"10:00", n:"국립신미술관", ja:"国立新美術館", kc:"art", k:"미술관", closed:"화 휴관", ok:"당일권",
+      {t:"10:00", n:"국립신미술관", ja:"国立新美術館", kc:"art", k:"미술관", closed:"화 휴관", ok:"당일권", dig:"@hi_dongwon", 
        arch:{by:"黒川紀章", year:2007},
        shot:"물결치는 유리 커튼월과 아트리움의 거대한 역원뿔 두 개. 관내 공용 공간은 개인 촬영 가능(전시실은 전시마다 다름). 창가 빛이 바닥에 떨어지는 오전이 좋아요.",
        leg:{line:"히비야선", from:"츠키지역", to:"롯폰기역", note:"환승 없이 직통", v:true},
        note:"소장품 없이 기획전만 여는 곳이라 무엇이 걸렸는지 미리 확인하세요.",
        q:"国立新美術館", lat:35.6652, lng:139.7264},
-      {t:"12:30", n:"네즈미술관과 네즈카페", ja:"根津美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"nezu", fee:1500, feeNote:"웹 예약, 정원 포함",
+      {t:"12:30", n:"네즈미술관과 네즈카페", ja:"根津美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"nezu", fee:1500, feeNote:"웹 예약, 정원 포함", dig:"@daytripkorea", 
        arch:{by:"隈研吾", year:2009},
-       shot:"입구에서 본관까지 대나무 벽 사이 진입로가 대표 장면. 사람이 없을 때 소실점으로. 정원 쪽에서 얇은 큰 지붕을.",
+       shot:"입구에서 본관까지 대나무 벽 사이 진입로가 대표 장면. 사람이 없을 때 소실점으로. 정원 쪽에서 얇은 큰 지붕을. 정원 안 NEZUCAFÉ는 사방이 유리라 숲이 액자처럼 들어와요(10:00~16:30, 음료 L.O. 16:00).",
        leg:{line:"치요다선", from:"노기자카역", to:"오모테산도역", v:true},
        note:"칠기 전시(10/24–11/23). 쿠마 겐고 건물에 일본 정원, 11월 하순이면 단풍 절정. 정원을 먼저 돌고 카페는 나중에.",
        q:"根津美術館", id:"ChIJxU48-2OLGGARHMtB5RAhytA", lat:35.6622568, lng:139.7170937},
@@ -988,10 +996,19 @@ const DAYS = [
        q:"Bar Luther Akasaka", lat:35.6754, lng:139.7369}
     ]},
 
-  { key:"sun", wd:"일", dt:"11.22", short:"긴자·출국", date:"2026-11-22", title:"긴자, 출국하는 날", summary:"서점 둘, 갤러리 하나, 긴자 양식 점심. 아티존을 금요일로 옮겨 아침이 느긋해졌어요. 18시 나리타 비행기라 13시 반 전에 긴자를 떠납니다.", walk:"긴자 안에서 걸어서만",
+  { key:"sun", wd:"일", dt:"11.22", short:"도쿄역·긴자·출국", date:"2026-11-22", title:"도쿄역에서 긴자로, 출국하는 날", summary:"황궁 분수공원에서 커피, 도쿄역과 국제포럼을 지나 1936년 찻집에서 아침. 서점 둘, 갤러리 하나, 긴자 양식 점심. 18시 나리타 비행기라 13시 반 전에 긴자를 떠납니다.", walk:"아침에 지하철 한 번, 나머지는 걸어서",
     stops:[
+      {t:"8:40", n:"스타벅스 황궁외원 와다쿠라 분수공원점", ja:"スターバックス コーヒー 皇居外苑 和田倉噴水公園店", kc:"food", k:"카페, 아침 커피", stay:30, dig:"@daytripkorea", 
+       leg:{line:"마루노우치선", from:"赤坂見附", to:"東京", note:"갈아타지 않음", v:true},
+       shot:"분수공원과 황궁 해자 옆 통유리 매장. 아침 빛이 낮게 드는 시간이라 창가 자리와 분수를 같이 넣어 보세요.",
+       note:"7:00~21:00. 체크아웃하고 짐을 숙소에 맡긴 뒤 8시쯤 나오세요. 도쿄역 마루노우치 역사를 지나 국제포럼, 긴자까지 걸어 내려갑니다.",
+       q:"スターバックス 皇居外苑 和田倉噴水公園店", lat:35.684, lng:139.7625},
+      {t:"9:40", n:"긴자 트리콜로르 본점", ja:"銀座トリコロール 本店", kc:"food", k:"찻집, 아침", stay:40, dig:"@daytripkorea", 
+       shot:"1936년에 연 찻집의 클래식한 실내. 창가 자리에서 커피 잔과 함께.",
+       note:"긴자 5초메, 1936년 개업. 8:00~19:00(영업시간은 공식 인스타 @tricolore_koushiki에서 다시 확인). 츠타야(GINZA SIX)까지 걸어서 몇 분.",
+       q:"銀座トリコロール 本店", lat:35.6703, lng:139.7668},
       {t:"10:30", n:"긴자 츠타야 서점", ja:"銀座 蔦屋書店", kc:"book", k:"서점",
-       note:"GINZA SIX 6층, 10:30에 엽니다. 체크아웃(11:00) 전에 짐을 숙소에 맡기고 나오세요. 아트와 사진집 서가가 압권이고, 짐 부칠 책은 여기서 마지막으로.",
+       note:"GINZA SIX 6층, 10:30에 엽니다. 아트와 사진집 서가가 압권이고, 짐 부칠 책은 여기서 마지막으로.",
        q:"銀座 蔦屋書店", id:"ChIJH6YwSOaLGGAR_LGfsNivcXE", lat:35.6694161, lng:139.7642674},
       {t:"11:30", n:"시세이도 파라 긴자 본점", ja:"資生堂パーラー 銀座本店レストラン", kc:"food", k:"식당, 점심", ask:"예약 권장", needId:"parlour",
        note:"긴자의 오래된 양식당. 11:30에 열고 월요일 휴무. 시세이도 갤러리와 같은 건물이라 점심 뒤 바로 내려가면 됩니다.",
@@ -1008,12 +1025,15 @@ const DAYS = [
 // 지나가며 찍는 건축. 시간 칸 없이 가까운 일정(near = 그 장소의 q) 카드에 붙는다. 2026-09-25 확인.
 // 좌표는 주소 기준 대략값이다. 지도·길찾기 버튼은 이름(q)으로 검색한다.
 const SIGHTS = [
+  {n:"표경관", ja:"表慶館", day:"thu", near:"東京国立博物館", by:"片山東熊", year:1909, dig:"@daytripkorea", 
+   why:"일본 첫 본격 미술관으로 지은 메이지 양관(중요문화재). 가운데와 양옆의 돔, 외벽 위쪽의 악기·제도 도구 부조. 안은 행사 때만 열려서 밖에서 봐요.",
+   q:"東京国立博物館 表慶館", lat:35.718, lng:139.7755, src:"https://tatefro.com/entry-51.html", srcn:"たてものフロンティア"},
   {n:"도쿄문화회관", ja:"東京文化会館", day:"thu", near:"国立西洋美術館", by:"前川國男", year:1961,
    why:"코르뷔지에의 제자 마에카와 구니오의 모더니즘 대표작. 스승의 서양미술관과 마주 보고 있어요.",
    q:"東京文化会館", lat:35.7129, lng:139.7751, src:"https://artplaza.geidai.ac.jp/sights/11992/", srcn:"藝大アートプラザ"},
   {n:"법륭사보물관", ja:"法隆寺宝物館", day:"thu", near:"東京国立博物館", by:"谷口吉生",
    why:"도쿄국립박물관 부지 안. 얕은 연못 너머 유리와 금속의 수평 입면이 조용하게 비쳐요.",
-   q:"法隆寺宝物館", lat:35.7192, lng:139.7744, src:"https://archi-graphy.com/%E6%B3%95%E9%9A%86%E5%AF%BA%E5%AE%9D%E7%89%A9%E9%A4%A8/", srcn:"ARCHI-GRAPHY"},
+   q:"法隆寺宝物館", dig:"@daytripkorea", lat:35.7192, lng:139.7744, src:"https://archi-graphy.com/%E6%B3%95%E9%9A%86%E5%AF%BA%E5%AE%9D%E7%89%A9%E9%A4%A8/", srcn:"ARCHI-GRAPHY"},
   {n:"프라다 아오야마", ja:"プラダ 青山店", day:"sat", near:"根津美術館", by:"Herzog & de Meuron", year:2003,
    why:"마름모 격자에 볼록한 유리를 끼운 건물. 네즈미술관 앞 미유키도리에 있어요.",
    q:"プラダ 青山店", lat:35.6627, lng:139.7148, src:"https://architecturephoto.net/syasin/005/h005.htm", srcn:"architecturephoto"},
@@ -1028,7 +1048,13 @@ const SIGHTS = [
    q:"銀座メゾンエルメス", lat:35.6717, lng:139.7632, src:"https://jbpress.ismedia.jp/articles/-/86591?page=2", srcn:"JBpress"},
   {n:"미키모토 긴자 2", ja:"MIKIMOTO Ginza 2", day:"sun", near:"森岡書店 銀座", by:"伊東豊雄", year:2005,
    why:"치즈 구멍 같은 불규칙한 창이 여러 층에 걸쳐 뚫린 분홍빛 외관. 모리오카 서점 가는 길 마로니에도리에.",
-   q:"MIKIMOTO Ginza 2", lat:35.6739, lng:139.7678, src:"https://www.asahi-mullion.com/column/article/tatemono/3407", srcn:"朝日マリオン"}
+   q:"MIKIMOTO Ginza 2", lat:35.6739, lng:139.7678, src:"https://www.asahi-mullion.com/column/article/tatemono/3407", srcn:"朝日マリオン"},
+  {n:"도쿄역 마루노우치 역사", ja:"東京駅丸の内駅舎", day:"sun", near:"スターバックス 皇居外苑 和田倉噴水公園店", by:"辰野金吾", year:1914, dig:"@daytripkorea", 
+   why:"붉은 벽돌 역사. 공습으로 잃은 남북 돔을 2012년에 처음 모습으로 되살렸어요. 와다쿠라에서 역 앞 광장까지 걸어서 몇 분, 광장 가운데서 좌우 대칭으로.",
+   q:"東京駅丸の内駅舎", lat:35.6812, lng:139.7661, src:"https://www.kajima.co.jp/tech/tokyo_station/index-j.html", srcn:"鹿島"},
+  {n:"도쿄국제포럼 유리동", ja:"東京国際フォーラム ガラス棟", day:"sun", near:"銀座トリコロール 本店", by:"Rafael Viñoly", year:1996, dig:"@daytripkorea", 
+   why:"유리 3,600장으로 감싼 배 밑바닥 같은 건물, 높이 약 60m 아트리움. 안은 자유롭게 볼 수 있어요. 도쿄역에서 트리콜로르 가는 길.",
+   q:"東京国際フォーラム", lat:35.6766, lng:139.764, src:"https://takearch1894.com/tokyo-international-forum/", srcn:"TAKE ARCH"}
 ];
 
 // 일정 밖 추천. 2026년 9월 22일 검색으로 확인한 것만 넣는다. 출처 없는 항목은 넣지 말 것.
@@ -1071,12 +1097,12 @@ const RECS = [
   {n:"Little Soul Cafe", ja:"リトルソウルカフェ", kc:"bar", k:"LP바", area:"시모키타자와", when:"sat",
    why:"시모키타자와에서 20년 넘은 레코드 바. 1만 4천 장 넘는 판에서 소울·펑크·재즈를 한 곡씩 골라 틉니다. 20:00~02:00(금·토 04:00), 연중무휴.",
    tip:"원래 토요일 마지막 자리였는데 숙소까지 멀어서 Bar Luther로 바꿨습니다. 그래도 가고 싶으면 토요일 21:00에 다시 넣으세요. 자리값 500엔, 현금.",
-   q:"Little Soul Cafe 下北沢", src:"https://www.littlesoulcafe.com/", srcn:"공식", lat:35.6632436, lng:139.6692659, slot:{day:"sat", t:"21:00"}},
+   q:"Little Soul Cafe 下北沢", dig:"@locally.official",  src:"https://www.littlesoulcafe.com/", srcn:"공식", lat:35.6632436, lng:139.6692659, slot:{day:"sat", t:"21:00"}},
 
   {n:"Spincoaster Music Bar", kc:"bar", k:"LP바", area:"요요기", when:"thu",
    why:"하이레조 음원과 아날로그 레코드를 함께 트는 음악 바. 19:00~02:00, 일요일 휴무, 17석. 예약 사이트에선 'Spincoaster Music Bar Shinjuku'로도 나옵니다.",
    tip:"원래 목요일 밤 자리였는데 아사쿠사에서 멀고 숙소와도 반대 방향이라 bar all로 바꿨습니다.",
-   q:"Spincoaster Music Bar", src:"https://www.hotpepper.jp/strJ001170751/", srcn:"핫페퍼", lat:35.6852642, lng:139.6992942, slot:{day:"thu", t:"19:45"}},
+   q:"Spincoaster Music Bar", dig:"@locally.official",  src:"https://www.hotpepper.jp/strJ001170751/", srcn:"핫페퍼", lat:35.6852642, lng:139.6992942, slot:{day:"thu", t:"19:45"}},
 
   {n:"짓켄바시 역스카이트리", ja:"十間橋", kc:"photo", k:"사진 스팟", area:"오시아게", when:"thu",
    why:"기타짓켄강 작은 다리. 물에 비친 거꾸로 선 스카이트리를 타워와 함께 찍는 유명한 자리예요. 스카이트리에서 걸어서 7~10분, 해 질 무렵이 좋아요.",
@@ -1091,7 +1117,87 @@ const RECS = [
   {n:"다이코쿠야 덴푸라", ja:"大黒家天麩羅 本店", kc:"food", k:"식당, 저녁", area:"아사쿠사", when:"thu",
    why:"아사쿠사의 오래된 튀김집. 진한 양념에 담근 새우튀김 덮밥이 간판이에요. 11:00~20:30(토·공휴일 21:00), 정기 휴일 없음.",
    tip:"고마카타 도제우가 쉬는 날이거나 미꾸라지가 부담스러우면 목요일 저녁을 이쪽으로 바꾸세요. 줄이 길 수 있어요.",
-   q:"大黒家天麩羅 本店", src:"https://www.hotpepper.jp/strJ000613522/", srcn:"핫페퍼", lat:35.7124, lng:139.7955, slot:{day:"thu", t:"17:50"}}
+   q:"大黒家天麩羅 本店", src:"https://www.hotpepper.jp/strJ000613522/", srcn:"핫페퍼", lat:35.7124, lng:139.7955, slot:{day:"thu", t:"17:50"}},
+
+  {n:"토라야 아카사카점", ja:"とらや 赤坂店", kc:"photo", k:"건축, 화과자", area:"아카사카", when:"any", dig:"@daytripkorea", 
+   why:"500년 된 화과자집 본점. 내부를 노송나무로 짠 건물은 나이토 히로시 설계(2018). 매장 평일 8:30~19:00, 주말 9:30~18:00, 찻집 虎屋菓寮은 11:00부터.",
+   tip:"숙소에서 걸어서 갈 거리예요. 목요일 리쿠기엔 가기 전 매장만 잠깐 들르거나, 선물용 양갱은 마지막 날 아침에.",
+   q:"とらや 赤坂店", src:"https://www.toraya-group.co.jp/shops/shop-5", srcn:"虎屋 공식", lat:35.6752, lng:139.7331, slot:{day:"thu", t:"8:30"}},
+
+  {n:"푸글렌 아사쿠사", ja:"FUGLEN ASAKUSA", kc:"food", k:"카페", area:"아사쿠사", when:"thu", dig:"@daytripkorea", 
+   why:"오슬로 카페의 아사쿠사점. 북유럽풍 실내에서 커피와 와플. 월~목 8:00~21:00, 금~일 23:00까지.",
+   tip:"목요일 저녁 아사쿠사에서 도제우 먹고 bar all 가기 전에 커피 한 잔. 목요일은 21시에 닫아요.",
+   q:"Fuglen Asakusa", src:"https://fuglencoffee.jp/en/pages/fuglen-asakusa", srcn:"Fuglen 공식", lat:35.716, lng:139.7955, slot:{day:"thu", t:"19:00"}},
+
+  {n:"가톨릭 메구로 성당", ja:"カトリック目黒教会(聖アンセルモ)", kc:"photo", k:"건축, 성당", area:"메구로", when:"fri", dig:"@daytripkorea", 
+   why:"안토닌 레이먼드 설계(1956). 접힌 콘크리트 벽과 천장, 세로 틈으로 들어오는 빛. 도쿄도 선정 역사적 건조물. 성당은 7:00~21:00(일요일 19:00까지) 열려 있어요.",
+   tip:"동쪽 벽으로 해가 드는 구조라 아침이 가장 좋아요. 금요일 로스터리 전에 넣으려면 7시쯤 숙소를 나서세요. 기도하는 곳이니 조용히, 미사 중엔 촬영하지 마세요.",
+   q:"カトリック目黒教会", src:"https://www.artarchi-japan.jp/2023/02/catholic-meguro-church.html", srcn:"建築とアートを巡る", lat:35.6352, lng:139.7135, slot:{day:"fri", t:"7:15"}},
+
+  {n:"호텔 가조엔 도쿄 카나데 라운지", ja:"ホテル雅叙園東京 カナデ ラウンジ", kc:"food", k:"호텔 라운지", area:"메구로", when:"sat", dig:"@hi_dongwon", 
+   why:"메구로 호텔 가조엔 도쿄의 1층 라운지. 10:30~22:30(L.O. 21:30).",
+   tip:"에비스(사진미술관)에서 한 정거장이라 토요일 오후에 묶기 좋아요. 메구로 성당과도 걸어서 몇 분.",
+   q:"ホテル雅叙園東京", src:"https://gajoen-tokyo.hiltonjapan.co.jp/restaurants/kanade-lounge", srcn:"가조엔 공식", lat:35.6317, lng:139.7123, slot:{day:"sat", t:"16:30"}},
+
+  {n:"쉐라톤 미야코 호텔 도쿄 로비 라운지 뱀부", ja:"シェラトン都ホテル東京 ロビーラウンジ バンブー", kc:"food", k:"호텔 라운지", area:"시로카네다이", when:"sat", dig:"@hi_dongwon", 
+   why:"시로카네다이 호텔의 로비 라운지. 평일·일 10:00~19:00, 금·토 21:30까지.",
+   tip:"일정과 떨어진 시로카네다이예요. 가조엔·메구로와 묶어 토요일 오후를 통째로 바꾸고 싶을 때.",
+   q:"シェラトン都ホテル東京", src:"https://www.miyakohotels.ne.jp/tokyo/restaurant/bamboo/", srcn:"호텔 공식", lat:35.6397, lng:139.7275, slot:{day:"sat", t:"15:30"}},
+
+  {n:"리가 로열 호텔 도쿄 가든 라운지", ja:"リーガロイヤルホテル東京 ガーデンラウンジ", kc:"food", k:"호텔 라운지", area:"와세다", when:"any", dig:"@hi_dongwon", 
+   why:"와세다 호텔의 1층 가든 라운지. 평일 11:00~17:30, 주말 18:30까지, 연중무휴.",
+   tip:"와세다라 이번 동선 어디와도 멀어요. 넣는다면 반나절을 따로 잡으세요.",
+   q:"リーガロイヤルホテル東京", src:"https://www.rihga.co.jp/tokyo/restaurant/list/garden_lounge", srcn:"호텔 공식", lat:35.7108, lng:139.7195, slot:{day:"fri", t:"11:30"}},
+
+  {n:"SAFU 사료 (도모 미술관 카페)", ja:"カフェダイニング 茶楓", kc:"food", k:"정원 카페", area:"도라노몬", when:"sat", dig:"@hi_dongwon", 
+   why:"기쿠치 간지쓰 기념 도모 미술관에 붙은 카페. '도시 속 고요한 정원'이 콘셉트. 11:00~18:00(식사 L.O. 13:00), 월요일 휴무.",
+   tip:"숙소에서 가까운 가미야초 쪽이에요. 토요일 국립신미술관 뒤 점심을 여기서 하려면 네즈미술관을 조금 늦추세요. 식사 주문은 13시까지.",
+   q:"カフェダイニング 茶楓", src:"https://safu.by-onko-chishin.com/", srcn:"공식", lat:35.6632, lng:139.7424, slot:{day:"sat", t:"11:45"}},
+
+  {n:"세타가야 미술관", ja:"世田谷美術館", kc:"art", k:"미술관, 건축", area:"요가", when:"sat", dig:"@hi_dongwon", 
+   why:"기누타 공원 숲속에 우치이 쇼조가 설계한 미술관. 10:00~18:00, 월요일 휴관. 2027년 4월부터 2030년 1월까지 전관 휴관이라 이번이 한동안 마지막 기회예요.",
+   tip:"用賀역에서 걸어서 17분. 일정과 멀어서 넣으려면 토요일 오전을 통째로 바꿔야 해요.",
+   q:"世田谷美術館", src:"https://www.setagayaartmuseum.or.jp/guide/open/", srcn:"미술관 공식", lat:35.6325, lng:139.6246, slot:{day:"sat", t:"10:00"}},
+
+  {n:"사카에즈시 총본점", ja:"栄寿し総本店", kc:"food", k:"스시, 저녁", area:"소시가야", when:"sat", dig:"@ganbarayyy",
+   why:"도쿄에 22년 산 사람이 꼽은 단골 스시집. 11:00~22:00(L.O. 21:30). 목요일과 셋째 수요일(1·5·8·12월 빼고) 휴무.",
+   tip:"게이오선 千歳烏山역에서 남쪽으로 걸어서 15분. 토요일 저녁을 푸즈쿠에 대신 여기로 바꿀 수 있어요.",
+   q:"栄寿し総本店", src:"https://sakaezushi.jp/", srcn:"공식", lat:35.657, lng:139.6005, slot:{day:"sat", t:"18:15"}},
+
+  {n:"테노하 다이칸야마", ja:"TENOHA DAIKANYAMA", kc:"food", k:"카페, 정원", area:"다이칸야마", when:"fri", dig:"@daytripkorea", 
+   why:"다이칸야마역 1분, 나무가 우거진 복합 공간의 카페와 꽃집.",
+   tip:"2025년 4월에 새로 열면서 영업시간이 바뀌었어요(10:00~17:30, 수요일 휴무라는 소개가 있지만 출처마다 달라요). 나카메구로 로스터리에서 한 정거장이라 금요일 아침과 묶을 수 있는데, 열기 전일 수 있어요.",
+   q:"TENOHA DAIKANYAMA", src:"https://daishizen.co.jp/news/3609/", srcn:"大自然", lat:35.6485, lng:139.703, slot:{day:"fri", t:"9:15"}},
+
+  {n:"시부야구 후레아이 식물센터", ja:"渋谷区ふれあい植物センター", kc:"leaf", k:"식물원, 카페", area:"시부야", when:"sat", dig:"@daytripkorea", 
+   why:"'일본에서 가장 작은 식물원'이라 불리는 곳. 먹을 수 있는 식물을 기르고, 안에서 식사·술도 돼요. 10:00~21:00, 월요일 휴원, 입장 100엔.",
+   tip:"시부야역에서 걸어서 10분. 토요일 SPBS 전후, 해 진 뒤 조명 켜진 온실도 좋아요.",
+   q:"渋谷区ふれあい植物センター", src:"https://sbgf.jp/guide/", srcn:"공식", lat:35.6555, lng:139.7082, slot:{day:"sat", t:"16:30"}},
+
+  {n:"블루보틀 도요스 파크 카페", ja:"ブルーボトルコーヒー 豊洲パークカフェ", kc:"food", k:"카페", area:"도요스", when:"sat", dig:"@daytripkorea", 
+   why:"도요스 공원 안, 공원과 이어진 탁 트인 매장(콘셉트가 '보더리스'). 8:00~19:00.",
+   tip:"토요일 츠키지 아침 다음, 국립신미술관 전에 한 시간이 빕니다. 츠키지에서 다리 건너 도요스까지 가까워요.",
+   q:"ブルーボトルコーヒー 豊洲パークカフェ", src:"https://store.bluebottlecoffee.jp/pages/toyosupark", srcn:"Blue Bottle 공식", lat:35.6545, lng:139.7925, slot:{day:"sat", t:"9:00"}},
+
+  {n:"STUDIO MULE", kc:"bar", k:"리스닝 바, 와인", area:"오쿠시부야", when:"fri", dig:"@locally.official", 
+   why:"레이블 mule musiq의 리스닝 바 겸 레코드 가게. 빈티지 오디오로 장르 없이 트는 판에 내추럴 와인. 일요일 휴무. 여는 시각이 출처마다 17:00·20:00으로 달라요(닫는 건 24:00).",
+   tip:"금요일 CAVE 대신 가기 좋은 시부야 쪽 바. 가기 전 인스타로 영업 확인.",
+   q:"STUDIO MULE 渋谷", src:"https://www.audio-technica.co.jp/always-listening/articles/studio-mule/", srcn:"Audio-Technica", lat:35.6645, lng:139.6935, slot:{day:"fri", t:"20:30"}},
+
+  {n:"B.Y.G", kc:"bar", k:"록 찻집", area:"시부야 햣켄다나", when:"fri", dig:"@locally.official", 
+   why:"1969년 도겐자카 햣켄다나에 연 록 찻집. 밤엔 록 바, 지하는 라이브 하우스. 새벽 2시까지.",
+   tip:"금요일 CAVE 대신. 여는 시각이 출처마다 달라요(16:00 또는 17:30).",
+   q:"B.Y.G 渋谷", src:"https://san-tatsu.jp/articles/239189/", srcn:"散歩の達人", lat:35.6588, lng:139.6965, slot:{day:"fri", t:"20:30"}},
+
+  {n:"Grandfather's", kc:"bar", k:"LP바", area:"시부야", when:"fri", dig:"@locally.official", 
+   why:"1971년에 연 바. 처음부터 LP만, 한 장에 한 곡씩 트는 '레코드 키퍼'가 있어요. 70~80년대 록·소울 2,000장. 17:00~03:00. 흡연 가능.",
+   tip:"금요일 CAVE 대신. 담배 연기가 있어요.",
+   q:"Grandfather's 渋谷", src:"https://www.audio-technica.co.jp/always-listening/articles/jazz-cafe-grandfathers/", srcn:"Audio-Technica", lat:35.6628, lng:139.7027, slot:{day:"fri", t:"20:30"}},
+
+  {n:"Jazz Inn Uncle Tom", kc:"bar", k:"재즈 바", area:"산겐자야", when:"sat", dig:"@locally.official", 
+   why:"산겐자야에서 아버지 가게를 자식이 이어 가는 재즈 바. 18:00~01:30(L.O.), 부정기 휴무.",
+   tip:"토요일 Bar Luther 대신. 산겐자야에서 숙소까지는 멀어서 막차를 먼저 확인하세요.",
+   q:"Jazz Inn Uncle Tom 三軒茶屋", src:"https://www.arban-mag.com/article/46338", srcn:"ARBAN", lat:35.6437, lng:139.671, slot:{day:"sat", t:"21:00"}}
 ];
 
 // 출발 전 준비. 예약 체크리스트와 같은 저장소(tokyo-checks)를 쓴다. 사실 항목은 2026년 9월 24일 검색으로 확인.
@@ -1543,11 +1649,11 @@ function stopHTML(d,s,prev){
   const nameBlock = `<button type="button" class="namebtn" data-big="${s._idx}"><span class="name">${esc(s.n)}${s.ja?"":ico("i-zoom","ki zoom")}</span>${ja}</button>`
     + (s.arch?`<p class="archline">${ico("i-art")}<span>${esc(s.arch.by)}${s.arch.year?` · ${s.arch.year}`:""}${s.arch.note?` · ${esc(s.arch.note)}`:""}</span></p>`:"");
   const leg = "";   // 경로는 카드 사이 이동 줄(hopHTML)에 표시
+  const P=placeOf(s);
   const acts=[];
-  if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q||s.n,s.id)}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
+  if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q||s.n,s.id||(P&&P.gid))}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
   if(s.lat && !s.hotel) acts.push(`<a class="btn" href="${DIR(prev,s)}" target="_blank" rel="noopener" aria-label="${esc(s.n)}까지 길찾기">${ico("i-route")}길찾기</a>`);
   const meta=badgeHTML(s);
-  const P=placeOf(s);
   const thumb = P && P.photo ? `<img class="thumb" src="${esc(P.photo)}" alt="" loading="lazy" decoding="async">` : "";
   return `<li class="stop${plain?" plain":""}${s.opt?" opt":""}" data-idx="${s._idx}" style="--kc:${K.c}">
     <div class="time">${esc(s.t)}</div>${dot}
@@ -1562,7 +1668,7 @@ function stopHTML(d,s,prev){
       ${s.note?`<p class="note">${esc(s.note)}</p>`:""}
       ${photoHTML(d,s)}
       ${rainAltHTML(d,s)}
-      ${meta||s.mine?`<div class="meta">${s.mine?`<span class="badge mine">내가 추가</span>`:""}${meta}</div>`:""}
+      ${meta||s.mine||s.dig?`<div class="meta">${s.mine?`<span class="badge mine">내가 추가</span>`:""}${s.dig?`<span class="badge dig" title="인스타에서 저장한 곳">${esc(s.dig)}</span>`:""}${meta}</div>`:""}
       ${acts.length?`<div class="acts">${acts.join("")}</div>`:""}
       ${s.mine?`<button type="button" class="linkish unmine" data-unmine="${esc(s.rid)}">일정에서 빼기</button>`:""}
     </article></li>`;
@@ -1927,6 +2033,8 @@ function rainAltHTML(d,s){
 const THEMES=[
   {k:"photo", n:"건축·사진",     kcs:["photo"],        ic:"i-camera",
    intro:"필름으로 남길 건물과 장면. 일정 속 건축가의 건물, 가는 길에 지나치는 건물, 사진 스팟을 모았어요. 해시태그는 누르면 복사돼요."},
+  {k:"dig",  n:"내가 저장한 곳",  kcs:[],             ic:"i-pin", c:"var(--k-photo)",
+   intro:"인스타에서 디깅해 둔 곳. 동선에 맞는 곳은 일정에 넣었고, 지나가는 건물은 가는 길에, 멀거나 시간이 안 맞는 곳은 추천으로 남겼어요. 분홍 태그는 저장한 계정이에요."},
   {k:"art",  n:"미술관·박물관",   kcs:["art"],          ic:"i-art",
    intro:"이번 여행의 뼈대예요. 11월 셋째 주에 열리는 특별전에 날짜를 맞췄습니다. 대부분 월요일에 쉬어서 수~일 일정과는 겹치지 않아요."},
   {k:"book", n:"서점·북카페",     kcs:["book"],         ic:"i-book",
@@ -1938,11 +2046,15 @@ const THEMES=[
   {k:"green",n:"정원·단풍·전망",  kcs:["leaf","view"],  ic:"i-leaf",
    intro:"늦가을이라 넣은 곳들이에요. 은행잎은 절정 직전이고, 해는 16:30쯤 집니다."}
 ];
+// 테마별로 모으는 규칙. 사진은 건축·촬영 메모가 있는 곳, 디깅은 dig가 있는 곳, 나머지는 종류(kc)
+const themeStops=(t,list,get=x=>x)=>list.filter(x=>{ const s=get(x); return t.k==="photo"?(s.arch||s.shot):t.k==="dig"?s.dig:t.kcs.includes(s.kc); });
+const themeSights=t=>t.k==="photo"?SIGHTS:t.k==="dig"?SIGHTS.filter(g=>g.dig):[];
+const themeColor=t=>t.c||(KIND[t.kcs[0]]||KIND.move).c;
 const firstSentence=t=>{ const m=String(t||"").match(/^.*?[.!?](\s|$)/); return m?m[0].trim():String(t||""); };
 function recCardHTML(r){
   const K=KIND[r.kc]||KIND.move;
   return `<li class="rec" style="--kc:${K.c}"><article class="card">
-    <p class="eyebrow ko">${ico(K.i)}<span>${esc(r.k)} · ${esc(r.area)}</span></p>
+    <p class="eyebrow ko">${ico(K.i)}<span>${esc(r.k)} · ${esc(r.area)}</span>${r.dig?` <em class="tdig">${esc(r.dig)}</em>`:""}</p>
     <button type="button" class="namebtn" data-rec="${esc(r.n)}"><span class="name">${esc(r.n)}</span>${r.ja?`<p class="ja">${esc(r.ja)}${ico("i-zoom","ki zoom")}</p>`:""}</button>
     <p class="note">${esc(r.why)}</p>
     ${r.tip?`<p class="tipline">${esc(r.tip)}</p>`:""}
@@ -1955,25 +2067,23 @@ function renderThemes(){
   // 원래 일정에 있는 추천만 추천 목록에서 뺀다. 내가 넣은 추천은 상태(넣은 시각·경고·빼기)를 보여주려고 남겨 둔다
   const inPlan=r=>DAYS.some(d=>(d.base||d.stops).some(s=>s.q===r.q));
   const secs=THEMES.map(t=>{
-    const K=KIND[t.kcs[0]]||KIND.move;
-    const items = t.k==="photo" ? all.filter(x=>x.s.arch||x.s.shot) : all.filter(x=>t.kcs.includes(x.s.kc));
-    const recs=RECS.filter(r=>t.kcs.includes(r.kc) && !inPlan(r));
-    const sights = t.k==="photo" ? SIGHTS : [];
+    const items=themeStops(t,all,x=>x.s);
+    const recs=RECS.filter(r=>(t.k==="dig"?r.dig:t.kcs.includes(r.kc)) && !inPlan(r));
+    const sights=themeSights(t);
     const rows=items.map(({d,s})=>`<li><button type="button" class="trow${s.opt?" opt":""}" data-see="${d.key}" data-q="${esc(s.q)}">
         <span class="tday"><b>${d.wd}</b><span>${esc(s.t)}</span></span>
-        <span class="tmain"><span class="tname">${esc(s.n)}${s.mine?` <em class="tmine">내가 추가</em>`:""}${s.opt?` <em class="topt">선택</em>`:""}</span>
+        <span class="tmain"><span class="tname">${esc(s.n)}${s.mine?` <em class="tmine">내가 추가</em>`:""}${s.opt?` <em class="topt">선택</em>`:""}${t.k!=="dig"&&s.dig?` <em class="tdig">${esc(s.dig)}</em>`:""}</span>
           ${s.ja?`<span class="tja" lang="ja">${esc(s.ja)}</span>`:""}
           ${s.note?`<span class="tnote">${esc(firstSentence(s.note))}</span>`:""}</span>
-        ${t.k==="photo"?(s.arch?`<span class="tfee">${esc(s.arch.by)}</span>`:""):s.fee>0?`<span class="tfee">${s.fee.toLocaleString("ko-KR")}엔</span>`:""}
+        ${t.k==="dig"?`<span class="tfee">${esc(s.dig)}</span>`:t.k==="photo"?(s.arch?`<span class="tfee">${esc(s.arch.by)}</span>`:""):s.fee>0?`<span class="tfee">${s.fee.toLocaleString("ko-KR")}엔</span>`:""}
       </button></li>`).join("");
     const srows=sights.map(g=>{ const d=DAYS.find(x=>x.key===g.day);
       return `<li class="srow"><a class="trow" href="${MAPS(g.q)}" target="_blank" rel="noopener">
         <span class="tday"><b>${d.wd}</b><span>가는 길</span></span>
-        <span class="tmain"><span class="tname">${esc(g.n)}</span><span class="tja" lang="ja">${esc(g.ja)}</span><span class="tnote">${esc(g.why)}</span></span>
+        <span class="tmain"><span class="tname">${esc(g.n)}${g.dig?` <em class="tdig">${esc(g.dig)}</em>`:""}</span><span class="tja" lang="ja">${esc(g.ja)}</span><span class="tnote">${esc(g.why)}</span></span>
         <span class="tfee">${esc(g.by)}${g.year?`<br>${g.year}`:""}</span></a>
         <button type="button" class="tagbtn" data-tags="${esc(tagsFor(g))}" aria-label="${esc(g.n)} 해시태그 복사">#</button></li>`; }).join("");
-    if(t.k==="photo") t._n=items.length+sights.length;
-    return `<section class="theme" id="th-${t.k}" style="--kc:${K.c}">
+    return `<section class="theme" id="th-${t.k}" style="--kc:${themeColor(t)}">
       <header class="theme-h"><span class="theme-ic">${ico(t.ic)}</span><div><h2>${esc(t.n)}</h2><p class="theme-n">일정 ${items.length}곳${sights.length?` · 가는 길 ${sights.length}곳`:""}${recs.length?` · 추천 ${recs.length}곳`:""}</p></div></header>
       <p class="theme-intro">${esc(t.intro)}</p>
       ${t.k==="photo"?`<div class="lightgrid">${DAYS.slice(1).map(d=>{ const L=lightOf(d.date); return `<span><b>${d.wd}</b> 골든 ${L.gold}–${L.set}<br>블루 ~${L.blue}</span>`; }).join("")}</div>`:""}
@@ -1982,8 +2092,8 @@ function renderThemes(){
       ${recs.length?`<h3 class="theme-sub">일정 밖 추천</h3><ol class="reclist">${recs.map(recCardHTML).join("")}</ol>`:""}
     </section>`;
   }).join("");
-  const chips=THEMES.map(t=>{ const n = t.k==="photo" ? all.filter(x=>x.s.arch||x.s.shot).length+SIGHTS.length : all.filter(x=>t.kcs.includes(x.s.kc)).length;
-    return `<a class="tchip" href="#th-${t.k}" style="--kc:${(KIND[t.kcs[0]]||KIND.move).c}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${n}</b></a>`; }).join("");
+  const chips=THEMES.map(t=>{ const n=themeStops(t,all,x=>x.s).length+themeSights(t).length+(t.k==="dig"?RECS.filter(r=>r.dig&&!inPlan(r)).length:0);
+    return `<a class="tchip" href="#th-${t.k}" style="--kc:${themeColor(t)}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${n}</b></a>`; }).join("");
   panelEl.innerHTML=`<section class="themes" role="tabpanel" aria-labelledby="nav-themes">
     <header class="pagehead">
       <p class="eyebrow">가이드북</p>
@@ -2023,7 +2133,7 @@ function renderHome(){
   const done=CHECKS.filter(c=>CHECKED[c.id]).length, left=CHECKS.filter(c=>!CHECKED[c.id]);
   const phase=nowInfo().phase;
   const all=[]; DAYS.forEach(d=>d.stops.forEach(s=>{ if(s.lat && !s.hotel) all.push(s); }));
-  const chips=THEMES.map(t=>`<button type="button" class="tchip" data-theme="${t.k}" style="--kc:${(KIND[t.kcs[0]]||KIND.move).c}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${t.k==="photo"?all.filter(x=>x.arch||x.shot).length+SIGHTS.length:all.filter(x=>t.kcs.includes(x.kc)).length}</b></button>`).join("");
+  const chips=THEMES.map(t=>`<button type="button" class="tchip" data-theme="${t.k}" style="--kc:${themeColor(t)}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${themeStops(t,all).length+themeSights(t).length+(t.k==="dig"?RECS.filter(r=>r.dig&&!DAYS.some(d=>(d.base||d.stops).some(s=>s.q===r.q))).length:0)}</b></button>`).join("");
   panelEl.innerHTML=`<section class="home${phase==="during"?" during":""}" role="tabpanel" aria-labelledby="nav-home">
     <header class="hero">
       <svg class="leaf" viewBox="0 0 64 64" aria-hidden="true">
@@ -2642,19 +2752,41 @@ function gErr(status,body){
   try{ const j=JSON.parse(body); if(j.error&&j.error.message) return "오류 "+status+": "+j.error.message; }catch(e){}
   return "오류 "+status+"가 났어요.";
 }
+// place_id가 없는 곳은 Text Search(New)로 이름+좌표 근처에서 한 곳을 찾아 ID를 얻는다.
+// POST + JSON이라 프리플라이트가 생기지만 places.googleapis.com은 CORS를 허용한다(2026-09-25 확인). 키는 쿼리로.
+async function findPlaceId(key,s){
+  const body={textQuery:s.q||s.n, languageCode:"ja", regionCode:"JP", pageSize:1};
+  if(s.lat) body.locationBias={circle:{center:{latitude:s.lat,longitude:s.lng},radius:1000}};
+  const r=await fetch("https://places.googleapis.com/v1/places:searchText?key="+encodeURIComponent(key)+"&fields=places.id",
+    {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  if(!r.ok) return {status:r.status, body:await r.text().catch(()=>"")};
+  const j=await r.json(); return {id:(j.places&&j.places[0]&&j.places[0].id)||""};
+}
 async function fetchPlaces(key,report){
-  const ids=[...new Set(ALL.filter(x=>x.id).map(x=>x.id))];
-  const out={}; let fail=0, firstErr="", done=0;
-  for(const id of ids){
-    report(++done, ids.length);
+  const seen=new Set(), jobs=[];
+  ALL.forEach(s=>{ const k=pkey(s); if(!seen.has(k)){ seen.add(k); jobs.push(s); } });
+  const out={}; let fail=0, firstErr="", done=0, total=jobs.length;
+  for(const s of jobs){
+    report(++done, total);
     try{
+      let id=s.id, found=false;
+      if(!id){
+        const f=await findPlaceId(key,s);
+        if(f.status){
+          fail++; if(!firstErr) firstErr=gErr(f.status,f.body);
+          if(f.status===400||f.status===401||f.status===403){ fail=total-Object.keys(out).length; break; }
+          continue;
+        }
+        if(!f.id){ fail++; if(!firstErr) firstErr=`'${s.n}'을(를) 구글에서 찾지 못했어요.`; continue; }
+        id=f.id; found=true;
+      }
       const u="https://places.googleapis.com/v1/places/"+encodeURIComponent(id)
             +"?key="+encodeURIComponent(key)+"&languageCode=ko&regionCode=JP&fields="+encodeURIComponent(PFIELDS);
       const r=await fetch(u);
       if(!r.ok){
         fail++;
         if(!firstErr) firstErr=gErr(r.status, await r.text().catch(()=>""));
-        if(r.status===400||r.status===401||r.status===403){ fail=ids.length-Object.keys(out).length; break; }
+        if(r.status===400||r.status===401||r.status===403){ fail=total-Object.keys(out).length; break; }
         continue;
       }
       const j=await r.json();
@@ -2674,22 +2806,22 @@ async function fetchPlaces(key,report){
           if(pr.ok){ const pj=await pr.json(); if(pj.photoUri) rec.photo=pj.photoUri; }
         }catch(e){}
       }
-      out[id]=rec;
+      if(found) rec.gid=id;
+      out[pkey(s)]=rec;
     }catch(e){ fail++; if(!firstErr) firstErr="네트워크에 닿지 못했어요."; }
   }
-  return {out, fail, total:ids.length, firstErr};
+  return {out, fail, total, firstErr};
 }
 function gStatus(msg,bad){
   const el=$("#gstat"); if(!el) return;
   if(msg!==undefined){ el.textContent=msg; el.classList.toggle("bad",!!bad); return; }
   const n=PSTORE.byId?Object.keys(PSTORE.byId).length:0;
-  const withId=new Set(ALL.filter(x=>x.id).map(x=>x.id)).size;
-  const noId=ALL.length-withId;
-  if(!n){ el.classList.remove("bad"); el.textContent="아직 받지 않았어요. 키를 넣고 눌러 주세요."+(noId?` 장소 ID가 없는 ${noId}곳은 건너뜁니다.`:""); return; }
+  const all=new Set(ALL.map(pkey)).size;
+  if(!n){ el.classList.remove("bad"); el.textContent=`아직 받지 않았어요. 키를 넣고 누르면 ${all}곳의 평점·영업시간·사진을 받아요.`; return; }
   const days=Math.floor(pAge()/864e5);
   if(pStale()){ el.classList.add("bad"); el.textContent=`받은 지 ${days}일 지나 표시를 멈췄습니다. 구글 정책상 30일까지만 보관해요. 다시 받아 주세요.`; return; }
   el.classList.remove("bad");
-  el.textContent=`${withId}곳 중 ${n}곳 저장됨 · ${days===0?"오늘":days+"일 전"} 받음`+(noId?` · 장소 ID가 없는 ${noId}곳은 빠져 있어요.`:"");
+  el.textContent=`${all}곳 중 ${Math.min(n,all)}곳 저장됨 · ${days===0?"오늘":days+"일 전"} 받음`;
 }
 (function(){
   const key=$("#gkey"), go=$("#gfetch"), clr=$("#gclear");
