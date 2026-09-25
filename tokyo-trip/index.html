@@ -987,7 +987,10 @@ const DAYS = [
       {t:"17:00", n:"SPBS 본점", ja:"SHIBUYA PUBLISHING & BOOKSELLERS", kc:"book", k:"서점",
        note:"출판사가 직접 운영하는 서점.",
        q:"SHIBUYA PUBLISHING & BOOKSELLERS", id:"ChIJ2xOID62MGGARLWvFZNk7PiA", lat:35.6642569, lng:139.6933161},
-      {t:"18:15", n:"Bookshelf Fuzkue", ja:"本の読める店 fuzkue 初台", kc:"book", k:"북카페, 저녁 겸", close:"23:00",
+      {t:"17:50", n:"SO BOOKS", kc:"book", k:"사진집 헌책방", closed:"일·월 휴무", close:"19:00", dig:"구글 지도", 
+       note:"사진집·아트·건축 책 전문 헌책방. 13:00~19:00. 代々木八幡역 2분이라 SPBS에서 걸어서 하츠다이 가는 길에 있어요. 필름으로 찍는 사람에게 이번 여행 서점 중 가장 맞는 곳.",
+       q:"SO BOOKS 代々木八幡", lat:35.669, lng:139.686},
+      {t:"18:45", n:"Bookshelf Fuzkue", ja:"本の読める店 fuzkue 初台", kc:"book", k:"북카페, 저녁 겸", close:"23:00",
        note:"하츠다이. 조용히 앉아 읽는 곳이라 오늘의 휴식 시간이기도 합니다.",
        q:"Bookshelf Fuzkue", id:"ChIJVVVWOTLzGGARtVH01Eyw00c", lat:35.6802894, lng:139.6869601},
       {t:"21:00", n:"Bar Luther 赤坂", ja:"バー ルーサー 赤坂", kc:"bar", k:"LP바", ask:"영업시간 확인",
@@ -1162,7 +1165,7 @@ const RECS = [
   {n:"사카에즈시 총본점", ja:"栄寿し総本店", kc:"food", k:"스시, 저녁", area:"소시가야", when:"sat", dig:"@ganbarayyy",
    why:"도쿄에 22년 산 사람이 꼽은 단골 스시집. 11:00~22:00(L.O. 21:30). 목요일과 셋째 수요일(1·5·8·12월 빼고) 휴무.",
    tip:"게이오선 千歳烏山역에서 남쪽으로 걸어서 15분. 토요일 저녁을 푸즈쿠에 대신 여기로 바꿀 수 있어요.",
-   q:"栄寿し総本店", src:"https://sakaezushi.jp/", srcn:"공식", lat:35.657, lng:139.6005, slot:{day:"sat", t:"18:15"}},
+   q:"栄寿し総本店", src:"https://sakaezushi.jp/", srcn:"공식", lat:35.657, lng:139.6005, slot:{day:"sat", t:"18:45"}},
 
   {n:"테노하 다이칸야마", ja:"TENOHA DAIKANYAMA", kc:"food", k:"카페, 정원", area:"다이칸야마", when:"fri", dig:"@daytripkorea", 
    why:"다이칸야마역 1분, 나무가 우거진 복합 공간의 카페와 꽃집.",
@@ -1197,7 +1200,92 @@ const RECS = [
   {n:"Jazz Inn Uncle Tom", kc:"bar", k:"재즈 바", area:"산겐자야", when:"sat", dig:"@locally.official", 
    why:"산겐자야에서 아버지 가게를 자식이 이어 가는 재즈 바. 18:00~01:30(L.O.), 부정기 휴무.",
    tip:"토요일 Bar Luther 대신. 산겐자야에서 숙소까지는 멀어서 막차를 먼저 확인하세요.",
-   q:"Jazz Inn Uncle Tom 三軒茶屋", src:"https://www.arban-mag.com/article/46338", srcn:"ARBAN", lat:35.6437, lng:139.671, slot:{day:"sat", t:"21:00"}}
+   q:"Jazz Inn Uncle Tom 三軒茶屋", src:"https://www.arban-mag.com/article/46338", srcn:"ARBAN", lat:35.6437, lng:139.671, slot:{day:"sat", t:"21:00"}},
+
+  {n:"모리 미술관 · 모리 마리코전", ja:"森美術館", kc:"art", k:"미술관, 밤까지", area:"롯폰기", when:"sat", dig:"구글 지도", 
+   why:"롯폰기힐스 53층. 모리 마리코전(10/31~2027/3/28). 10:00~22:00(화요일은 17:00까지)이라 저녁에 볼 수 있는 몇 안 되는 미술관이에요.",
+   tip:"토요일 푸즈쿠에 뒤, Bar Luther 전에. 롯폰기는 숙소와 가까워요.",
+   q:"森美術館", src:"https://www.mori.art.museum/jp/exhibitions/", srcn:"모리 미술관 공식", lat:35.6605, lng:139.7292, slot:{day:"sat", t:"19:30"}},
+
+  {n:"메이지 신궁 뮤지엄", ja:"明治神宮ミュージアム", kc:"photo", k:"건축, 박물관", area:"하라주쿠", when:"sat", dig:"구글 지도", 
+   why:"구마 겐고 설계(2019). 숲속에 낮게 깔린 지붕과 기둥. 10:00~16:30, 목요일 휴관, 1,000엔.",
+   tip:"토요일 와타리움·Utrecht와 같은 하라주쿠 쪽. 네즈미술관(구마 겐고)과 같은 날이라 비교해 보기 좋아요.",
+   q:"明治神宮ミュージアム", src:"https://www.meijijingu.or.jp/museum/", srcn:"明治神宮 공식", lat:35.6725, lng:139.6995, slot:{day:"sat", t:"15:00"}},
+
+  {n:"블루보틀 시부야 카페", ja:"ブルーボトルコーヒー 渋谷カフェ", kc:"food", k:"카페", area:"시부야", when:"sat", dig:"구글 지도", 
+   why:"기타야 공원 안 2층 매장. 8:00~20:00.",
+   tip:"토요일 Utrecht에서 SPBS로 가는 길 한가운데예요.",
+   q:"ブルーボトルコーヒー 渋谷カフェ", src:"https://store.bluebottlecoffee.jp/pages/shibuya", srcn:"Blue Bottle 공식", lat:35.6624, lng:139.7019, slot:{day:"sat", t:"16:30"}},
+
+  {n:"COW BOOKS 나카메구로", kc:"book", k:"헌책방", area:"나카메구로", when:"fri", dig:"구글 지도", 
+   why:"셀렉트숍 같은 헌책방. 12:00~19:00, 월요일 휴무. 나카메구로역에서 걸어서 7분.",
+   tip:"금요일 로스터리와 같은 동네인데 12시에 열어서 아침엔 못 들어가요. 메구로강 따라 걸으며 가게 앞만 보거나, 동선을 바꿔야 해요.",
+   q:"COW BOOKS 中目黒", src:"https://www.cowbooks.jp/", srcn:"COW BOOKS 공식", lat:35.6475, lng:139.6955, slot:{day:"fri", t:"12:00"}},
+
+  {n:"Books & Cafe 드레드노트", kc:"book", k:"북카페", area:"기요스미시라카와", when:"any", dig:"구글 지도", 
+   why:"주인이 고른 책과 커피, 밥. 평일 11:00~19:30, 주말 10:00~20:00, 화요일 휴무.",
+   tip:"기요스미시라카와역에서 걸어서 10분. 일정과 떨어져 있어요.",
+   q:"Books&Cafe ドレッドノート", src:"https://www.dreadnought-2019.com/bookcafe", srcn:"공식", lat:35.6795, lng:139.8035, slot:{day:"thu", t:"14:15"}},
+
+  {n:"Forest Library 森の図書室", kc:"book", k:"북라운지", area:"시부야", when:"any", dig:"구글 지도", 
+   why:"시부야 교차로 근처 8층, 책장처럼 생긴 문 안쪽의 서재형 공간. 시간제 요금에 음료 포함(1시간 1,000엔).",
+   tip:"비 오는 저녁 시부야에서 쉬어 가기 좋아요.",
+   q:"森の図書室 渋谷", src:"https://tokyocheapo.com/restaurant/forest-library/", srcn:"Tokyo Cheapo", lat:35.6605, lng:139.6985, slot:{day:"sat", t:"17:00"}},
+
+  {n:"본야 Title", ja:"本屋 Title", kc:"book", k:"서점, 카페", area:"오기쿠보", when:"any", dig:"구글 지도", 
+   why:"오래된 건물을 고쳐 만든 동네 서점. 12:00~19:30(일 19:00), 수요일과 첫째·셋째 화요일 휴무.",
+   tip:"서쪽 오기쿠보라 이번 동선과 멀어요.",
+   q:"本屋 Title 荻窪", src:"https://www.title-books.com/access", srcn:"공식", lat:35.7065, lng:139.6105, slot:{day:"sat", t:"13:00"}},
+
+  {n:"platform3", kc:"book", k:"독립 서점", area:"히가시나카노", when:"any", dig:"구글 지도", 
+   why:"loneliness books와 (TT) press가 같이 운영하는 공간. 아시아의 퀴어·페미니즘·고독을 다룬 책과 진. 평일 14:00~22:00, 주말 12:00~22:00.",
+   tip:"히가시나카노라 신주쿠 서쪽. 토요일 하츠다이(푸즈쿠에)에서 비교적 가까워요.",
+   q:"platform3 東中野", src:"https://www.timeout.jp/tokyo/ja/news/platform_3-101724", srcn:"Time Out Tokyo", lat:35.7075, lng:139.6835, slot:{day:"sat", t:"20:00"}},
+
+  {n:"LAMBERT", kc:"food", k:"말차 카페", area:"오쿠보", when:"any", dig:"구글 지도", 
+   why:"70년 된 일본 가옥을 고친 말차 가게. 10:30~17:00. 매장 안 자리는 예약제, 테이크아웃은 예약 없이.",
+   tip:"신오쿠보 쪽이라 일정과 떨어져 있어요. 앉아서 먹으려면 예약부터.",
+   q:"LAMBERT 百人町", src:"https://www.lambert.tokyo/", srcn:"공식", lat:35.7035, lng:139.6975, slot:{day:"sat", t:"13:00"}},
+
+  {n:"SISIRI 에비스", kc:"food", k:"화과자", area:"에비스", when:"sat", dig:"구글 지도", 
+   why:"홋카이도 재료로 만드는 화과자집. 오래된 집을 고친 가게. 토·일·공휴일만 10:00~17:00. 눈 모찌(雪もち)가 간판이에요.",
+   tip:"토요일에만 맞출 수 있어요. 인기라 공식 사이트 픽업 예약(토요일 9:30 오픈)을 확인하세요.",
+   q:"SISIRI 恵比寿", src:"https://sisiri.com/contact/", srcn:"공식", lat:35.6445, lng:139.7185, slot:{day:"sat", t:"16:30"}},
+
+  {n:"EUREKA!", kc:"bar", k:"사케 바", area:"니시아자부", when:"any", dig:"구글 지도", 
+   why:"사케 소믈리에 지바 마리에의 가게. 화~금 18:00~23:30, 토·일 13:00~21:00, 월요일 휴무. 앉으려면 예약, 없으면 서서 마시는 자리.",
+   tip:"숙소에서 가까운 편이에요. 목요일이나 금요일 밤 LP바 대신.",
+   q:"EUREKA! 西麻布", src:"https://www.tablecheck.com/en/eureka-sake", srcn:"TableCheck", lat:35.6575, lng:139.7215, slot:{day:"fri", t:"20:30"}},
+
+  {n:"record bar 33 1/3rpm", kc:"bar", k:"LP바", area:"시부야", when:"fri", dig:"구글 지도", 
+   why:"1960~80년대 록·팝을 제대로 듣는 레코드 바. 바 18:00~25:00, 낮엔 카페. 목·일·공휴일 휴무.",
+   tip:"금요일 CAVE 대신. 시부야역 서쪽 출구에서 3분.",
+   q:"record bar 33 1/3rpm", src:"https://www.33-1-3rpm.com/%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9-%E5%96%B6%E6%A5%AD%E6%99%82%E9%96%93/", srcn:"공식", lat:35.6575, lng:139.6985, slot:{day:"fri", t:"20:30"}},
+
+  {n:"도쿄대 은행나무길과 야스다 강당", ja:"東京大学 銀杏並木", kc:"leaf", k:"은행잎, 건축", area:"혼고", when:"thu", dig:"구글 지도", 
+   why:"정문에서 야스다 강당까지 이어지는 은행나무 길. 일반인도 7:00~18:00에 볼 수 있어요(시험 기간 등은 예외).",
+   tip:"절정은 예년 11월 하순~12월 초라 19일엔 조금 이를 수 있어요. 목요일 리쿠기엔과 우에노 사이에 있어요.",
+   q:"東京大学 本郷キャンパス 銀杏並木", src:"https://www.u-tokyo.ac.jp/ja/about/campus-guide/public02_05.html", srcn:"도쿄대 공식", lat:35.7128, lng:139.7605, slot:{day:"thu", t:"10:00"}},
+
+  {n:"12 KANDA", kc:"photo", k:"건축", area:"간다", when:"fri", dig:"구글 지도", 
+   why:"sinato(오노 지카라) 설계. 바깥 피난 계단과 발코니가 층마다 다르게 튀어나온 공유 오피스. 밖에서 보는 건물이에요.",
+   tip:"금요일 진보초에서 동쪽으로 조금. 아티존 가는 길에 돌아가도 돼요.",
+   q:"12 KANDA 神田須田町", src:"https://architecturephoto.net/216957/", srcn:"architecturephoto", lat:35.6955, lng:139.7695, slot:{day:"fri", t:"15:15"}},
+
+  {n:"MONOSPINAL", kc:"photo", k:"건축", area:"아사쿠사바시", when:"thu", dig:"구글 지도", 
+   why:"야마구치 마코토 설계(2023). 기울어진 벽 아홉 장이 둘러싼 게임 회사 본사. 고가 선로 옆. 밖에서 보는 건물이에요.",
+   tip:"목요일 호쿠사이 미술관(료고쿠)에서 강 건너편이에요.",
+   q:"MONOSPINAL 浅草橋", src:"https://architecturephoto.net/207637/", srcn:"architecturephoto", lat:35.697, lng:139.7845, slot:{day:"thu", t:"13:50"}},
+
+  {n:"에비스 가든 플레이스", ja:"恵比寿ガーデンプレイス", kc:"photo", k:"사진 스팟", area:"에비스", when:"sat", dig:"구글 지도", 
+   why:"겨울마다 세계 최대급 바카라 샹들리에를 광장에 켜요. 2025년엔 11/8~1/12, 11:00~23:00.",
+   tip:"2026년 일정은 아직 발표 전이에요. 사진미술관이 바로 여기라 같이 묶으세요.",
+   q:"恵比寿ガーデンプレイス", src:"https://event.gardenplace.jp/special/2025baccarat/", srcn:"공식", lat:35.6421, lng:139.7137, slot:{day:"sat", t:"17:30"}},
+
+  {n:"도쿄 타워", ja:"東京タワー", kc:"view", k:"전망대, 야경", area:"시바공원", when:"any", dig:"구글 지도", 
+   why:"메인데크(150m) 9:00~23:00, 어른 1,500엔부터.",
+   tip:"숙소에서 가까워요. 올라가는 것보다 시바공원이나 조조지 쪽에서 불 켜진 타워를 필름으로 찍는 게 나을 수도 있어요.",
+   q:"東京タワー", src:"https://www.tokyotower.co.jp/fee/", srcn:"도쿄 타워 공식", lat:35.6586, lng:139.7454, slot:{day:"thu", t:"21:00"}}
 ];
 
 // 출발 전 준비. 예약 체크리스트와 같은 저장소(tokyo-checks)를 쓴다. 사실 항목은 2026년 9월 24일 검색으로 확인.
@@ -2034,7 +2122,7 @@ const THEMES=[
   {k:"photo", n:"건축·사진",     kcs:["photo"],        ic:"i-camera",
    intro:"필름으로 남길 건물과 장면. 일정 속 건축가의 건물, 가는 길에 지나치는 건물, 사진 스팟을 모았어요. 해시태그는 누르면 복사돼요."},
   {k:"dig",  n:"내가 저장한 곳",  kcs:[],             ic:"i-pin", c:"var(--k-photo)",
-   intro:"인스타에서 디깅해 둔 곳. 동선에 맞는 곳은 일정에 넣었고, 지나가는 건물은 가는 길에, 멀거나 시간이 안 맞는 곳은 추천으로 남겼어요. 분홍 태그는 저장한 계정이에요."},
+   intro:"인스타에서 디깅해 둔 곳과 구글 지도 '도쿄 서점 앤 북카페' 목록. 동선에 맞는 곳은 일정에 넣었고, 지나가는 건물은 가는 길에, 멀거나 시간이 안 맞는 곳은 추천으로 남겼어요. 분홍 태그는 저장한 계정이에요."},
   {k:"art",  n:"미술관·박물관",   kcs:["art"],          ic:"i-art",
    intro:"이번 여행의 뼈대예요. 11월 셋째 주에 열리는 특별전에 날짜를 맞췄습니다. 대부분 월요일에 쉬어서 수~일 일정과는 겹치지 않아요."},
   {k:"book", n:"서점·북카페",     kcs:["book"],         ic:"i-book",
