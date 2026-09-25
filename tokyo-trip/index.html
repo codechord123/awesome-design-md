@@ -394,6 +394,24 @@ ol.reclist{list-style:none;margin:0;padding:0;display:grid;gap:var(--s3)}
 .addform .btn.key{background:var(--ink)}
 .addhint{margin:0;font-size:13px;color:var(--muted);line-height:1.5}
 .badge.mine{background:var(--ink);color:var(--surface)}
+.planpick{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 12px;padding:2px 0}
+.planpick::-webkit-scrollbar{display:none}
+.pp{flex:0 0 auto;border:0;border-radius:999px;padding:8px 14px;min-height:36px;font:inherit;font-size:14px;font-weight:700;background:var(--surface);color:var(--text2);box-shadow:inset 0 0 0 1px var(--line);cursor:pointer}
+.pp.on{background:var(--ink);color:var(--surface);box-shadow:none}
+.planintro{margin:0 0 12px;font-size:14px;line-height:1.55;color:var(--text2);word-break:keep-all}
+.planintro b{color:var(--ink);margin-right:4px}
+.plancards{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.plancard{display:grid;gap:8px;width:100%;text-align:left;border:0;border-radius:18px;padding:16px;background:var(--surface);font:inherit;color:var(--ink);cursor:pointer;box-shadow:inset 0 0 0 1px var(--line)}
+.plancard.on{box-shadow:inset 0 0 0 2px var(--ink)}
+.pc-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pc-top b{font-size:17px;font-weight:800;letter-spacing:-.02em}
+.pc-top em{font-style:normal;font-size:12px;font-weight:700;color:var(--muted);background:var(--faint);border-radius:6px;padding:2px 7px}
+.pc-top i{font-style:normal;font-size:12px;font-weight:700;margin-left:auto;color:var(--surface);background:var(--ink);border-radius:6px;padding:2px 7px}
+.pc-intro{font-size:14px;line-height:1.55;color:var(--text2);word-break:keep-all}
+.pc-days{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.pc-days li{display:flex;gap:8px;font-size:13.5px;color:var(--text2)}
+.pc-days b{color:var(--ink);width:1.4em;flex:0 0 auto}
+@media (min-width:700px){.plancards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .badge.dig{background:var(--k-photo);color:var(--surface)}
 .tdig,.tname .tdig{font-style:normal;font-size:11px;font-weight:700;border-radius:5px;padding:1px 5px;background:var(--k-photo);color:var(--surface);vertical-align:2px}
 .unmine{margin-top:var(--s1);color:var(--muted)}
@@ -906,18 +924,19 @@ const DAYS = [
        q:"bar all 赤坂", lat:35.6755, lng:139.7372}
     ]},
 
-  { key:"fri", wd:"금", dt:"11.20", short:"나카메구로·진보초·니혼바시", date:"2026-11-20", title:"나카메구로에서 진보초, 니혼바시로", summary:"나카메구로 스타벅스 로스터리 아침, 근대미술관, 카레 점심, 헌책방 거리. 금요일은 아티존이 20시까지 열어서 저녁 스시 전에 넣었습니다.", walk:"아침만 멀리, 진보초 안은 걸어서",
+  { key:"fri", wd:"금", dt:"11.20", short:"츠키지·진보초·니혼바시", date:"2026-11-20", title:"츠키지에서 진보초, 니혼바시로", summary:"츠키지 시장 아침, 근대미술관, 카레 점심, 헌책방 거리, 아티존(금요일 20시까지), 가부토초 스시와 탁주, 밤엔 숙소 옆 LP바. 도쿄 동쪽 도심 안에서만 움직여요.", walk:"동쪽 도심 안에서만, 밤엔 긴자선 한 번에 숙소로",
     stops:[
-      {t:"8:00", n:"스타벅스 리저브 로스터리 도쿄", ja:"スターバックス リザーブ ロースタリー 東京", kc:"food", k:"카페, 아침", dig:"@daytripkorea", 
-       leg:{line:"지하철", from:"赤坂見附", to:"中目黒", note:"19분 안팎, 환승 있음", v:true},
-       arch:{by:"隈研吾(외관)", year:2019},
-       shot:"4층까지 뚫린 천장에 17m 구리 캐스크와 벚꽃 모양 종이접기 천장. 1층 바 앞에서 위로 올려 찍고, 밖에선 메구로강 다리 위에서 삼나무 판자 외관을 정면으로. 아침 역광이 부드러워요.",
-       note:"2019년에 연 세계 다섯 번째 로스터리. 7:00~22:00. 주말엔 번호표(Airウェイト)가 필요할 만큼 붐벼서 평일 아침으로 잡았어요. 1층 베이커리 프린치에서 아침을 먹습니다.",
-       q:"スターバックス リザーブ ロースタリー 東京", lat:35.6495, lng:139.6941},
+      {t:"7:30", n:"츠키지 장외시장", ja:"築地場外市場", kc:"market", k:"시장", cash:true,
+       shot:"이른 아침 좁은 골목과 간판, 가게 사람들. 가게 앞 촬영은 한마디 묻고(도움 탭 한마디).",
+       note:"9시 넘으면 몸싸움. 일요일·공휴일엔 대부분 닫아요.",
+       q:"築地場外市場", id:"ChIJW2cLzSGLGGARXAKXv6EkbqI", lat:35.6647703, lng:139.7702515},
+      {t:"8:00", n:"우니토라 나카도리점", ja:"うに虎 中通り店", kc:"food", k:"식당, 아침",
+       note:"7시부터. 시장 한복판이라 따로 움직일 필요 없음.",
+       q:"うに虎 中通り店", id:"ChIJ7QgKJ9-LGGAR-CG9wwEzMG0", lat:35.6655762, lng:139.7704993},
       {t:"10:15", n:"도쿄국립근대미술관", ja:"東京国立近代美術館", kc:"art", k:"미술관", closed:"월 휴관", ok:"창구 당일권", close:"20:00",
        arch:{by:"谷口吉郎", year:1969},
        shot:"굵은 기둥이 받치는 필로티와 물결치는 보. 해자(기타노마루) 쪽에서 건물 전체를.",
-       leg:{line:"지하철", from:"中目黒", to:"竹橋", note:"30분 안팎, 환승 2번", v:true},
+       leg:{line:"지하철", from:"築地", to:"竹橋", note:"16분 안팎, 환승 1번", v:true},
        note:"다케히사 유메지전(10/23–1/11). 화가이자 시인, 디자이너였던 유메지의 대표작 〈구로후네야〉가 약 40년 만에 나옵니다.",
        q:"東京国立近代美術館", id:"ChIJL0kSfg2MGGARKv5KX53ZZ2Y", lat:35.6905432, lng:139.7546932},
       {t:"12:00", n:"구풍 카레 본디", ja:"欧風カレー ボンディ 神保町本店", kc:"food", k:"식당, 점심",
@@ -942,27 +961,26 @@ const DAYS = [
       {t:"18:50", n:"KITOKI · 평화 도부로쿠 양조소", ja:"KITOKI 平和どぶろく兜町醸造所", kc:"photo", k:"건축, 한 잔", opt:true, close:"22:30", dig:"@daytripkorea", 
        arch:{by:"ADX", year:2022, note:"일본 첫 목조 하이브리드 빌딩"},
        shot:"10층 건물을 콘크리트 큰 틀 안에 나무로 채운 외관. 해가 진 뒤라 1층 불빛이 나무 사이로 새어 나올 때, 길 건너에서 세로로 한 장.",
-       note:"기쿠스시와 같은 가부토초라 걸어서 몇 분. 1층 양조소에서 도부로쿠(탁주) 한 잔. 평일 13:00~22:30. CAVE로 가려면 40분쯤만 있다가 나오세요.",
+       note:"기쿠스시와 같은 가부토초라 걸어서 몇 분. 1층 양조소에서 도부로쿠(탁주) 한 잔. 평일 13:00~22:30. Bar Luther까지 긴자선 한 번이에요.",
        q:"KITOKI 兜町", lat:35.6809, lng:139.7781},
-      {t:"20:30", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
-       note:"지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키지가 7:30이니 너무 늦지 않게.",
-       leg:{line:"긴자선", from:"日本橋", to:"渋谷", note:"갈아타지 않음", v:true},
-       q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841}
+      {t:"20:30", n:"Bar Luther 赤坂", ja:"バー ルーサー 赤坂", kc:"bar", k:"LP바", ask:"영업시간 확인",
+       leg:{line:"긴자선", from:"日本橋", to:"赤坂見附", note:"갈아타지 않음", v:true},
+       note:"숙소 옆 블록 지하(赤坂3-20-2). 70~80년대 소울·블랙 컨템퍼러리·AOR을 아날로그로 트는 바. 일요일 휴무. 영업시간이 출처마다 달라서(19:00~03:30 / 18:00~22:00) 전화(03-6277-8016)로 확인하세요. 금요일의 끝을 숙소 앞에서.",
+       q:"Bar Luther Akasaka", lat:35.6754, lng:139.7369},
     ]},
 
-  { key:"sat", wd:"토", dt:"11.21", short:"츠키지·롯폰기·시부야", date:"2026-11-21", title:"츠키지, 롯폰기, 아오야마, 시부야", summary:"새벽 시장에서 은행나무길 거쳐, 밤엔 숙소 옆 LP바에서 마무리. 가장 긴 하루예요.", walk:"도보 약 11km",
+  { key:"sat", wd:"토", dt:"11.21", short:"나카메구로·롯폰기·시부야", date:"2026-11-21", title:"나카메구로에서 롯폰기, 아오야마, 시부야로", summary:"나카메구로 로스터리 아침에서 롯폰기, 아오야마 은행나무길, 시부야 서점들을 지나 밤엔 시부야 LP바. 남서쪽으로 한 방향이고 가장 긴 하루예요.", walk:"도보 약 11km",
     stops:[
-      {t:"7:30", n:"츠키지 장외시장", ja:"築地場外市場", kc:"market", k:"시장", cash:true,
-       shot:"이른 아침 좁은 골목과 간판, 가게 사람들. 가게 앞 촬영은 한마디 묻고(도움 탭 한마디).",
-       note:"9시 넘으면 몸싸움. 일요일엔 대부분 닫아 오늘이 유일합니다.",
-       q:"築地場外市場", id:"ChIJW2cLzSGLGGARXAKXv6EkbqI", lat:35.6647703, lng:139.7702515},
-      {t:"8:00", n:"우니토라 나카도리점", ja:"うに虎 中通り店", kc:"food", k:"식당, 아침",
-       note:"7시부터. 시장 한복판이라 따로 움직일 필요 없음.",
-       q:"うに虎 中通り店", id:"ChIJ7QgKJ9-LGGAR-CG9wwEzMG0", lat:35.6655762, lng:139.7704993},
+      {t:"7:30", n:"스타벅스 리저브 로스터리 도쿄", ja:"スターバックス リザーブ ロースタリー 東京", kc:"food", k:"카페, 아침", dig:"@daytripkorea", 
+       leg:{line:"지하철", from:"赤坂見附", to:"中目黒", note:"19분 안팎, 환승 있음", v:true},
+       arch:{by:"隈研吾(외관)", year:2019},
+       shot:"4층까지 뚫린 천장에 17m 구리 캐스크와 벚꽃 모양 종이접기 천장. 1층 바 앞에서 위로 올려 찍고, 밖에선 메구로강 다리 위에서 삼나무 판자 외관을 정면으로. 아침 역광이 부드러워요.",
+       note:"2019년에 연 세계 다섯 번째 로스터리. 7:00~22:00. 토요일은 번호표(Airウェイト)가 필요할 만큼 붐벼서 문 여는 7시에 맞춰 가요. 1층 베이커리 프린치에서 아침을 먹습니다.",
+       q:"スターバックス リザーブ ロースタリー 東京", lat:35.6495, lng:139.6941},
       {t:"10:00", n:"국립신미술관", ja:"国立新美術館", kc:"art", k:"미술관", closed:"화 휴관", ok:"당일권", dig:"@hi_dongwon", 
        arch:{by:"黒川紀章", year:2007},
        shot:"물결치는 유리 커튼월과 아트리움의 거대한 역원뿔 두 개. 관내 공용 공간은 개인 촬영 가능(전시실은 전시마다 다름). 창가 빛이 바닥에 떨어지는 오전이 좋아요.",
-       leg:{line:"히비야선", from:"츠키지역", to:"롯폰기역", note:"환승 없이 직통", v:true},
+       leg:{line:"히비야선", from:"中目黒", to:"六本木", note:"8분, 갈아타지 않음", v:true},
        note:"소장품 없이 기획전만 여는 곳이라 무엇이 걸렸는지 미리 확인하세요.",
        q:"国立新美術館", lat:35.6652, lng:139.7264},
       {t:"12:30", n:"네즈미술관과 네즈카페", ja:"根津美術館", kc:"art", k:"미술관", closed:"월 휴관", need:"일시 지정 예약", needId:"nezu", fee:1500, feeNote:"웹 예약, 정원 포함", dig:"@daytripkorea", 
@@ -993,10 +1011,9 @@ const DAYS = [
       {t:"18:45", n:"Bookshelf Fuzkue", ja:"本の読める店 fuzkue 初台", kc:"book", k:"북카페, 저녁 겸", close:"23:00",
        note:"하츠다이. 조용히 앉아 읽는 곳이라 오늘의 휴식 시간이기도 합니다.",
        q:"Bookshelf Fuzkue", id:"ChIJVVVWOTLzGGARtVH01Eyw00c", lat:35.6802894, lng:139.6869601},
-      {t:"21:00", n:"Bar Luther 赤坂", ja:"バー ルーサー 赤坂", kc:"bar", k:"LP바", ask:"영업시간 확인",
-       leg:{line:"지하철", from:"初台", to:"赤坂見附", note:"19분 안팎, 환승 1번", v:true},
-       note:"숙소 옆 블록 지하(赤坂3-20-2). 70~80년대 소울·블랙 컨템퍼러리·AOR을 아날로그로 트는 바. 일요일 휴무. 영업시간이 출처마다 달라서(19:00~03:30 / 18:00~22:00) 전화(03-6277-8016)로 확인하세요. 긴 토요일의 끝을 숙소 앞에서.",
-       q:"Bar Luther Akasaka", lat:35.6754, lng:139.7369}
+      {t:"21:00", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
+       note:"지하 LP바. 8시 넘으면 자리가 찹니다. 돌아올 땐 긴자선 渋谷 → 赤坂見附 한 번이라 숙소까지 갈아타지 않아요. 막차는 준비 > 숙소·교통의 막차 안내를 보세요.",
+       q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841},
     ]},
 
   { key:"sun", wd:"일", dt:"11.22", short:"도쿄역·긴자·출국", date:"2026-11-22", title:"도쿄역에서 긴자로, 출국하는 날", summary:"황궁 분수공원에서 커피, 도쿄역과 국제포럼을 지나 1936년 찻집에서 아침. 서점 둘, 갤러리 하나, 긴자 양식 점심. 18시 나리타 비행기라 13시 반 전에 긴자를 떠납니다.", walk:"아침에 지하철 한 번, 나머지는 걸어서",
@@ -1099,7 +1116,7 @@ const RECS = [
 
   {n:"Little Soul Cafe", ja:"リトルソウルカフェ", kc:"bar", k:"LP바", area:"시모키타자와", when:"sat",
    why:"시모키타자와에서 20년 넘은 레코드 바. 1만 4천 장 넘는 판에서 소울·펑크·재즈를 한 곡씩 골라 틉니다. 20:00~02:00(금·토 04:00), 연중무휴.",
-   tip:"원래 토요일 마지막 자리였는데 숙소까지 멀어서 Bar Luther로 바꿨습니다. 그래도 가고 싶으면 토요일 21:00에 다시 넣으세요. 자리값 500엔, 현금.",
+   tip:"토요일 밤은 시부야 CAVE로 잡았어요. 시모키타자와로 가고 싶으면 토요일 21:00에 넣으세요. 숙소까지는 멀어요. 자리값 500엔, 현금.",
    q:"Little Soul Cafe 下北沢", dig:"@locally.official",  src:"https://www.littlesoulcafe.com/", srcn:"공식", lat:35.6632436, lng:139.6692659, slot:{day:"sat", t:"21:00"}},
 
   {n:"Spincoaster Music Bar", kc:"bar", k:"LP바", area:"요요기", when:"thu",
@@ -1132,10 +1149,10 @@ const RECS = [
    tip:"목요일 저녁 아사쿠사에서 도제우 먹고 bar all 가기 전에 커피 한 잔. 목요일은 21시에 닫아요.",
    q:"Fuglen Asakusa", src:"https://fuglencoffee.jp/en/pages/fuglen-asakusa", srcn:"Fuglen 공식", lat:35.716, lng:139.7955, slot:{day:"thu", t:"19:00"}},
 
-  {n:"가톨릭 메구로 성당", ja:"カトリック目黒教会(聖アンセルモ)", kc:"photo", k:"건축, 성당", area:"메구로", when:"fri", dig:"@daytripkorea", 
+  {n:"가톨릭 메구로 성당", ja:"カトリック目黒教会(聖アンセルモ)", kc:"photo", k:"건축, 성당", area:"메구로", when:"sat", dig:"@daytripkorea", 
    why:"안토닌 레이먼드 설계(1956). 접힌 콘크리트 벽과 천장, 세로 틈으로 들어오는 빛. 도쿄도 선정 역사적 건조물. 성당은 7:00~21:00(일요일 19:00까지) 열려 있어요.",
-   tip:"동쪽 벽으로 해가 드는 구조라 아침이 가장 좋아요. 금요일 로스터리 전에 넣으려면 7시쯤 숙소를 나서세요. 기도하는 곳이니 조용히, 미사 중엔 촬영하지 마세요.",
-   q:"カトリック目黒教会", src:"https://www.artarchi-japan.jp/2023/02/catholic-meguro-church.html", srcn:"建築とアートを巡る", lat:35.6352, lng:139.7135, slot:{day:"fri", t:"7:15"}},
+   tip:"동쪽 벽으로 해가 드는 구조라 아침이 가장 좋아요. 토요일 로스터리 전에 넣으려면 6시 반쯤 숙소를 나서세요. 기도하는 곳이니 조용히, 미사 중엔 촬영하지 마세요.",
+   q:"カトリック目黒教会", src:"https://www.artarchi-japan.jp/2023/02/catholic-meguro-church.html", srcn:"建築とアートを巡る", lat:35.6352, lng:139.7135, slot:{day:"sat", t:"7:00"}},
 
   {n:"호텔 가조엔 도쿄 카나데 라운지", ja:"ホテル雅叙園東京 カナデ ラウンジ", kc:"food", k:"호텔 라운지", area:"메구로", when:"sat", dig:"@hi_dongwon", 
    why:"메구로 호텔 가조엔 도쿄의 1층 라운지. 10:30~22:30(L.O. 21:30).",
@@ -1152,7 +1169,7 @@ const RECS = [
    tip:"와세다라 이번 동선 어디와도 멀어요. 넣는다면 반나절을 따로 잡으세요.",
    q:"リーガロイヤルホテル東京", src:"https://www.rihga.co.jp/tokyo/restaurant/list/garden_lounge", srcn:"호텔 공식", lat:35.7108, lng:139.7195, slot:{day:"fri", t:"11:30"}},
 
-  {n:"SAFU 사료 (도모 미술관 카페)", ja:"カフェダイニング 茶楓", kc:"food", k:"정원 카페", area:"도라노몬", when:"sat", dig:"@hi_dongwon", 
+  {n:"SAFU (도모 미술관 정원 카페)", ja:"カフェダイニング 茶楓", kc:"food", k:"정원 카페", area:"도라노몬", when:"sat", dig:"@hi_dongwon", 
    why:"기쿠치 간지쓰 기념 도모 미술관에 붙은 카페. '도시 속 고요한 정원'이 콘셉트. 11:00~18:00(식사 L.O. 13:00), 월요일 휴무.",
    tip:"숙소에서 가까운 가미야초 쪽이에요. 토요일 국립신미술관 뒤 점심을 여기서 하려면 네즈미술관을 조금 늦추세요. 식사 주문은 13시까지.",
    q:"カフェダイニング 茶楓", src:"https://safu.by-onko-chishin.com/", srcn:"공식", lat:35.6632, lng:139.7424, slot:{day:"sat", t:"11:45"}},
@@ -1167,39 +1184,39 @@ const RECS = [
    tip:"게이오선 千歳烏山역에서 남쪽으로 걸어서 15분. 토요일 저녁을 푸즈쿠에 대신 여기로 바꿀 수 있어요.",
    q:"栄寿し総本店", src:"https://sakaezushi.jp/", srcn:"공식", lat:35.657, lng:139.6005, slot:{day:"sat", t:"18:45"}},
 
-  {n:"테노하 다이칸야마", ja:"TENOHA DAIKANYAMA", kc:"food", k:"카페, 정원", area:"다이칸야마", when:"fri", dig:"@daytripkorea", 
+  {n:"테노하 다이칸야마", ja:"TENOHA DAIKANYAMA", kc:"food", k:"카페, 정원", area:"다이칸야마", when:"sat", dig:"@daytripkorea", 
    why:"다이칸야마역 1분, 나무가 우거진 복합 공간의 카페와 꽃집.",
-   tip:"2025년 4월에 새로 열면서 영업시간이 바뀌었어요(10:00~17:30, 수요일 휴무라는 소개가 있지만 출처마다 달라요). 나카메구로 로스터리에서 한 정거장이라 금요일 아침과 묶을 수 있는데, 열기 전일 수 있어요.",
-   q:"TENOHA DAIKANYAMA", src:"https://daishizen.co.jp/news/3609/", srcn:"大自然", lat:35.6485, lng:139.703, slot:{day:"fri", t:"9:15"}},
+   tip:"2025년 4월에 새로 열면서 영업시간이 바뀌었어요(10:00~17:30, 수요일 휴무라는 소개가 있지만 출처마다 달라요). 나카메구로 로스터리에서 한 정거장이라 토요일 아침과 묶을 수 있는데, 열기 전일 수 있어요.",
+   q:"TENOHA DAIKANYAMA", src:"https://daishizen.co.jp/news/3609/", srcn:"大自然", lat:35.6485, lng:139.703, slot:{day:"sat", t:"9:00"}},
 
   {n:"시부야구 후레아이 식물센터", ja:"渋谷区ふれあい植物センター", kc:"leaf", k:"식물원, 카페", area:"시부야", when:"sat", dig:"@daytripkorea", 
    why:"'일본에서 가장 작은 식물원'이라 불리는 곳. 먹을 수 있는 식물을 기르고, 안에서 식사·술도 돼요. 10:00~21:00, 월요일 휴원, 입장 100엔.",
    tip:"시부야역에서 걸어서 10분. 토요일 SPBS 전후, 해 진 뒤 조명 켜진 온실도 좋아요.",
    q:"渋谷区ふれあい植物センター", src:"https://sbgf.jp/guide/", srcn:"공식", lat:35.6555, lng:139.7082, slot:{day:"sat", t:"16:30"}},
 
-  {n:"블루보틀 도요스 파크 카페", ja:"ブルーボトルコーヒー 豊洲パークカフェ", kc:"food", k:"카페", area:"도요스", when:"sat", dig:"@daytripkorea", 
+  {n:"블루보틀 도요스 파크 카페", ja:"ブルーボトルコーヒー 豊洲パークカフェ", kc:"food", k:"카페", area:"도요스", when:"fri", dig:"@daytripkorea", 
    why:"도요스 공원 안, 공원과 이어진 탁 트인 매장(콘셉트가 '보더리스'). 8:00~19:00.",
-   tip:"토요일 츠키지 아침 다음, 국립신미술관 전에 한 시간이 빕니다. 츠키지에서 다리 건너 도요스까지 가까워요.",
-   q:"ブルーボトルコーヒー 豊洲パークカフェ", src:"https://store.bluebottlecoffee.jp/pages/toyosupark", srcn:"Blue Bottle 공식", lat:35.6545, lng:139.7925, slot:{day:"sat", t:"9:00"}},
+   tip:"금요일 츠키지 아침 다음, 근대미술관 전에 한 시간이 빕니다. 츠키지에서 다리 건너 도요스까지 가까워요.",
+   q:"ブルーボトルコーヒー 豊洲パークカフェ", src:"https://store.bluebottlecoffee.jp/pages/toyosupark", srcn:"Blue Bottle 공식", lat:35.6545, lng:139.7925, slot:{day:"fri", t:"9:00"}},
 
-  {n:"STUDIO MULE", kc:"bar", k:"리스닝 바, 와인", area:"오쿠시부야", when:"fri", dig:"@locally.official", 
+  {n:"STUDIO MULE", kc:"bar", k:"리스닝 바, 와인", area:"오쿠시부야", when:"sat", dig:"@locally.official", 
    why:"레이블 mule musiq의 리스닝 바 겸 레코드 가게. 빈티지 오디오로 장르 없이 트는 판에 내추럴 와인. 일요일 휴무. 여는 시각이 출처마다 17:00·20:00으로 달라요(닫는 건 24:00).",
-   tip:"금요일 CAVE 대신 가기 좋은 시부야 쪽 바. 가기 전 인스타로 영업 확인.",
-   q:"STUDIO MULE 渋谷", src:"https://www.audio-technica.co.jp/always-listening/articles/studio-mule/", srcn:"Audio-Technica", lat:35.6645, lng:139.6935, slot:{day:"fri", t:"20:30"}},
+   tip:"토요일 CAVE 대신 가기 좋은 시부야 쪽 바. 가기 전 인스타로 영업 확인.",
+   q:"STUDIO MULE 渋谷", src:"https://www.audio-technica.co.jp/always-listening/articles/studio-mule/", srcn:"Audio-Technica", lat:35.6645, lng:139.6935, slot:{day:"sat", t:"21:00"}},
 
-  {n:"B.Y.G", kc:"bar", k:"록 찻집", area:"시부야 햣켄다나", when:"fri", dig:"@locally.official", 
+  {n:"B.Y.G", kc:"bar", k:"록 찻집", area:"시부야 햣켄다나", when:"sat", dig:"@locally.official", 
    why:"1969년 도겐자카 햣켄다나에 연 록 찻집. 밤엔 록 바, 지하는 라이브 하우스. 새벽 2시까지.",
-   tip:"금요일 CAVE 대신. 여는 시각이 출처마다 달라요(16:00 또는 17:30).",
-   q:"B.Y.G 渋谷", src:"https://san-tatsu.jp/articles/239189/", srcn:"散歩の達人", lat:35.6588, lng:139.6965, slot:{day:"fri", t:"20:30"}},
+   tip:"토요일 CAVE 대신. 여는 시각이 출처마다 달라요(16:00 또는 17:30).",
+   q:"B.Y.G 渋谷", src:"https://san-tatsu.jp/articles/239189/", srcn:"散歩の達人", lat:35.6588, lng:139.6965, slot:{day:"sat", t:"21:00"}},
 
-  {n:"Grandfather's", kc:"bar", k:"LP바", area:"시부야", when:"fri", dig:"@locally.official", 
+  {n:"Grandfather's", kc:"bar", k:"LP바", area:"시부야", when:"sat", dig:"@locally.official", 
    why:"1971년에 연 바. 처음부터 LP만, 한 장에 한 곡씩 트는 '레코드 키퍼'가 있어요. 70~80년대 록·소울 2,000장. 17:00~03:00. 흡연 가능.",
-   tip:"금요일 CAVE 대신. 담배 연기가 있어요.",
-   q:"Grandfather's 渋谷", src:"https://www.audio-technica.co.jp/always-listening/articles/jazz-cafe-grandfathers/", srcn:"Audio-Technica", lat:35.6628, lng:139.7027, slot:{day:"fri", t:"20:30"}},
+   tip:"토요일 CAVE 대신. 담배 연기가 있어요.",
+   q:"Grandfather's 渋谷", src:"https://www.audio-technica.co.jp/always-listening/articles/jazz-cafe-grandfathers/", srcn:"Audio-Technica", lat:35.6628, lng:139.7027, slot:{day:"sat", t:"21:00"}},
 
   {n:"Jazz Inn Uncle Tom", kc:"bar", k:"재즈 바", area:"산겐자야", when:"sat", dig:"@locally.official", 
    why:"산겐자야에서 아버지 가게를 자식이 이어 가는 재즈 바. 18:00~01:30(L.O.), 부정기 휴무.",
-   tip:"토요일 Bar Luther 대신. 산겐자야에서 숙소까지는 멀어서 막차를 먼저 확인하세요.",
+   tip:"토요일 CAVE 대신. 산겐자야에서 숙소까지는 멀어서 막차를 먼저 확인하세요.",
    q:"Jazz Inn Uncle Tom 三軒茶屋", src:"https://www.arban-mag.com/article/46338", srcn:"ARBAN", lat:35.6437, lng:139.671, slot:{day:"sat", t:"21:00"}},
 
   {n:"모리 미술관 · 모리 마리코전", ja:"森美術館", kc:"art", k:"미술관, 밤까지", area:"롯폰기", when:"sat", dig:"구글 지도", 
@@ -1217,10 +1234,10 @@ const RECS = [
    tip:"토요일 Utrecht에서 SPBS로 가는 길 한가운데예요.",
    q:"ブルーボトルコーヒー 渋谷カフェ", src:"https://store.bluebottlecoffee.jp/pages/shibuya", srcn:"Blue Bottle 공식", lat:35.6624, lng:139.7019, slot:{day:"sat", t:"16:30"}},
 
-  {n:"COW BOOKS 나카메구로", kc:"book", k:"헌책방", area:"나카메구로", when:"fri", dig:"구글 지도", 
+  {n:"COW BOOKS 나카메구로", kc:"book", k:"헌책방", area:"나카메구로", when:"sat", dig:"구글 지도", 
    why:"셀렉트숍 같은 헌책방. 12:00~19:00, 월요일 휴무. 나카메구로역에서 걸어서 7분.",
-   tip:"금요일 로스터리와 같은 동네인데 12시에 열어서 아침엔 못 들어가요. 메구로강 따라 걸으며 가게 앞만 보거나, 동선을 바꿔야 해요.",
-   q:"COW BOOKS 中目黒", src:"https://www.cowbooks.jp/", srcn:"COW BOOKS 공식", lat:35.6475, lng:139.6955, slot:{day:"fri", t:"12:00"}},
+   tip:"토요일 로스터리와 같은 동네인데 12시에 열어서 아침엔 못 들어가요. '책과 레코드' 플랜은 여기서 시작해요.",
+   q:"COW BOOKS 中目黒", src:"https://www.cowbooks.jp/", srcn:"COW BOOKS 공식", lat:35.6475, lng:139.6955, slot:{day:"sat", t:"12:00"}},
 
   {n:"Books & Cafe 드레드노트", kc:"book", k:"북카페", area:"기요스미시라카와", when:"any", dig:"구글 지도", 
    why:"주인이 고른 책과 커피, 밥. 평일 11:00~19:30, 주말 10:00~20:00, 화요일 휴무.",
@@ -1257,10 +1274,10 @@ const RECS = [
    tip:"숙소에서 가까운 편이에요. 목요일이나 금요일 밤 LP바 대신.",
    q:"EUREKA! 西麻布", src:"https://www.tablecheck.com/en/eureka-sake", srcn:"TableCheck", lat:35.6575, lng:139.7215, slot:{day:"fri", t:"20:30"}},
 
-  {n:"record bar 33 1/3rpm", kc:"bar", k:"LP바", area:"시부야", when:"fri", dig:"구글 지도", 
+  {n:"record bar 33 1/3rpm", kc:"bar", k:"LP바", area:"시부야", when:"sat", dig:"구글 지도", 
    why:"1960~80년대 록·팝을 제대로 듣는 레코드 바. 바 18:00~25:00, 낮엔 카페. 목·일·공휴일 휴무.",
-   tip:"금요일 CAVE 대신. 시부야역 서쪽 출구에서 3분.",
-   q:"record bar 33 1/3rpm", src:"https://www.33-1-3rpm.com/%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9-%E5%96%B6%E6%A5%AD%E6%99%82%E9%96%93/", srcn:"공식", lat:35.6575, lng:139.6985, slot:{day:"fri", t:"20:30"}},
+   tip:"토요일 CAVE 대신. 시부야역 서쪽 출구에서 3분.",
+   q:"record bar 33 1/3rpm", src:"https://www.33-1-3rpm.com/%E3%82%A2%E3%82%AF%E3%82%BB%E3%82%B9-%E5%96%B6%E6%A5%AD%E6%99%82%E9%96%93/", srcn:"공식", lat:35.6575, lng:139.6985, slot:{day:"sat", t:"21:00"}},
 
   {n:"도쿄대 은행나무길과 야스다 강당", ja:"東京大学 銀杏並木", kc:"leaf", k:"은행잎, 건축", area:"혼고", when:"thu", dig:"구글 지도", 
    why:"정문에서 야스다 강당까지 이어지는 은행나무 길. 일반인도 7:00~18:00에 볼 수 있어요(시험 기간 등은 예외).",
@@ -1286,6 +1303,59 @@ const RECS = [
    why:"메인데크(150m) 9:00~23:00, 어른 1,500엔부터.",
    tip:"숙소에서 가까워요. 올라가는 것보다 시바공원이나 조조지 쪽에서 불 켜진 타워를 필름으로 찍는 게 나을 수도 있어요.",
    q:"東京タワー", src:"https://www.tokyotower.co.jp/fee/", srcn:"도쿄 타워 공식", lat:35.6586, lng:139.7454, slot:{day:"thu", t:"21:00"}}
+];
+
+// 컨셉별 일정. 날짜마다 지역은 기본과 같고(목 북동·금 동쪽 도심·토 남서·일 긴자), 무엇을 볼지만 다르다.
+// ref = 기본 일정·추천·지나가는 건물의 q. 사실(영업시간·요금)은 원래 항목에서 그대로 가져온다.
+// 원래 구간 정보(leg)는 앞 장소가 같을 때만 keep:true 로 살린다. 일요일은 모든 플랜이 같다.
+const PLANS = [
+  {k:"base", n:"지역별 기본", tag:"고루",
+   intro:"하루에 한 지역. 목요일 북동쪽(우에노·스미다·아사쿠사), 금요일 동쪽 도심(츠키지·진보초·니혼바시), 토요일 남서쪽(나카메구로·롯폰기·아오야마·시부야), 일요일 긴자. 미술관·서점·LP바를 고루 넣었어요."},
+  {k:"film", n:"필름·건축", tag:"빛 따라 걷기",
+   intro:"건축가의 건물과 빛 드는 시간에 맞춘 플랜. 스카이트리는 올라가지 않고 짓켄바시에서 찍고, 금요일 해 질 녘엔 도쿄역, 토요일 아침엔 레이먼드의 성당. 시부야에서 필름 현상을 맡겨요.",
+   days:{
+    thu:{title:"빛 따라 북동쪽", summary:"아침 정원, 도쿄대 은행나무길, 메이지 양관과 모더니즘, 세지마 가즈요의 호쿠사이 미술관, 해 질 녘엔 짓켄바시에서 물에 비친 스카이트리.", walk:"북쪽에서 동쪽으로, 해 지는 시각에 맞춰",
+     stops:[{t:"9:00",ref:"六義園",keep:true},{t:"10:20",ref:"東京大学 本郷キャンパス 銀杏並木"},{t:"11:15",ref:"東京国立博物館"},{t:"12:50",ref:"国立西洋美術館"},
+      {t:"13:10",ref:"ROUTE BOOKS"},{t:"14:20",ref:"MONOSPINAL 浅草橋"},{t:"14:50",ref:"すみだ北斎美術館"},
+      {t:"16:05",ref:"十間橋",shot:"골든아워에 도착해 블루아워까지 머물러요. 시각은 위 빛 시간표를 보세요. 광각으로 세로, 타워와 물에 비친 모습을 같이."},
+      {t:"17:15",ref:"浅草文化観光センター"},{t:"17:50",ref:"駒形どぜう 本店"},{t:"19:45",ref:"bar all 赤坂"}]},
+    fri:{title:"동쪽 도심의 건축", summary:"시장 아침, 근대미술관, 건축 책 전문 난요도와 12 KANDA, 아티존을 일찍 보고 해 질 녘엔 도쿄역과 국제포럼. 저녁은 가부토초 스시와 목조 빌딩 KITOKI.", walk:"동쪽 도심 안에서만, 해 질 무렵 도쿄역",
+     stops:[{t:"7:30",ref:"築地場外市場"},{t:"8:00",ref:"うに虎 中通り店"},{t:"10:15",ref:"東京国立近代美術館",keep:true},{t:"12:00",ref:"欧風カレー ボンディ 神保町本店"},
+      {t:"13:00",ref:"南洋堂書店"},{t:"13:40",ref:"12 KANDA 神田須田町"},
+      {t:"14:20",ref:"アーティゾン美術館",note:"이 플랜에선 일찍 봐요. 웹 예약 슬롯을 14:30 전후로 잡고, 해 지기 전에 도쿄역으로 걸어가세요."},
+      {t:"16:00",ref:"東京駅丸の内駅舎"},{t:"16:40",ref:"東京国際フォーラム"},{t:"17:30",ref:"Kiku Sushi 日本橋"},{t:"18:50",ref:"KITOKI 兜町"},{t:"20:30",ref:"Bar Luther Akasaka",keep:true}]},
+    sat:{title:"아침 빛에서 네온까지", summary:"동쪽 벽으로 빛이 드는 레이먼드의 성당, 로스터리, 구로카와 기쇼의 국립신미술관, 구마 겐고의 네즈와 메이지 신궁 뮤지엄, 오모테산도 건축, 시부야에서 필름 현상 맡기고 사진집 서점.", walk:"남서쪽 한 방향, 밤엔 긴자선 한 번에 숙소로",
+     stops:[{t:"7:00",ref:"カトリック目黒教会"},{t:"7:45",ref:"スターバックス リザーブ ロースタリー 東京"},{t:"10:00",ref:"国立新美術館",keep:true},{t:"12:30",ref:"根津美術館",keep:true},
+      {t:"14:00",ref:"神宮外苑いちょう並木"},{t:"15:00",ref:"明治神宮ミュージアム",fee:1000,feeNote:"일반"},{t:"16:00",ref:"Utrecht 神宮前"},
+      {t:"16:50",ref:"カメラのキタムラ 渋谷店"},{t:"17:40",ref:"SO BOOKS 代々木八幡"},{t:"18:40",ref:"Bookshelf Fuzkue"},{t:"21:00",ref:"THE MUSIC BAR CAVE SHIBUYA"}]}
+   }},
+  {k:"books", n:"책과 레코드", tag:"서점·LP바",
+   intro:"미술관은 줄이고 서점·북카페·레코드 바에 오래 머무는 플랜. 아침은 느긋하게 시작해요.",
+   days:{
+    thu:{title:"우에노와 강 건너 북카페", summary:"박물관 하나, 우에노 북카페 점심, 호쿠사이, 기요스미시라카와의 드레드노트에서 오후, 저녁은 아사쿠사, 밤엔 숙소 옆 LP바.", walk:"우에노에서 스미다강 동쪽으로",
+     stops:[{t:"10:00",ref:"東京国立博物館"},{t:"12:30",ref:"ROUTE BOOKS"},{t:"14:00",ref:"すみだ北斎美術館"},{t:"15:30",ref:"Books&Cafe ドレッドノート"},
+      {t:"17:50",ref:"駒形どぜう 本店"},{t:"19:45",ref:"bar all 赤坂"}]},
+    fri:{title:"진보초에서 하루", summary:"츠키지 없이 느긋하게. 근대미술관 뒤 진보초 헌책방 거리를 오래 걷고, 아티존, 가부토초 스시, 밤엔 숙소 옆 LP바.", walk:"진보초 안은 걸어서",
+     stops:[{t:"10:15",ref:"東京国立近代美術館"},{t:"12:00",ref:"欧風カレー ボンディ 神保町本店"},{t:"13:00",ref:"CHEKCCORI 神保町"},{t:"13:45",ref:"南洋堂書店"},
+      {t:"14:30",ref:"神保町ブックセンター"},{t:"15:45",ref:"アーティゾン美術館",keep:true},{t:"17:30",ref:"Kiku Sushi 日本橋"},{t:"19:00",ref:"KITOKI 兜町"},{t:"20:30",ref:"Bar Luther Akasaka",keep:true}]},
+    sat:{title:"시부야 책과 레코드", summary:"나카메구로 로스터리와 COW BOOKS, 오모테산도 Utrecht, 시부야 SPBS와 사진집 헌책방 SO BOOKS, 푸즈쿠에에서 저녁 겸 독서, 밤엔 시부야 LP바 두 곳.", walk:"나카메구로에서 시부야까지, 밤엔 긴자선 한 번",
+     stops:[{t:"9:30",ref:"スターバックス リザーブ ロースタリー 東京",keep:true},{t:"11:00",ref:"TENOHA DAIKANYAMA",opt:true},{t:"12:00",ref:"COW BOOKS 中目黒"},
+      {t:"13:30",ref:"Utrecht 神宮前"},{t:"14:30",ref:"ブルーボトルコーヒー 渋谷カフェ"},{t:"15:30",ref:"SHIBUYA PUBLISHING & BOOKSELLERS"},{t:"16:30",ref:"SO BOOKS 代々木八幡"},
+      {t:"17:30",ref:"Bookshelf Fuzkue"},{t:"20:30",ref:"THE MUSIC BAR CAVE SHIBUYA"},{t:"22:00",ref:"Grandfather's 渋谷",opt:true}]}
+   }},
+  {k:"slow", n:"느린 카페·정원", tag:"쉬엄쉬엄",
+   intro:"하루 예닐곱 곳만. 정원과 카페, 호텔 라운지에서 오래 앉아 있는 플랜. 예약이 까다로운 곳과 새벽 일정은 뺐어요.",
+   days:{
+    thu:{title:"정원과 강가, 천천히", summary:"리쿠기엔을 느긋하게, 박물관 하나, 북카페 점심, 호쿠사이, 해 질 녘 아사쿠사의 북유럽 카페, 저녁은 튀김 덮밥, 밤엔 숙소 옆 LP바.", walk:"북쪽에서 동쪽으로, 천천히",
+     stops:[{t:"9:30",ref:"六義園",keep:true},{t:"11:30",ref:"東京国立博物館"},{t:"13:40",ref:"ROUTE BOOKS"},{t:"14:45",ref:"すみだ北斎美術館"},
+      {t:"16:30",ref:"Fuglen Asakusa"},{t:"18:00",ref:"大黒家天麩羅 本店"},{t:"19:45",ref:"bar all 赤坂"}]},
+    fri:{title:"화과자에서 정원 카페까지", summary:"숙소 앞 토라야에서 시작해 근대미술관, 카레, 진보초 북센터에서 오래 읽고, 도라노몬의 정원 카페, 저녁은 가부토초 스시. 밤은 일찍.", walk:"동쪽 도심, 이동은 짧게",
+     stops:[{t:"8:40",ref:"とらや 赤坂店"},{t:"10:15",ref:"東京国立近代美術館"},{t:"12:00",ref:"欧風カレー ボンディ 神保町本店"},{t:"13:15",ref:"神保町ブックセンター"},
+      {t:"15:00",ref:"カフェダイニング 茶楓"},{t:"17:30",ref:"Kiku Sushi 日本橋"}]},
+    sat:{title:"로스터리, 정원, 식물원", summary:"로스터리 아침, 가조엔 라운지, 네즈미술관 정원, 은행나무길, 시부야의 작은 식물원에서 저녁, 모리 미술관 밤 관람, 숙소 옆 LP바.", walk:"남서쪽, 밤엔 숙소 근처로",
+     stops:[{t:"8:00",ref:"スターバックス リザーブ ロースタリー 東京",keep:true},{t:"10:40",ref:"ホテル雅叙園東京"},{t:"12:30",ref:"根津美術館"},{t:"14:30",ref:"神宮外苑いちょう並木"},
+      {t:"15:30",ref:"ブルーボトルコーヒー 渋谷カフェ"},{t:"17:00",ref:"渋谷区ふれあい植物センター"},{t:"19:15",ref:"森美術館"},{t:"21:15",ref:"Bar Luther Akasaka"}]}
+   }}
 ];
 
 // 출발 전 준비. 예약 체크리스트와 같은 저장소(tokyo-checks)를 쓴다. 사실 항목은 2026년 9월 24일 검색으로 확인.
@@ -1472,8 +1542,39 @@ function indexStops(){
       else if(s.lat) s.num=++i; });
   });
 }
-indexStops();
-const ALL = DAYS.flatMap(d=>d.stops.filter(s=>s.lat && !s.hotel));
+
+/* ---------- 플랜 ----------
+   DAYS에 적힌 일정이 기본(지역별) 플랜이다. 다른 플랜은 PLANS의 ref로 기본 일정·추천·지나가는 건물을
+   찾아 복사해 d.base 를 바꾼 뒤 indexStops()로 다시 번호를 매긴다. 고른 플랜은 tokyo-plan. */
+DAYS.forEach(d=>{ d.orig=d.stops.slice(); d.origMeta={title:d.title, summary:d.summary, walk:d.walk, short:d.short}; });
+let CURPLAN="base";
+function planStop(sp){
+  const {ref,keep,...ov}=sp; let o=null;
+  for(const d of DAYS){ const f=d.orig.find(x=>x.q===ref); if(f){ const {leg,num,_idx,_from,...rest}=f; o=rest; if(keep&&leg) o.leg=leg; break; } }
+  if(!o){ const r=RECS.find(x=>x.q===ref);
+    if(r) o={n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, q:r.q, lat:r.lat, lng:r.lng, dig:r.dig, fromRec:true}; }
+  if(!o){ const g=SIGHTS.find(x=>x.q===ref);
+    if(g) o={n:g.n, ja:g.ja, kc:"photo", k:"건축", arch:{by:g.by, year:g.year}, note:g.why, q:g.q, lat:g.lat, lng:g.lng, dig:g.dig}; }
+  if(!o){ console.warn("플랜에서 못 찾은 장소:",ref); return null; }
+  return Object.assign(o,ov);
+}
+function planStopsFor(P,d){ const pd=P.days&&P.days[d.key]; return pd ? pd.stops.map(planStop).filter(Boolean) : d.orig.slice(); }
+let ALL=[];
+function applyPlan(k){
+  const P=PLANS.find(p=>p.k===k)||PLANS[0]; CURPLAN=P.k;
+  DAYS.forEach(d=>{ const pd=P.days&&P.days[d.key];
+    d.base=planStopsFor(P,d);
+    Object.assign(d, pd ? {title:pd.title, summary:pd.summary, walk:pd.walk||d.origMeta.walk, short:d.origMeta.short} : d.origMeta); });
+  indexStops();
+  ALL=DAYS.flatMap(d=>d.stops.filter(s=>s.lat && !s.hotel));
+}
+// 모든 플랜의 장소(구글 장소 정보 받기·붙여넣기용). pkey가 같은 곳은 한 번만
+function everyPlace(){
+  const m=new Map();
+  PLANS.forEach(P=>DAYS.forEach(d=>planStopsFor(P,d).forEach(s=>{ if(s.lat && !s.hotel && !m.has(pkey(s))) m.set(pkey(s),s); })));
+  return [...m.values()];
+}
+applyPlan(LS.get("tokyo-plan","base"));
 
 /* ---------- 도쿄 시각 ---------- */
 const TZ = "Asia/Tokyo";
@@ -1851,6 +1952,7 @@ function renderDay(key){
   }).join("");
   panelEl.innerHTML=`<section class="day" role="tabpanel" aria-labelledby="tab-${d.key}" tabindex="-1">
     <header class="dayhead">
+      ${planPickHTML()}
       <p class="eyebrow kicker">${dayNo}일차 &middot; ${d.dt} ${d.wd}요일</p>
       <h2>${esc(d.title)}</h2>
       <p class="summary">${esc(d.summary)}</p>
@@ -2128,7 +2230,7 @@ const THEMES=[
   {k:"book", n:"서점·북카페",     kcs:["book"],         ic:"i-book",
    intro:"진보초 헌책방 거리부터 책 한 권만 파는 긴자 서점까지. 금요일은 사실상 서점의 날이에요."},
   {k:"bar",  n:"LP바",            kcs:["bar"],          ic:"i-bar",
-   intro:"밤마다 한 곳. 목·토요일은 숙소에서 걸어서 2분이라 막차 걱정이 없어요."},
+   intro:"밤마다 한 곳. 목·금요일은 숙소에서 걸어서 2분, 토요일 시부야도 긴자선 한 번이라 갈아타지 않아요."},
   {k:"food", n:"먹을 곳",         kcs:["food","market"],ic:"i-food",
    intro:"새벽 츠키지부터 1801년에 문을 연 미꾸라지 요리집, 에도마에 스시, 긴자 양식까지. 예약할 곳은 준비 탭에 모아 뒀어요."},
   {k:"green",n:"정원·단풍·전망",  kcs:["leaf","view"],  ic:"i-leaf",
@@ -2198,6 +2300,30 @@ function renderThemes(){
   }));
 }
 
+/* ---------- 플랜 고르기 ---------- */
+function planPickHTML(){
+  const P=PLANS.find(p=>p.k===CURPLAN)||PLANS[0];
+  return `<div class="planpick" role="group" aria-label="일정 플랜">${PLANS.map(p=>`<button type="button" class="pp${p.k===CURPLAN?" on":""}" data-plan="${p.k}" aria-pressed="${p.k===CURPLAN}">${esc(p.n)}</button>`).join("")}</div>
+    ${P.k!=="base"?`<p class="planintro"><b>${esc(P.n)}</b> ${esc(P.intro)}</p>`:""}`;
+}
+function setPlan(k){
+  applyPlan(k); LS.set("tokyo-plan",CURPLAN);
+  const P=PLANS.find(p=>p.k===CURPLAN);
+  refresh(); toast(`'${P.n}' 일정으로 바꿨어요`);
+}
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-plan]"); if(!b) return;
+  e.preventDefault(); if(b.dataset.plan!==CURPLAN) setPlan(b.dataset.plan);
+  if(b.dataset.open) { go("plan",{day:"thu"}); window.scrollTo({top:0}); } });
+function planCardsHTML(){
+  return PLANS.map(P=>{ const ds=DAYS.filter(d=>["thu","fri","sat"].includes(d.key));
+    const lines=ds.map(d=>{ const st=planStopsFor(P,d).filter(s=>s.lat&&!s.hotel); const pd=P.days&&P.days[d.key];
+      return `<li><b>${d.wd}</b><span>${esc(pd?pd.title:d.origMeta.title)} · ${st.length}곳</span></li>`; }).join("");
+    return `<li><button type="button" class="plancard${P.k===CURPLAN?" on":""}" data-plan="${P.k}" data-open="1" aria-pressed="${P.k===CURPLAN}">
+      <span class="pc-top"><b>${esc(P.n)}</b><em>${esc(P.tag)}</em>${P.k===CURPLAN?`<i>보는 중</i>`:""}</span>
+      <span class="pc-intro">${esc(P.intro)}</span>
+      <ul class="pc-days">${lines}</ul></button></li>`; }).join("");
+}
+
 /* ---------- 홈 ---------- */
 function dayCardHTML(d){
   const pins=d.stops.filter(s=>s.lat && !s.hotel);
@@ -2241,8 +2367,12 @@ function renderHome(){
       ${left.length>4?`<p class="more">외 ${left.length-4}건 더</p>`:""}
       <div class="acts"><button type="button" class="btn key" data-gotab="prep">준비 탭에서 체크하기</button></div>
     </section>` : ""}
+    <section class="hsec" aria-labelledby="plan-h">
+      <div class="hs-top"><h2 id="plan-h">일정 고르기</h2><span class="sub">지역은 같고 보는 것만 달라요</span></div>
+      <ol class="plancards">${planCardsHTML()}</ol>
+    </section>
     <section class="hsec" aria-labelledby="days-h">
-      <div class="hs-top"><h2 id="days-h">닷새 한눈에</h2><span class="sub">누르면 그날 일정</span></div>
+      <div class="hs-top"><h2 id="days-h">닷새 한눈에</h2><span class="sub">${esc((PLANS.find(p=>p.k===CURPLAN)||PLANS[0]).n)} · 누르면 그날 일정</span></div>
       <ol class="dcards">${DAYS.map(dayCardHTML).join("")}</ol>
     </section>
     <section class="hsec" aria-labelledby="th-h">
@@ -2351,10 +2481,11 @@ function icsFor(){
 }
 function renderIcsMine(){
   const el=$("#icsmine"); if(!el) return;
-  const n=getMine().length;
-  if(!n){ el.innerHTML=""; return; }
-  el.innerHTML=`<p class="sub" style="margin:12px 0 0">추천에서 직접 넣은 ${n}곳은 위 캘린더에 없어요. 아래 파일에는 다 들어 있습니다. 아이폰에서 바로 안 열리면 파일 앱에 저장한 뒤 눌러 여세요. 이미 위 캘린더를 넣었다면 겹치니 한 가지만 쓰세요.</p>
-    <div class="acts"><button type="button" class="btn" id="icsminebtn">${ico("i-cal")}내가 추가한 곳까지 넣은 캘린더 받기</button></div>`;
+  const n=getMine().length, P=PLANS.find(p=>p.k===CURPLAN)||PLANS[0], alt=P.k!=="base";
+  if(!n && !alt){ el.innerHTML=""; return; }
+  const why=[alt?`지금 보고 있는 '${P.n}' 일정은`:"", n?`추천에서 직접 넣은 ${n}곳은`:""].filter(Boolean).join(" ");
+  el.innerHTML=`<p class="sub" style="margin:12px 0 0">${esc(why)} 위 캘린더(지역별 기본)와 달라요. 아래 파일은 지금 화면의 일정 그대로예요. 아이폰에서 바로 안 열리면 파일 앱에 저장한 뒤 눌러 여세요. 이미 위 캘린더를 넣었다면 겹치니 한 가지만 쓰세요.</p>
+    <div class="acts"><button type="button" class="btn" id="icsminebtn">${ico("i-cal")}${alt?`'${esc(P.n)}' 일정`:"내가 추가한 곳까지 넣은"} 캘린더 받기</button></div>`;
   $("#icsminebtn").addEventListener("click",()=>{
     const blob=new Blob([icsFor()],{type:"text/calendar;charset=utf-8"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="tokyo-trip-mine.ics";
@@ -2633,7 +2764,7 @@ $("#daybar").addEventListener("click",e=>{
 /* ---------- 키 없이 붙여넣기 ---------- */
 const NORM = x => String(x||"").replace(/[\s·・,，.()（）]/g,"").toLowerCase();
 function promptText(){
-  const names=ALL.map(x=>x.n);
+  const names=everyPlace().map(x=>x.n);
   return "도쿄 장소 " + names.length + "곳의 구글 지도 평점을 찾아서, 설명 없이 JSON 배열 하나만 출력해 줘.\n"
     + '형식: [{"name":"한국어 이름 그대로","rating":4.5,"reviews":12400,"type":"분류"}]\n'
     + "rating은 소수 한 자리 숫자, reviews는 리뷰 수 정수, type은 구글에 나오는 분류를 한국어로.\n"
@@ -2650,7 +2781,7 @@ function importPasted(text){
   if(!Array.isArray(arr)) return {err:"JSON 배열이어야 합니다."};
 
   const index=new Map();
-  ALL.forEach(x=>{ [x.n,x.ja,x.q].filter(Boolean).forEach(k=>{ if(!index.has(NORM(k))) index.set(NORM(k),x); }); });
+  everyPlace().forEach(x=>{ [x.n,x.ja,x.q].filter(Boolean).forEach(k=>{ if(!index.has(NORM(k))) index.set(NORM(k),x); }); });
 
   const out={}; let hit=0; const miss=[];
   arr.forEach(r=>{
@@ -2852,7 +2983,7 @@ async function findPlaceId(key,s){
 }
 async function fetchPlaces(key,report){
   const seen=new Set(), jobs=[];
-  ALL.forEach(s=>{ const k=pkey(s); if(!seen.has(k)){ seen.add(k); jobs.push(s); } });
+  everyPlace().forEach(s=>{ const k=pkey(s); if(!seen.has(k)){ seen.add(k); jobs.push(s); } });
   const out={}; let fail=0, firstErr="", done=0, total=jobs.length;
   for(const s of jobs){
     report(++done, total);
@@ -2904,7 +3035,7 @@ function gStatus(msg,bad){
   const el=$("#gstat"); if(!el) return;
   if(msg!==undefined){ el.textContent=msg; el.classList.toggle("bad",!!bad); return; }
   const n=PSTORE.byId?Object.keys(PSTORE.byId).length:0;
-  const all=new Set(ALL.map(pkey)).size;
+  const all=new Set(everyPlace().map(pkey)).size;
   if(!n){ el.classList.remove("bad"); el.textContent=`아직 받지 않았어요. 키를 넣고 누르면 ${all}곳의 평점·영업시간·사진을 받아요.`; return; }
   const days=Math.floor(pAge()/864e5);
   if(pStale()){ el.classList.add("bad"); el.textContent=`받은 지 ${days}일 지나 표시를 멈췄습니다. 구글 정책상 30일까지만 보관해요. 다시 받아 주세요.`; return; }

@@ -207,34 +207,49 @@ END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-fri-0@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261119T230000Z
-DTEND:20261120T011500Z
-SUMMARY:1. 스타벅스 리저브 로스터리 도쿄
-LOCATION:スターバックス リザーブ ロースタリー 東京
-DESCRIPTION:スターバックス リザーブ ロースタリー 東京\n2
- 019년에 연 세계 다섯 번째 로스터리. 7:00~22:00. 주말엔 번
- 호표(Airウェイト)가 필요할 만큼 붐벼서 평일 아침으로 
- 잡았어요. 1층 베이커리 프린치에서 아침을 먹습니다.\nh
- ttps://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%83%BC
- %E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%AA%E3%82%B6%E3%83%BC%E3%83%9
- 6%20%E3%83%AD%E3%83%BC%E3%82%B9%E3%82%BF%E3%83%AA%E3%83%BC%20%E6%9D%B1%E4%
- BA%AC&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%8
- 3%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%AA%E3%82%B6%E3%83%BC%E3%
- 83%96%20%E3%83%AD%E3%83%BC%E3%82%B9%E3%82%BF%E3%83%AA%E3%83%BC%20%E6%9D%B1
- %E4%BA%AC&hl=ko
+DTSTART:20261119T223000Z
+DTEND:20261119T230000Z
+SUMMARY:1. 츠키지 장외시장
+LOCATION:築地場外市場
+DESCRIPTION:築地場外市場\n9시 넘으면 몸싸움. 일요일·공휴
+ 일엔 대부분 닫아요.\nhttps://www.google.com/maps/search/?api=1&que
+ ry=%E7%AF%89%E5%9C%B0%E5%A0%B4%E5%A4%96%E5%B8%82%E5%A0%B4&query_place_id=C
+ hIJW2cLzSGLGGARXAKXv6EkbqI&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E7%AF%89%E5%9C%B0%E5%A
+ 0%B4%E5%A4%96%E5%B8%82%E5%A0%B4&query_place_id=ChIJW2cLzSGLGGARXAKXv6EkbqI
+ &hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:스타벅스 리저브 로스터리 도쿄
+DESCRIPTION:츠키지 장외시장
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-fri-1@tokyo-trip
 DTSTAMP:20260924T000000Z
+DTSTART:20261119T230000Z
+DTEND:20261120T011500Z
+SUMMARY:2. 우니토라 나카도리점
+LOCATION:うに虎 中通り店
+DESCRIPTION:うに虎 中通り店\n7시부터. 시장 한복판이라 따
+ 로 움직일 필요 없음.\nhttps://www.google.com/maps/search/?api=1&qu
+ ery=%E3%81%86%E3%81%AB%E8%99%8E%20%E4%B8%AD%E9%80%9A%E3%82%8A%E5%BA%97&que
+ ry_place_id=ChIJ7QgKJ9-LGGAR-CG9wwEzMG0&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E3%81%86%E3%81%AB%E8%9
+ 9%8E%20%E4%B8%AD%E9%80%9A%E3%82%8A%E5%BA%97&query_place_id=ChIJ7QgKJ9-LGGA
+ R-CG9wwEzMG0&hl=ko
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:우니토라 나카도리점
+TRIGGER:-PT30M
+END:VALARM
+END:VEVENT
+BEGIN:VEVENT
+UID:tokyo-2026-fri-2@tokyo-trip
+DTSTAMP:20260924T000000Z
 DTSTART:20261120T011500Z
 DTEND:20261120T030000Z
-SUMMARY:2. 도쿄국립근대미술관
+SUMMARY:3. 도쿄국립근대미술관
 LOCATION:東京国立近代美術館
 DESCRIPTION:東京国立近代美術館\n다케히사 유메지전(10/23–
  1/11). 화가이자 시인\, 디자이너였던 유메지의 대표작 〈
@@ -252,11 +267,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-2@tokyo-trip
+UID:tokyo-2026-fri-3@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T030000Z
 DTEND:20261120T040000Z
-SUMMARY:3. 구풍 카레 본디
+SUMMARY:4. 구풍 카레 본디
 LOCATION:欧風カレー ボンディ 神保町本店
 DESCRIPTION:欧風カレー ボンディ 神保町本店\n진보초 카레
  의 대표. 간다 고서센터 빌딩 2층\, 평일 11:00~22:00\, 연중
@@ -274,11 +289,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-3@tokyo-trip
+UID:tokyo-2026-fri-4@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T040000Z
 DTEND:20261120T044500Z
-SUMMARY:4. 책거리 CHEKCCORI
+SUMMARY:5. 책거리 CHEKCCORI
 LOCATION:チェッコリ
 DESCRIPTION:チェッコリ\n한국책 전문 서점. 수~토만 엽니다.
  \nhttps://www.google.com/maps/search/?api=1&query=CHEKCCORI%20%E7%A5%9E%E4
@@ -292,11 +307,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-4@tokyo-trip
+UID:tokyo-2026-fri-5@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T044500Z
 DTEND:20261120T053000Z
-SUMMARY:5. 난요도 서점
+SUMMARY:6. 난요도 서점
 LOCATION:南洋堂書店
 DESCRIPTION:南洋堂書店\n건축 전문 헌책방. 실내 촬영 금지.
  \nhttps://www.google.com/maps/search/?api=1&query=%E5%8D%97%E6%B4%8B%E5%A0
@@ -310,11 +325,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-5@tokyo-trip
+UID:tokyo-2026-fri-6@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T053000Z
 DTEND:20261120T064500Z
-SUMMARY:6. 진보초 북센터
+SUMMARY:7. 진보초 북센터
 LOCATION:神保町ブックセンター
 DESCRIPTION:神保町ブックセンター\n이와나미쇼텐 건물. 산 
  책 펼쳐보며 커피 한 잔 쉬어 가는 자리.\nhttps://www.google.
@@ -331,11 +346,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-6@tokyo-trip
+UID:tokyo-2026-fri-7@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T064500Z
 DTEND:20261120T083000Z
-SUMMARY:7. 아티존 미술관
+SUMMARY:8. 아티존 미술관
 LOCATION:アーティゾン美術館
 DESCRIPTION:アーティゾン美術館\n교바시. 유럽에 간 일본 
  서양화가들\, 후지이 히카루와 소장품의 협업 등 전시 
@@ -354,11 +369,11 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-7@tokyo-trip
+UID:tokyo-2026-fri-8@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T083000Z
 DTEND:20261120T095000Z
-SUMMARY:8. 기쿠스시
+SUMMARY:9. 기쿠스시
 LOCATION:菊寿司
 DESCRIPTION:菊寿司\n니혼바시 가부토초에서 60년 넘게 이어
  온 에도마에 스시(日本橋兜町17-1). 저녁 17:00~22:00\, 토·
@@ -374,17 +389,17 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-8@tokyo-trip
+UID:tokyo-2026-fri-9@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T095000Z
 DTEND:20261120T113000Z
-SUMMARY:9. KITOKI · 평화 도부로쿠 양조소
+SUMMARY:10. KITOKI · 평화 도부로쿠 양조소
 LOCATION:KITOKI 平和どぶろく兜町醸造所
 DESCRIPTION:KITOKI 平和どぶろく兜町醸造所\n기쿠스시와 같
  은 가부토초라 걸어서 몇 분. 1층 양조소에서 도부로쿠(
- 탁주) 한 잔. 평일 13:00~22:30. CAVE로 가려면 40분쯤만 있다
- 가 나오세요.\nhttps://www.google.com/maps/search/?api=1&query=KITOKI%
- 20%E5%85%9C%E7%94%BA&hl=ko
+ 탁주) 한 잔. 평일 13:00~22:30. Bar Luther까지 긴자선 한 번이
+ 에요.\nhttps://www.google.com/maps/search/?api=1&query=KITOKI%20%E5%85%9
+ C%E7%94%BA&hl=ko
 URL:https://www.google.com/maps/search/?api=1&query=KITOKI%20%E5%85%9C%E7%9
  4%BA&hl=ko
 BEGIN:VALARM
@@ -394,21 +409,23 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-fri-9@tokyo-trip
+UID:tokyo-2026-fri-10@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T113000Z
 DTEND:20261120T130000Z
-SUMMARY:10. THE MUSIC BAR CAVE SHIBUYA
-LOCATION:THE MUSIC BAR CAVE SHIBUYA
-DESCRIPTION:지하 LP바. 8시 넘으면 자리가 찹니다. 내일 츠키
- 지가 7:30이니 너무 늦지 않게.\nhttps://www.google.com/maps/searc
- h/?api=1&query=THE%20MUSIC%20BAR%20CAVE%20SHIBUYA&query_place_id=ChIJSZ7Dk
- MGNGGARDBKSX-n_p_E&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=THE%20MUSIC%20BAR%20CAV
- E%20SHIBUYA&query_place_id=ChIJSZ7DkMGNGGARDBKSX-n_p_E&hl=ko
+SUMMARY:11. Bar Luther 赤坂
+LOCATION:バー ルーサー 赤坂
+DESCRIPTION:バー ルーサー 赤坂\n숙소 옆 블록 지하(赤坂3-20
+ -2). 70~80년대 소울·블랙 컨템퍼러리·AOR을 아날로그로 
+ 트는 바. 일요일 휴무. 영업시간이 출처마다 달라서(19:00
+ ~03:30 / 18:00~22:00) 전화(03-6277-8016)로 확인하세요. 금요일
+ 의 끝을 숙소 앞에서.\nhttps://www.google.com/maps/search/?api=1&qu
+ ery=Bar%20Luther%20Akasaka&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=Bar%20Luther%20Akasaka&
+ hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:THE MUSIC BAR CAVE SHIBUYA
+DESCRIPTION:Bar Luther 赤坂
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
@@ -416,48 +433,33 @@ BEGIN:VEVENT
 UID:tokyo-2026-sat-0@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261120T223000Z
-DTEND:20261120T230000Z
-SUMMARY:1. 츠키지 장외시장
-LOCATION:築地場外市場
-DESCRIPTION:築地場外市場\n9시 넘으면 몸싸움. 일요일엔 대
- 부분 닫아 오늘이 유일합니다.\nhttps://www.google.com/maps/sear
- ch/?api=1&query=%E7%AF%89%E5%9C%B0%E5%A0%B4%E5%A4%96%E5%B8%82%E5%A0%B4&que
- ry_place_id=ChIJW2cLzSGLGGARXAKXv6EkbqI&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E7%AF%89%E5%9C%B0%E5%A
- 0%B4%E5%A4%96%E5%B8%82%E5%A0%B4&query_place_id=ChIJW2cLzSGLGGARXAKXv6EkbqI
- &hl=ko
+DTEND:20261121T010000Z
+SUMMARY:1. 스타벅스 리저브 로스터리 도쿄
+LOCATION:スターバックス リザーブ ロースタリー 東京
+DESCRIPTION:スターバックス リザーブ ロースタリー 東京\n2
+ 019년에 연 세계 다섯 번째 로스터리. 7:00~22:00. 토요일은 
+ 번호표(Airウェイト)가 필요할 만큼 붐벼서 문 여는 7시
+ 에 맞춰 가요. 1층 베이커리 프린치에서 아침을 먹습니
+ 다.\nhttps://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E
+ 3%83%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%AA%E3%82%B6%E3%83%BC%
+ E3%83%96%20%E3%83%AD%E3%83%BC%E3%82%B9%E3%82%BF%E3%83%AA%E3%83%BC%20%E6%9D
+ %B1%E4%BA%AC&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=%E3%82%B9%E3%82%BF%E3%8
+ 3%BC%E3%83%90%E3%83%83%E3%82%AF%E3%82%B9%20%E3%83%AA%E3%82%B6%E3%83%BC%E3%
+ 83%96%20%E3%83%AD%E3%83%BC%E3%82%B9%E3%82%BF%E3%83%AA%E3%83%BC%20%E6%9D%B1
+ %E4%BA%AC&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:츠키지 장외시장
+DESCRIPTION:스타벅스 리저브 로스터리 도쿄
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
 UID:tokyo-2026-sat-1@tokyo-trip
 DTSTAMP:20260924T000000Z
-DTSTART:20261120T230000Z
-DTEND:20261121T010000Z
-SUMMARY:2. 우니토라 나카도리점
-LOCATION:うに虎 中通り店
-DESCRIPTION:うに虎 中通り店\n7시부터. 시장 한복판이라 따
- 로 움직일 필요 없음.\nhttps://www.google.com/maps/search/?api=1&qu
- ery=%E3%81%86%E3%81%AB%E8%99%8E%20%E4%B8%AD%E9%80%9A%E3%82%8A%E5%BA%97&que
- ry_place_id=ChIJ7QgKJ9-LGGAR-CG9wwEzMG0&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=%E3%81%86%E3%81%AB%E8%9
- 9%8E%20%E4%B8%AD%E9%80%9A%E3%82%8A%E5%BA%97&query_place_id=ChIJ7QgKJ9-LGGA
- R-CG9wwEzMG0&hl=ko
-BEGIN:VALARM
-ACTION:DISPLAY
-DESCRIPTION:우니토라 나카도리점
-TRIGGER:-PT30M
-END:VALARM
-END:VEVENT
-BEGIN:VEVENT
-UID:tokyo-2026-sat-2@tokyo-trip
-DTSTAMP:20260924T000000Z
 DTSTART:20261121T010000Z
 DTEND:20261121T033000Z
-SUMMARY:3. 국립신미술관
+SUMMARY:2. 국립신미술관
 LOCATION:国立新美術館
 DESCRIPTION:国立新美術館\n소장품 없이 기획전만 여는 곳이
  라 무엇이 걸렸는지 미리 확인하세요.\nhttps://www.google.com
@@ -472,11 +474,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-3@tokyo-trip
+UID:tokyo-2026-sat-2@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T033000Z
 DTEND:20261121T050000Z
-SUMMARY:4. 네즈미술관과 네즈카페
+SUMMARY:3. 네즈미술관과 네즈카페
 LOCATION:根津美術館
 DESCRIPTION:根津美術館\n칠기 전시(10/24–11/23). 쿠마 겐고 
  건물에 일본 정원\, 11월 하순이면 단풍 절정. 정원을 먼
@@ -492,11 +494,11 @@ TRIGGER:-PT60M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-4@tokyo-trip
+UID:tokyo-2026-sat-3@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T050000Z
 DTEND:20261121T055000Z
-SUMMARY:5. 진구가이엔 은행나무길
+SUMMARY:4. 진구가이엔 은행나무길
 LOCATION:神宮外苑いちょう並木
 DESCRIPTION:神宮外苑いちょう並木\n아오야마도리에서 이어
  지는 300m 은행나무 터널. 절정은 11월 하순~12월 상순이라
@@ -515,11 +517,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-5@tokyo-trip
+UID:tokyo-2026-sat-4@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T055000Z
 DTEND:20261121T065000Z
-SUMMARY:6. 와타리움 미술관
+SUMMARY:5. 와타리움 미술관
 LOCATION:ワタリウム美術館
 DESCRIPTION:ワタリウム美術館\n마리오 보타 설계. 1층 아트
  북숍 on Sundays가 사실상 본 무대. 은행나무길에서 걸어서
@@ -536,11 +538,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-6@tokyo-trip
+UID:tokyo-2026-sat-5@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T065000Z
 DTEND:20261121T080000Z
-SUMMARY:7. Utrecht
+SUMMARY:6. Utrecht
 LOCATION:ユトレヒト
 DESCRIPTION:ユトレヒト\n아트북과 진. 잡화점 2층\, 간판이 
  없어요.\nhttps://www.google.com/maps/search/?api=1&query=Utrecht%20%E7%
@@ -554,11 +556,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-7@tokyo-trip
+UID:tokyo-2026-sat-6@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T080000Z
 DTEND:20261121T085000Z
-SUMMARY:8. SPBS 본점
+SUMMARY:7. SPBS 본점
 LOCATION:SHIBUYA PUBLISHING & BOOKSELLERS
 DESCRIPTION:SHIBUYA PUBLISHING & BOOKSELLERS\n출판사가 직접 운영하
  는 서점.\nhttps://www.google.com/maps/search/?api=1&query=SHIBUYA%20PUB
@@ -573,11 +575,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-8@tokyo-trip
+UID:tokyo-2026-sat-7@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T085000Z
 DTEND:20261121T094500Z
-SUMMARY:9. SO BOOKS
+SUMMARY:8. SO BOOKS
 LOCATION:SO BOOKS 代々木八幡
 DESCRIPTION:사진집·아트·건축 책 전문 헌책방. 13:00~19:00. 
  代々木八幡역 2분이라 SPBS에서 걸어서 하츠다이 가는 길
@@ -593,11 +595,11 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-9@tokyo-trip
+UID:tokyo-2026-sat-8@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T094500Z
 DTEND:20261121T120000Z
-SUMMARY:10. Bookshelf Fuzkue
+SUMMARY:9. Bookshelf Fuzkue
 LOCATION:本の読める店 fuzkue 初台
 DESCRIPTION:本の読める店 fuzkue 初台\n하츠다이. 조용히 앉
  아 읽는 곳이라 오늘의 휴식 시간이기도 합니다.\nhttps://
@@ -612,23 +614,22 @@ TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
 BEGIN:VEVENT
-UID:tokyo-2026-sat-10@tokyo-trip
+UID:tokyo-2026-sat-9@tokyo-trip
 DTSTAMP:20260924T000000Z
 DTSTART:20261121T120000Z
 DTEND:20261121T133000Z
-SUMMARY:11. Bar Luther 赤坂
-LOCATION:バー ルーサー 赤坂
-DESCRIPTION:バー ルーサー 赤坂\n숙소 옆 블록 지하(赤坂3-20
- -2). 70~80년대 소울·블랙 컨템퍼러리·AOR을 아날로그로 
- 트는 바. 일요일 휴무. 영업시간이 출처마다 달라서(19:00
- ~03:30 / 18:00~22:00) 전화(03-6277-8016)로 확인하세요. 긴 토요
- 일의 끝을 숙소 앞에서.\nhttps://www.google.com/maps/search/?api=1
- &query=Bar%20Luther%20Akasaka&hl=ko
-URL:https://www.google.com/maps/search/?api=1&query=Bar%20Luther%20Akasaka&
- hl=ko
+SUMMARY:10. THE MUSIC BAR CAVE SHIBUYA
+LOCATION:THE MUSIC BAR CAVE SHIBUYA
+DESCRIPTION:지하 LP바. 8시 넘으면 자리가 찹니다. 돌아올 땐
+  긴자선 渋谷 → 赤坂見附 한 번이라 숙소까지 갈아타지
+  않아요. 막차는 준비 > 숙소·교통의 막차 안내를 보세
+ 요.\nhttps://www.google.com/maps/search/?api=1&query=THE%20MUSIC%20BAR%20
+ CAVE%20SHIBUYA&query_place_id=ChIJSZ7DkMGNGGARDBKSX-n_p_E&hl=ko
+URL:https://www.google.com/maps/search/?api=1&query=THE%20MUSIC%20BAR%20CAV
+ E%20SHIBUYA&query_place_id=ChIJSZ7DkMGNGGARDBKSX-n_p_E&hl=ko
 BEGIN:VALARM
 ACTION:DISPLAY
-DESCRIPTION:Bar Luther 赤坂
+DESCRIPTION:THE MUSIC BAR CAVE SHIBUYA
 TRIGGER:-PT30M
 END:VALARM
 END:VEVENT
