@@ -33,10 +33,10 @@ const LINE={
   sun:{code:"M",  c:"var(--L-sun)", hex:"#E60012", name:"긴자선"}
 };
 const REGION={
-  thu:{n:"북동쪽", sub:"우에노 · 스미다 · 아사쿠사", concept:"에도의 동쪽. 박물관 숲 우에노, 호쿠사이의 스미다, 강 건너 스카이트리, 저녁은 아사쿠사 노포."},
-  fri:{n:"동쪽 도심", sub:"츠키지 · 진보초 · 마루노우치 · 니혼바시", concept:"새벽 시장과 헌책방 거리, 붉은 벽돌 도쿄역, 증권가 가부토초의 새 가게들."},
-  sat:{n:"남서쪽", sub:"나카메구로 · 롯폰기 · 아오야마 · 시부야", concept:"강가 로스터리에서 롯폰기 미술관, 오모테산도 건축, 시부야의 서점과 레코드 바까지."},
-  sun:{n:"긴자", sub:"도쿄역 · 유라쿠초 · 긴자", concept:"떠나는 날 오전. 1936년 찻집, 사진집 서가, 책 한 권만 파는 서점."}
+  thu:{n:"북동쪽", sub:"고마고메 · 야나카 · 우에노 · 간다", concept:"가장 먼 다이묘 정원에서 시작해 야나카 옛 찻집과 목욕탕 갤러리, 박물관 숲 우에노, 콘도르의 양관, 저녁은 간다 소바 노포."},
+  fri:{n:"동쪽 도심", sub:"츠키지 · 진보초 · 시바 · 긴자", concept:"새벽 시장과 헌책방 거리, 두 미술관, 해 지는 도쿄 타워, 긴자 스시 노포."},
+  sat:{n:"남서쪽", sub:"나카메구로 · 아오야마 · 롯폰기 · 시부야", concept:"강가 로스터리에서 네즈 정원, 은행나무길, 국립신미술관, 해 지는 시부야 스카이, 도겐자카 라멘."},
+  sun:{n:"긴자", sub:"쓰키지 · 긴자 · 도라노몬", concept:"떠나는 날 오전. 혼간지 아침, 문구와 사진집 서가, 정원 카페 점심."}
 };
 const DAY=Object.fromEntries(DAYS.map(d=>[d.key,d]));
 const WDK={wed:"수",thu:"목",fri:"금",sat:"토",sun:"일"};
@@ -72,9 +72,10 @@ CAT.forEach((p,k)=>{ p.id=k; });
 const SKEY="tokyo-lines";
 let S=null;
 function place(id){ return CAT.get(id) || (S && S.added && S.added[id]) || null; }
-function blank(){ return {v:1, pv:PLANVER, tpl:"best", days:{thu:[],fri:[],sat:[],sun:[]}, start:{}, pins:{}, dur:{}, star:{}, added:{}}; }
+function blank(){ return {v:1, pv:PLANVER, tpl:DEFPLAN, days:{thu:[],fri:[],sat:[],sun:[]}, start:{}, pins:{}, dur:{}, star:{}, added:{}}; }
 // 노선 판(pv)이 바뀌면 한 번 새 추천 노선으로 바꾸고, 이전 노선은 tokyo-lines-prev에 남겨 되돌릴 수 있게 한다
-const PLANVER=3;
+const PLANVER=4;
+const DEFPLAN="henry";
 function tplStops(P,dk){
   const d=DAY[dk], pd=P.days && P.days[dk];
   if(!pd) return d.stops.filter(s=>s.q && !s.hotel).map(s=>({q:s.q, t:s.t}));
@@ -88,7 +89,9 @@ function fromTemplate(k, keep){
     const st=tplStops(P,dk).filter(x=>(place(x.q)&&!place(x.q).gone)||(keep&&keep.added&&keep.added[x.q]));
     s.days[dk]=st.map(x=>x.q);
     st.forEach(x=>{ const p=place(x.q); if(p && (p.need||p.needId||p.kc==="bar"||x.pin)) s.pins[x.q]=x.t; if(x.dur) s.dur[x.q]=x.dur; });
-    if(st[0]) s.start[dk]=fmt(round5(toMin(st[0].t)-travel(HOTEL,place(st[0].q)).min));
+    const pd=P.days && P.days[dk];
+    if(pd && pd.start) s.start[dk]=pd.start;
+    else if(st[0]) s.start[dk]=fmt(round5(toMin(st[0].t)-travel(HOTEL,place(st[0].q)).min));
     if(P.k==="base") (DAY[dk].cands||[]).forEach(q=>{ if(place(q)) s.star[q]=true; });
     (P.stars||[]).forEach(q=>{ if(place(q)) s.star[q]=true; });
   });
@@ -99,7 +102,7 @@ function migrate(){
   let my=null; try{ my=JSON.parse(LS.get("tokyo-myplan","null")); }catch(e){}
   let mine=[]; try{ mine=JSON.parse(LS.get("tokyo-mine","[]"))||[]; }catch(e){}
   const tpl=LS.get("tokyo-plan","base");
-  const s=fromTemplate(my && my.from || (LS.get("tokyo-plan","") && PLANS.some(p=>p.k===tpl) ? tpl : "best"));
+  const s=fromTemplate(my && my.from || (LS.get("tokyo-plan","") && PLANS.some(p=>p.k===tpl) ? tpl : DEFPLAN));
   if(my && my.days){
     Object.entries(my.added||{}).forEach(([k,a])=>{ if(a && a.lat) s.added[k]=Object.assign({id:k}, a, {gid:a.id, id:k}); });
     EDIT.forEach(dk=>{ const list=my.days[dk]||[];
@@ -115,7 +118,7 @@ function migrate(){
 let NEWPLAN=false;
 function load(){
   try{ const v=JSON.parse(LS.get(SKEY,"null")); if(v && v.days){ EDIT.forEach(k=>{ v.days[k]=(v.days[k]||[]); }); v.start=v.start||{}; v.pins=v.pins||{}; v.dur=v.dur||{}; v.star=v.star||{}; v.added=v.added||{};
-    if((v.pv||1)<PLANVER){ LS.set("tokyo-lines-prev",JSON.stringify(v)); LS.set("tokyo-lines-news","best"); const n=fromTemplate("best",{star:v.star, added:v.added}); NEWPLAN=true; return n; }
+    if((v.pv||1)<PLANVER){ LS.set("tokyo-lines-prev",JSON.stringify(v)); LS.set("tokyo-lines-news",DEFPLAN); const n=fromTemplate(DEFPLAN,{star:v.star, added:v.added}); NEWPLAN=true; return n; }
     return v; } }catch(e){}
   return migrate();
 }
@@ -126,7 +129,7 @@ EDIT.forEach(dk=>{ S.days[dk]=S.days[dk].filter(id=>place(id)); });
 
 /* ─────────────── 시간 계산 ─────────────── */
 function travel(a,b){
-  if(!a || !b || !a.lat || !b.lat) return {min:0, mode:"same", d:0};
+  if(!a || !b || !a.lat || !b.lat) return {min:0, mode:"noloc", d:0};   // 좌표 없음(구글 정보를 받기 전의 Claude 발견 장소)
   const d=km(a,b);
   if(d<0.08) return {min:0, mode:"same", d};
   if(d<=1.2) return {min:Math.max(2,Math.round(d*1000/72)), mode:"walk", d};       // 도보 분속 72m
@@ -169,7 +172,7 @@ function schedule(dk){
     const g=gOpenAt(placeOf(p), date, start); if(g===false && !p.outside) warn.push({lv:"warn", t:"구글: 이 시각엔 닫혀 있음"});
     if(p.gone) warn.push({lv:"bad", t:"문 닫은 곳이에요"});
     const G=placeOf(p); if(G && G.status==="CLOSED_PERMANENTLY") warn.push({lv:"bad", t:"구글: 폐업"}); else if(G && G.status==="CLOSED_TEMPORARILY") warn.push({lv:"bad", t:"구글: 임시 휴업"});
-    if(dk==="sun" && end>toMin(SUN_LEAVE)) warn.push({lv:end-toMin(SUN_LEAVE)>10?"bad":"warn", t:`${SUN_LEAVE}엔 긴자를 떠나야 해요`});
+    if(dk==="sun" && end>toMin(SUN_LEAVE)) warn.push({lv:end-toMin(SUN_LEAVE)>10?"bad":"warn", t:`${SUN_LEAVE}엔 짐 찾으러 숙소로 떠나야 해요`});
     rows.push({id, p, i, tr, arr, start, end, dur, wait, late, pin, warn, from:prev});
     t=end; prev=p;
   });
@@ -181,6 +184,7 @@ const code=(dk,i)=>({l:LINE[dk].code, n:String(i+1).padStart(2,"0")});
 function hopText(r,first){
   const pre=first?"숙소에서 ":"";
   if(r.tr.mode==="same") return `${ico("i-walk")}${pre}같은 건물`;
+  if(r.tr.mode==="noloc") return `${ico("i-walk")}${pre}이동 시간 모름 · 구글 장소 정보를 받으면 계산돼요`;
   const dist=r.tr.d<1?Math.round(r.tr.d*1000)+"m":r.tr.d.toFixed(1)+"km";
   return r.tr.mode==="walk" ? `${ico("i-walk")}${pre}도보 ${r.tr.min}분 · ${dist}` : `${ico("i-train")}${pre}전철 약 ${r.tr.min}분 · ${dist}`;
 }
@@ -290,11 +294,14 @@ buildArea(); hydrateLoc();
 function areaOf(p){ if(AREA.has(p.id)) return AREA.get(p.id); if(!p.lat) return "far"; if(km(p,HOTEL)<2.5) return "hotel"; let best="far",bd=3; EDIT.forEach(dk=>(S.days[dk]||[]).forEach(id=>{ const q=place(id); if(q && q.lat){ const x=km(q,p); if(x<bd){bd=x;best=dk;} } })); return best; }
 const AREANAME={thu:"북동쪽",fri:"동쪽 도심",sat:"남서쪽",sun:"긴자",hotel:"숙소 근처",far:"먼 곳"};
 function dayOf(id){ return EDIT.find(dk=>S.days[dk].includes(id))||null; }
+// 예약 체크는 지금 노선에 든 곳만(q 없는 항목은 늘)
+function checksNow(){ return CHECKS.filter(c=>!c.q || !!dayOf(c.q)); }
 
 /* 새 추천 노선 알림 — 한 번 바꾼 뒤 되돌리기를 고를 수 있게 */
 function newsHTML(){
-  if(LS.get("tokyo-lines-news","")!=="best") return "";
-  return `<div class="news" role="status"><p><b>Claude 추천 노선으로 바꿨어요</b>꼭 갈 일곱 곳(스카이트리·도쿄 타워·츠키지·로스터리·네즈·국립신미술관·SAFU)을 넣고, 겹치는 컨셉은 하나씩만 남겼어요.${LS.get("tokyo-lines-prev","")?" 직접 고친 노선은 따로 보관해 두었어요.":""}</p>
+  const P=PLANS.find(p=>p.k===LS.get("tokyo-lines-news",""));
+  if(!P) return "";
+  return `<div class="news" role="status"><p><b>${esc(P.n)} 노선으로 바꿨어요</b>${esc(P.news||P.intro||"")}${LS.get("tokyo-lines-prev","")?" 직접 고친 노선은 따로 보관해 두었어요.":""}</p>
     <div class="acts">${LS.get("tokyo-lines-prev","")?`<button class="btn" data-news="undo">이전 노선으로</button>`:""}<button class="btn ink" data-news="ok">좋아요</button></div></div>`;
 }
 function newsAct(k){
@@ -500,7 +507,7 @@ function renderHome(){
     return `<button class="lrow" style="--c:${LINE[dk].c}" data-go="board" data-day="${dk}">
       ${lsym(dk)}<span><span class="t">${WDK[dk]} ${DAY[dk].dt} · ${esc(REGION[dk].n)}</span><span class="s">${esc(REGION[dk].sub)}</span><span style="display:inline-flex;margin-top:6px">${st}</span></span>
       <span class="m"><b>${n}역</b>${n?`${fmt(sc.depart)}–${fmt(sc.home)}`:""}</span></button>`; }).join("");
-  const done=CHECKS.filter(c=>CHECKED[c.id]).length;
+  const CK=checksNow(), done=CK.filter(c=>CHECKED[c.id]).length;
   main.innerHTML=`<div class="wrap">${newsHTML()}
     <section class="hero">
       <p class="hero-date num">11.18<span>—</span>22</p>
@@ -514,7 +521,7 @@ function renderHome(){
       <div class="lines" style="margin-top:10px">${rows}</div></section>
     <section class="sec"><div class="sec-h"><h2>예약</h2><span class="en">Reservations</span></div>
       <button class="lrow" style="--c:var(--ink)" data-go="tools" data-open="resv"><span class="picto" style="width:34px;height:34px;border-radius:10px">${ico("i-check")}</span>
-        <span><span class="t">${done}/${CHECKS.length} 완료</span><span class="s">${esc(CHECKS.filter(c=>!CHECKED[c.id]).slice(0,3).map(c=>c.t).join(" · ")||"모두 끝났어요")}</span></span><span class="m"></span></button></section>
+        <span><span class="t">${done}/${CK.length} 완료</span><span class="s">${esc(CK.filter(c=>!CHECKED[c.id]).slice(0,3).map(c=>c.t).join(" · ")||"모두 끝났어요")}</span></span><span class="m"></span></button></section>
     <p class="src" style="margin:28px 0 20px">이전 화면(예산·교통·공항·날씨 안내)은 <a href="classic.html">여기</a>에 그대로 있어요.</p>
   </div>`;
   $$(".netmap .ln").forEach(g=>{ const f=()=>go("board",g.dataset.day); g.addEventListener("click",f); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
@@ -1103,8 +1110,8 @@ function renderTools(keep){
          <label class="fld" style="margin-top:14px">받는 기기: 여기에 붙여넣기<textarea id="mv-in" rows="3" placeholder="TOKYOLINES1.…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea></label>
          <div class="acts"><button class="btn" id="mv-paste">클립보드에서 붙여넣기</button><button class="btn ink" id="mv-go">가져오기</button></div>
          <p id="mv-stat" style="margin-top:10px"></p>`)}
-      ${tl("resv","i-check","예약 체크",`${CHECKS.filter(c=>CHECKED[c.id]).length}/${CHECKS.length}`,
-        CHECKS.map(c=>`<label class="chk"><input type="checkbox" data-chk="${c.id}"${CHECKED[c.id]?" checked":""}><span><b>${esc(c.t)}</b>${esc(c.d)}</span></label>`).join(""))}
+      ${tl("resv","i-check","예약 체크",`${checksNow().filter(c=>CHECKED[c.id]).length}/${checksNow().length}`,
+        checksNow().map(c=>`<label class="chk"><input type="checkbox" data-chk="${c.id}"${CHECKED[c.id]?" checked":""}><span><b>${esc(c.t)}</b>${esc(c.d)}</span></label>`).join(""))}
       ${tl("film","i-camera","필름 기록",`${roll.frames.length}/${roll.exp}`,
         `<div class="film"><b>${roll.frames.length}</b><span>/ ${roll.exp} · 롤 ${roll.id}</span></div>
          <div class="acts"><button class="btn ink" data-film="1">${ico("i-camera")}한 컷</button><button class="btn" data-film="-1"${roll.frames.length?"":" disabled"}>되돌리기</button><button class="btn" data-film="new">새 롤</button><button class="btn" data-film="copy"${film.rolls.some(r=>r.frames.length)?"":" disabled"}>기록 복사</button></div>
@@ -1117,7 +1124,7 @@ function renderTools(keep){
          <div class="acts"><button class="btn ink" data-hotel>${ico("i-zoom")}주소 크게 보기</button><a class="btn" href="${MAPS(HOTEL.q)}" target="_blank" rel="noopener">${ico("i-map")}지도</a></div>`)}
       ${tl("sos","i-help","긴급 연락처","",`<div class="sos">${SOS.map(x=>`<a href="tel:${x.tel.replace(/[^+\d]/g,"")}"><span><b>${esc(x.n)}</b><br><span style="font-size:13px">${esc(x.d)}</span></span><span class="num">${esc(x.tel)}</span></a>`).join("")}</div><p style="margin-top:10px">대사관 번호는 출발 전에 외교부 페이지에서 다시 확인하세요.</p>`)}
       ${tl("tpl","i-line","노선 템플릿",PLANS.find(p=>p.k===S.tpl)?.n||"",
-        `<p>정리해 둔 네 가지 일정 중 하나로 노선을 다시 짭니다. 찜과 직접 담은 곳은 남아요.</p><div class="tpl">${PLANS.filter(p=>p.k!=="mine").map(p=>`<button data-tpl="${p.k}"><b>${esc(p.n)}${p.k===S.tpl?" · 지금":""}</b><span>${esc(p.intro)}</span></button>`).join("")}</div>`)}
+        `<p>정리해 둔 일정 중 하나로 노선을 다시 짭니다. 찜과 직접 담은 곳은 남아요.</p><div class="tpl">${PLANS.filter(p=>p.k!=="mine").map(p=>`<button data-tpl="${p.k}"><b>${esc(p.n)}${p.k===S.tpl?" · 지금":""}</b><span>${esc(p.intro)}</span></button>`).join("")}</div>`)}
       ${tl("google","i-pin","구글 장소 정보",n?`${n}곳`:"키 없음",
         `<p>키를 넣고 받으면 모든 블록에 사진·평점·요일별 영업시간이 붙고, 영업시간 밖이면 운행표에 경고가 떠요. 30일 동안 보관해요.</p>
          <label class="fld">Places API 키<input type="password" id="gkey" value="${esc(key)}" autocomplete="off" placeholder="AIza…"></label>
@@ -1161,7 +1168,7 @@ function renderTools(keep){
   $("#exp").addEventListener("click",()=>download("tokyo-lines.json",JSON.stringify(S,null,1),"application/json"));
   $("#imp").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; try{ const v=JSON.parse(await f.text()); if(!v||!v.days) throw 0; useLines(v); commit("노선을 불러왔어요"); }catch(err){ toast("이 파일은 읽을 수 없어요"); } });
   $("#ics").addEventListener("click",()=>download("tokyo-lines.ics",icsText(),"text/calendar;charset=utf-8"));
-  $("#reset").addEventListener("click",()=>{ if(!confirm("처음 노선(Claude 추천)으로 돌아갈까요? 찜과 직접 담은 곳은 남아요.")) return; S=fromTemplate("best",{star:S.star, added:S.added}); commit("처음 노선으로 돌아갔어요"); });
+  $("#reset").addEventListener("click",()=>{ if(!confirm(`처음 노선(${(PLANS.find(p=>p.k===DEFPLAN)||{}).n})으로 돌아갈까요? 찜과 직접 담은 곳은 남아요.`)) return; S=fromTemplate(DEFPLAN,{star:S.star, added:S.added}); commit("처음 노선으로 돌아갔어요"); });
 }
 function download(name,text,type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); }
 function icsText(){
