@@ -69,16 +69,8 @@
 
 <main id="main" tabindex="-1"></main>
 
-<section class="drawer" id="drawer" aria-label="보관함">
-  <div class="drawer-h" id="drawer-h" role="button" tabindex="0" aria-expanded="false">
-    <span class="picto"><svg class="ki"><use href="#i-box"/></svg></span>
-    <b>보관함</b><span class="num" id="drawer-n"></span>
-    <span class="spacer"></span>
-    <span class="num" id="drawer-hint">끌어서 노선에 넣기</span>
-  </div>
-  <div class="filters" id="drawer-f"></div>
-  <ul class="pool" id="pool" aria-label="아직 노선에 없는 장소"></ul>
-</section>
+<aside class="side" id="side" aria-label="보관함" hidden></aside>
+<div class="trash" id="trash" aria-hidden="true"><span>여기에 놓으면 보관함으로 빼요</span><ul></ul></div>
 
 <nav class="tabs" aria-label="메뉴"><div class="wrap" role="tablist">
   <button class="tab" role="tab" data-go="home" id="t-home"><svg class="ki"><use href="#i-network"/></svg>노선도</button>
@@ -88,6 +80,7 @@
 </div></nav>
 
 <dialog class="sheet" id="sheet" aria-labelledby="sh-title"></dialog>
+<dialog class="sheet picker" id="picker" aria-label="장소 추가"></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="vendor/leaflet.js"></script>

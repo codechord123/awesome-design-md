@@ -288,6 +288,7 @@ function moveTo(id,dk,idx){
 /* ─────────────── 화면 ─────────────── */
 let VIEW=LS.get("tokyo-lines-view","home"), CUR=LS.get("tokyo-lines-day","thu");
 if(!DAYKEYS.includes(CUR)) CUR="thu";
+{ const N=tripNow(); if(N.phase==="during" && N.dk) CUR=N.dk; }   // 여행 중에는 앱을 열면 오늘 노선부터
 const main=$("#main");
 let SORTS=[];
 function go(v,dk){
@@ -297,10 +298,12 @@ function go(v,dk){
 }
 function render(){
   $$(".tab").forEach(t=>t.setAttribute("aria-selected", String(t.dataset.go===VIEW)));
-  document.body.classList.toggle("onboard", VIEW==="board" && CUR!=="wed");
+  document.body.dataset.view=VIEW;
+  if(picker.open && VIEW!=="board") picker.close();
   SORTS.forEach(s=>{ try{ s.destroy(); }catch(e){} }); SORTS=[];
   if(VIEW==="board") renderBoard(); else if(VIEW==="pool") renderPool(); else if(VIEW==="tools") renderTools(); else renderHome();
-  renderDrawer();
+  renderSide();
+  if(picker.open && picker._redraw) picker._redraw();
   wireDnD();
   clock();
 }
@@ -351,7 +354,7 @@ function lcdHTML(){
     <p class="k">${cur?"Now":"Next"} <em>${cur?"지금":"次は · 다음"}</em> <span class="sta sm" style="--c:${LINE[N.dk].c};margin-left:auto"><i>${c.l}</i><b>${c.n}</b></span></p>
     <p class="n">${esc(r.p.n)}</p>${r.p.ja?`<p class="j">${esc(r.p.ja)}</p>`:""}
     <p class="w">${cur?`${fmt(r.end)}까지 · ${r.end-N.min}분 남음`:`${fmt(r.start)} 도착 예정 · ${left}분 뒤`}</p>
-    <div class="acts"><a class="btn go" href="${DIR(r.from||HOTEL,r.p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a><button class="btn" data-big="${esc(r.id)}">${ico("i-zoom")}크게 보기</button><button class="btn" data-go="board" data-day="${N.dk}">운행표</button></div>
+    <div class="acts"><a class="btn go" href="${DIR(r.from||HOTEL,r.p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a><button class="btn" data-big="${esc(r.id)}">${ico("i-zoom")}크게 보기</button>${VIEW==="board"?"":`<button class="btn" data-go="board" data-day="${N.dk}">운행표</button>`}</div>
   </section>`;
 }
 function renderHome(){
@@ -381,82 +384,74 @@ function renderHome(){
   $$(".netmap .ln").forEach(g=>{ const f=()=>go("board",g.dataset.day); g.addEventListener("click",f); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
 }
 
-/* ── 운행표 ── */
-function stripSVG(dk,sc){
-  const n=sc.rows.length, gap=78, W=Math.max(320, 60+(n+1)*gap), y=26, col=LINE[dk].hex;
-  let s=`<line x1="22" y1="${y}" x2="${W-22}" y2="${y}" stroke="${col}" stroke-width="8" stroke-linecap="round"/>`;
-  const hub=x=>`<rect x="${x-10}" y="${y-10}" width="20" height="20" rx="6" fill="var(--ink)"/><rect x="${x-4.5}" y="${y-4.5}" width="9" height="9" rx="2.5" fill="var(--card)"/>`;
-  s+=hub(22)+hub(W-22);
-  sc.rows.forEach((r,i)=>{ const x=22+(i+1)*gap*(W-44)/((n+1)*gap);
-    const bad=r.warn.some(w=>w.lv==="bad");
-    s+=`<circle cx="${x}" cy="${y}" r="9" fill="var(--card)" stroke="${bad?"var(--red)":col}" stroke-width="4"/>`;
-    s+=`<text x="${x}" y="${y+30}" text-anchor="middle" font-family="Barlow Condensed,sans-serif" font-weight="700" font-size="14" fill="var(--ink)">${fmt(r.start)}</text>`;
-    const nm=r.p.n.length>7?r.p.n.slice(0,6)+"…":r.p.n;
-    s+=`<text x="${x}" y="${y+48}" text-anchor="middle" font-family="Pretendard Variable,sans-serif" font-weight="700" font-size="11.5" fill="var(--sub)">${esc(nm)}</text>`;
-  });
-  return `<svg viewBox="0 0 ${W} 86" width="${W}" height="86" aria-hidden="true">${s}</svg>`;
-}
-function blockHTML(dk,r,now){
-  const p=r.p, P=placeOf(p), bad=r.warn.some(w=>w.lv==="bad");
-  const flags=[];
-  if(r.pin) flags.push(flag("pin",`${r.pin} 고정`,"i-lock"));
-  if(p.need||p.needId){ const done=p.needId && CHECKED[p.needId]; flags.push(flag(done?"good":"warn", done?"예약 완료":(p.need||p.ask||"예약 확인"))); }
-  r.warn.forEach(w=>flags.push(flag(w.lv,w.t)));
-  const st=now&&now.cur&&now.cur.id===r.id?" now":(now&&now.N.dk===dk&&now.N.min>=r.end?" past":"");
-  return `<li class="blk${bad?" bad":""}${st}" data-id="${esc(r.id)}" style="--c:${LINE[dk].c}">
-    <div class="rail">${sta(dk,r.i)}</div>
-    <div class="hop">${hopText(r,r.i===0)}${r.wait>=10?` <span class="wait">· ${r.wait}분 여유</span>`:""}</div>
-    <div class="card" role="button" tabindex="0" data-open="${esc(r.id)}">
-      <div>
-        <div class="tm"><b>${fmt(r.start)}</b><span>– ${fmt(r.end)} · ${r.dur}분</span></div>
-        <p class="nm">${esc(p.n)}</p>${p.ja?`<p class="jp">${esc(p.ja)}</p>`:""}
-        <div class="mt">${picto(p)}<span>${esc(p.k||"")}</span>${flags.join("")}</div>
-      </div>
-      ${P&&P.photo?`<img class="ph" src="${esc(P.photo)}" alt="" loading="lazy">`:`<span class="grip" aria-hidden="true">${ico("i-grip")}</span>`}
+/* ── 운행표: 선 하나에 역 ──
+   카드 상자 없이 시각 | 역 점 | 이름 세 칸. 역 사이 이동은 선 옆 작은 글씨. 고정 UI는 위 날짜 줄 하나뿐. */
+function stationHTML(dk,r,now){
+  const p=r.p, P=placeOf(p), bad=r.warn.some(w=>w.lv==="bad"), warn=!bad && r.warn.length>0;
+  const cur=now && now.cur && now.cur.id===r.id, past=!cur && now && now.N.dk===dk && now.N.min>=r.end;
+  const c=code(dk,r.i), meta=[esc(p.k||""), `${r.dur}분`];
+  if(r.pin) meta.push(`${ico("i-lock","ki mi")}${esc(r.pin)}`);
+  if(p.need||p.needId) meta.push(p.needId && CHECKED[p.needId] ? `<span class="ok">예약 완료</span>` : `<span class="nd">${esc(p.need||p.ask||"예약 확인")}</span>`);
+  return `<li class="st${bad?" bad":warn?" warn":""}${cur?" now":""}${past?" past":""}" data-id="${esc(r.id)}">
+    <p class="mv">${hopText(r,r.i===0)}${r.wait>=10?` · <span class="wait">${r.wait}분 여유</span>`:""}</p>
+    <div class="row" role="button" tabindex="0" data-open="${esc(r.id)}" aria-label="${c.l}${c.n} ${esc(p.n)} ${fmt(r.start)}">
+      <span class="t"><b>${fmt(r.start)}</b><i>${c.l}${c.n}</i></span>
+      <span class="dot" aria-hidden="true"></span>
+      <span class="b"><span class="n">${esc(p.n)}</span><span class="m">${meta.join(" · ")}</span>${r.warn.length?`<span class="w">${r.warn.map(w=>esc(w.t)).join(" · ")}</span>`:""}</span>
+      ${P&&P.photo?`<img class="th" src="${esc(P.photo)}" alt="" loading="lazy">`:""}
     </div></li>`;
 }
+function termHTML(label,time,input){
+  return `<div class="term"><span class="tt">${input||`<b>${time}</b>`}</span><span class="hub" aria-hidden="true"></span><span class="tn">${label}</span></div>`;
+}
 function wedHTML(){
-  const w=DAY.wed, s=w.stops;
-  return `<section class="linehead"><div class="bar" style="--c:${LINE.wed.c}"></div>
-    <div class="row" style="margin-top:16px">${lsym("wed","lg")}<div><h1>수요일 ${w.dt}</h1><p class="reg">도착 · 나리타 → 아카사카미쓰케</p></div></div>
-    <p class="lsum">${esc(w.summary)}</p></section>
-    <ol class="blocks">${s.map((x,i)=>`<li class="blk" style="--c:${LINE.wed.c}"><div class="rail">${sta("wed",i)}</div><div class="hop"></div>
-      <div class="card" style="cursor:default"><div><div class="tm"><b>${esc(x.t)}</b></div><p class="nm">${esc(x.n)}</p><p class="jp" style="font-size:14px;color:var(--sub);margin-top:6px">${esc(x.note||"")}</p></div></div></li>`).join("")}</ol>
+  const w=DAY.wed;
+  return `<header class="dh" style="--c:${LINE.wed.c}"><p class="k">${lsym("wed","sm")}<span>도착 · 나리타 → 아카사카미쓰케</span></p>
+      <h1>수요일 <span class="num">${w.dt}</span></h1><p class="meta">${esc(w.summary)}</p></header>
+    <div class="lw" style="--c:${LINE.wed.c}"><ol class="line">${w.stops.map((x,i)=>`<li class="st"><p class="mv"></p><div class="row" style="cursor:default">
+      <span class="t"><b>${esc(x.t)}</b><i>KS${String(i+1).padStart(2,"0")}</i></span><span class="dot"></span>
+      <span class="b"><span class="n">${esc(x.n)}</span><span class="m" style="white-space:normal">${esc(x.note||"")}</span></span></div></li>`).join("")}</ol></div>
     <p class="src">공항 접근·막차 안내는 <a href="classic.html">이전 화면</a>의 수요일에 자세히 있어요.</p>`;
 }
+function dswHTML(){
+  return `<nav class="dsw" aria-label="날짜 노선"><div class="wrap" role="tablist">${DAYKEYS.map(dk=>`<div class="dt" role="tab" tabindex="0" data-day="${dk}" style="--c:${LINE[dk].c}" aria-selected="${dk===CUR}" aria-label="${WDK[dk]}요일 ${LINE[dk].code} 노선">
+      ${lsym(dk,"sm")}<span class="d">${WDK[dk]} ${DAY[dk].dt.split(".")[1]}</span>${EDIT.includes(dk)?`<ul class="drop" data-day="${dk}" aria-hidden="true"></ul>`:""}</div>`).join("")}</div></nav>`;
+}
 function renderBoard(){
-  const tabs=DAYKEYS.map(dk=>`<div class="dtab" role="tab" tabindex="0" style="--c:${LINE[dk].c}" data-day="${dk}" aria-selected="${dk===CUR}" aria-label="${WDK[dk]}요일 ${LINE[dk].code} 노선">
-      ${lsym(dk,"sm")}<span class="d">${WDK[dk]} ${DAY[dk].dt.split(".")[1]}</span>${EDIT.includes(dk)?`<ul class="drop" data-day="${dk}" aria-hidden="true"></ul>`:""}</div>`).join("");
   let body="";
   if(CUR==="wed") body=wedHTML();
   else{
-    const dk=CUR, sc=schedule(dk), now=nowNext(), R=REGION[dk];
+    const dk=CUR, sc=schedule(dk), now=nowNext(), R=REGION[dk], n=sc.rows.length;
     const pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
-    body=`<section class="linehead"><div class="bar" style="--c:${LINE[dk].c}"></div>
-      <div class="row" style="margin-top:16px">${lsym(dk,"lg")}<div><h1>${WDK[dk]}요일 ${DAY[dk].dt}</h1><p class="reg">${esc(R.n)} · ${esc(R.sub)}</p></div></div>
-      <div class="lmeta"><span><b>${sc.rows.length}</b>역</span><span><b>${fmt(sc.depart)}</b> 출발</span><span><b>${fmt(sc.home)}</b> 숙소</span><span><b>${sc.dist.toFixed(1)}</b>km</span>
-        ${sc.bad?flag("bad",`확인 ${sc.bad}`):sc.warns?flag("warn",`주의 ${sc.warns}`):sc.rows.length?flag("good","문제 없음"):""}</div>
-      <p class="lsum">${esc(R.concept)}</p></section>
+    const status = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
+    body=`<header class="dh" style="--c:${LINE[dk].c}">
+        <p class="k">${lsym(dk,"sm")}<span>${esc(R.n)} · ${esc(R.sub)}</span></p>
+        <h1>${WDK[dk]}요일 <span class="num">${DAY[dk].dt}</span></h1>
+        <p class="meta">${n?`<b>${n}</b>역 · <b>${fmt(sc.depart)}–${fmt(sc.home)}</b> · ${sc.dist.toFixed(1)}km · ${status}`:"아직 비어 있어요"}</p>
+        ${n?`<p class="links"><button class="lk" id="mapbtn">${ico("i-map")}지도</button><a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a></p>`:""}
+      </header>
       ${now.N.dk===dk?lcdHTML():""}
-      ${sc.rows.length?`<div class="strip">${stripSVG(dk,sc)}</div>`:""}
-      <div class="acts" style="margin:6px 0 14px">${sc.rows.length?`<button class="btn" id="mapbtn">${ico("i-map")}지도</button><a class="btn" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a>`:""}</div>
-      <div class="terminal"><span class="hub">숙</span><label>숙소 출발 <input type="time" id="depart" value="${hhmm(fmt(sc.depart))}" aria-label="숙소 출발 시각"></label></div>
-      <ol class="blocks${sc.rows.length?"":" empty"}" id="line" data-day="${dk}">${sc.rows.map(r=>blockHTML(dk,r,now)).join("")}</ol>
-      ${sc.rows.length?`<div class="terminal"><span class="hub">숙</span><span>숙소 도착 약 <b class="num" style="font-size:17px;color:var(--ink)">${fmt(sc.home)}</b> · ${hopText({tr:sc.back},false).replace(/<svg[\s\S]*?<\/svg>/,"")}</span></div>`:""}
-      <div class="addrow"><button class="btn" id="openpool">${ico("i-plus")}보관함에서 블록 꺼내기</button></div>
-      <p class="src">시각은 이동 거리로 잡은 추정이에요(도보 분속 72m, 전철은 10분 + km당 2.6분). 예약·바처럼 시각이 정해진 곳은 ${ico("i-lock","ki")} 고정, 여는 시각이 알려진 곳은 열 때까지 기다리게 계산해요.</p>`;
+      <div class="lw" style="--c:${LINE[dk].c}">
+        ${termHTML("숙소 출발 <small>· 시각을 눌러 바꿔요</small>","",`<label class="dep"><b>${fmt(sc.depart)}</b><input type="time" id="depart" value="${hhmm(fmt(sc.depart))}" aria-label="숙소 출발 시각"></label>`)}
+        <ol class="line" id="line" data-day="${dk}">${sc.rows.map(r=>stationHTML(dk,r,now)).join("")}</ol>
+        ${n?`<p class="mv last">${hopText({tr:sc.back},false)}</p>${termHTML("숙소 도착",fmt(sc.home))}`:""}
+      </div>
+      <button class="addst" id="addst">${ico("i-plus")}장소 추가</button>
+      <p class="hint">길게 눌러 끌면 순서가 바뀌어요. 위 날짜에 놓으면 그날로, 아래 '빼기'에 놓으면 보관함으로 가요.<br>시각은 거리로 잡은 추정이고, ${ico("i-lock","ki mi")} 표시는 예약·바처럼 고정한 시각이에요.</p>`;
   }
-  main.innerHTML=`<div class="daytabs"><div class="wrap" role="tablist" aria-label="날짜 노선">${tabs}</div></div><div class="wrap">${body}</div>`;
-  $$(".dtab").forEach(b=>{ const f=()=>{ CUR=b.dataset.day; LS.set("tokyo-lines-day",CUR); render(); };
-    b.addEventListener("click",e=>{ if(e.target.closest(".drop .blk")) return; f(); });
+  main.innerHTML=`${dswHTML()}<div class="wrap">${body}</div>`;
+  $$(".dt").forEach(b=>{ const f=()=>{ CUR=b.dataset.day; LS.set("tokyo-lines-day",CUR); render(); window.scrollTo({top:0}); };
+    b.addEventListener("click",e=>{ if(e.target.closest(".drop li")) return; f(); });
     b.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
-  const dep=$("#depart"); if(dep) dep.addEventListener("change",()=>{ const t=dep.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return; S.start[CUR]=t; commit(`숙소 출발 ${t}`); });
+  const dep=$("#depart"); if(dep) dep.addEventListener("click",()=>{ try{ dep.showPicker(); }catch(e){} });
+  if(dep) dep.addEventListener("change",()=>{ const t=dep.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return; S.start[CUR]=t; commit(`숙소 출발 ${t}`); });
   const mb=$("#mapbtn"); if(mb) mb.addEventListener("click",()=>openMap(CUR));
-  const op=$("#openpool"); if(op) op.addEventListener("click",()=>setDrawer(true));
+  const ad=$("#addst"); if(ad) ad.addEventListener("click",()=>openPicker());
 }
 
-/* ── 보관함 서랍(운행표) ── */
-let DRAWER_OPEN=false, DF=LS.get("tokyo-lines-df","area");
+/* ── 장소 추가: 휴대폰은 시트, 넓은 화면은 오른쪽 패널(끌어서 넣기) ── */
+let DF=LS.get("tokyo-lines-df","area");
+const wide=()=>matchMedia("(min-width: 980px)").matches;
 function poolItems(scope){
   const placed=new Set(EDIT.flatMap(dk=>S.days[dk]));
   const all=[...CAT.values(), ...Object.values(S.added)].filter(p=>!placed.has(p.id));
@@ -466,54 +461,66 @@ function poolItems(scope){
   const m=MOOD.find(x=>x.k===scope); if(m) return all.filter(p=>m.kc.includes(p.kc));
   return all;
 }
-function miniHTML(p){
-  return `<li class="blk mini" data-id="${esc(p.id)}" style="--c:${LINE[CUR]?LINE[CUR].c:"var(--ink)"}"><div class="card" role="button" tabindex="0" data-open="${esc(p.id)}">
-    ${picto(p)}<div style="min-width:0"><p class="nm">${esc(p.n)}</p><p class="sub">${esc(AREANAME[areaOf(p)]||"")} · ${esc(p.k||"")}${p.dig?` · ${esc(p.dig)}`:""}</p></div>
-    ${S.star[p.id]?`<span class="star">${ico("i-star")}</span>`:"<span></span>"}
-    <button class="add" data-add="${esc(p.id)}" aria-label="${esc(p.n)} ${WDK[CUR]||""}요일 노선에 넣기">${ico("i-plus")}</button></div></li>`;
+function pkHTML(p){
+  return `<li class="pk" data-id="${esc(p.id)}"><span class="pi">${ico((KIND[p.kc]||KIND.view).i)}</span>
+    <span class="pb" role="button" tabindex="0" data-open="${esc(p.id)}"><span class="n">${S.star[p.id]?`<span class="star">${ico("i-star","ki mi")}</span>`:""}${esc(p.n)}</span><span class="m">${esc(AREANAME[areaOf(p)]||"")} · ${esc(p.k||"")}</span></span>
+    <button class="add" data-add="${esc(p.id)}">넣기</button></li>`;
 }
-function renderDrawer(){
-  const dr=$("#drawer"); if(VIEW!=="board" || CUR==="wed"){ return; }
-  const scopes=[["area",`${AREANAME[CUR]}`],["star","찜"],["hotel","숙소 근처"],...MOOD.map(m=>[m.k,m.n]),["all","전체"]];
+function pickerBody(){
+  const scopes=[["area",AREANAME[CUR]||"이 동네"],["star","찜"],["hotel","숙소 근처"],...MOOD.map(m=>[m.k,m.n]),["all","전체"]];
   if(!scopes.some(s=>s[0]===DF)) DF="area";
   const items=poolItems(DF).sort((a,b)=>(!!S.star[b.id]-!!S.star[a.id])||a.n.localeCompare(b.n,"ko"));
-  $("#drawer-n").textContent=`${items.length}`;
-  $("#drawer-f").innerHTML=`<div class="chips">${scopes.map(([k,n])=>`<button class="chip" data-df="${k}" aria-pressed="${k===DF}">${esc(n)} <b>${poolItems(k).length}</b></button>`).join("")}</div>`;
-  $("#pool").innerHTML=items.map(miniHTML).join("") || `<li class="src" style="padding:20px 0">여기엔 남은 블록이 없어요. '전체'를 눌러 보세요.</li>`;
-  dr.classList.toggle("open",DRAWER_OPEN);
-  $("#drawer-h").setAttribute("aria-expanded",String(DRAWER_OPEN));
-  $$("#drawer [data-df]").forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); DF=b.dataset.df; LS.set("tokyo-lines-df",DF); renderDrawer(); wireDnD(); }));
+  return `<div class="chips pkf">${scopes.map(([k,n])=>`<button class="chip" data-df="${k}" aria-pressed="${k===DF}">${esc(n)} <b>${poolItems(k).length}</b></button>`).join("")}</div>
+    <ul class="pool" id="pool">${items.map(pkHTML).join("")||`<li class="src" style="padding:16px 0">여기엔 남은 곳이 없어요. '전체'를 눌러 보세요.</li>`}</ul>`;
 }
-function setDrawer(open){ DRAWER_OPEN=open; $("#drawer").classList.toggle("open",open); $("#drawer-h").setAttribute("aria-expanded",String(open)); }
-$("#drawer-h").addEventListener("click",()=>setDrawer(!DRAWER_OPEN));
-$("#drawer-h").addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); setDrawer(!DRAWER_OPEN); } });
+function renderSide(){
+  const side=$("#side");
+  const on=VIEW==="board" && CUR!=="wed" && wide();
+  side.hidden=!on; document.body.classList.toggle("withside",on);
+  if(!on) return;
+  side.innerHTML=`<div class="side-h"><b>보관함</b><span>${WDK[CUR]}요일 노선으로 끌어 넣기</span></div>${pickerBody()}`;
+  $$("[data-df]",side).forEach(b=>b.addEventListener("click",()=>{ DF=b.dataset.df; LS.set("tokyo-lines-df",DF); renderSide(); wireDnD(); }));
+}
+const picker=$("#picker");
+function openPicker(){
+  if(CUR==="wed") return;
+  if(wide()){ const s=$("#side"); if(s) s.scrollTop=0; return; }
+  const draw=()=>{ picker.innerHTML=`<div class="sh-top"><span class="lsym sm" style="--c:${LINE[CUR].c}">${LINE[CUR].code}</span><b tabindex="-1" autofocus>${WDK[CUR]}요일에 넣기</b>
+      <button class="x" data-close aria-label="닫기">${ico("i-x")}</button></div><div class="sh-body">${pickerBody()}</div>`;
+    $$("[data-df]",picker).forEach(b=>b.addEventListener("click",()=>{ DF=b.dataset.df; LS.set("tokyo-lines-df",DF); draw(); })); };
+  draw(); if(!picker.open) picker.showModal();
+  picker._redraw=draw;
+}
+picker.addEventListener("click",e=>{ if(e.target===picker || e.target.closest("[data-close]")) picker.close(); });
 
 /* ── 끌어서 놓기 ── */
 function wireDnD(){
   SORTS.forEach(s=>{ try{ s.destroy(); }catch(e){} }); SORTS=[];
   if(!window.Sortable || VIEW!=="board" || CUR==="wed") return;
-  const line=$("#line"), pool=$("#pool");
-  const clearHot=()=>$$(".dtab.hot").forEach(x=>x.classList.remove("hot"));
-  const common={group:{name:"trip",pull:true,put:true}, draggable:".blk", animation:180, delay:170, delayOnTouchOnly:true, touchStartThreshold:6,
+  const line=$("#line"), pool=wide()?$("#side #pool"):null, trash=$("#trash ul");
+  const clearHot=()=>{ $$(".dt.hot").forEach(x=>x.classList.remove("hot")); $("#trash").classList.remove("hot"); };
+  const common={group:{name:"trip",pull:true,put:true}, draggable:"li[data-id]", animation:160, delay:170, delayOnTouchOnly:true, touchStartThreshold:6,
     ghostClass:"ghost", chosenClass:"chosen", forceFallback:true, fallbackOnBody:true, fallbackTolerance:4, scroll:true, scrollSensitivity:90, scrollSpeed:16, bubbleScroll:true,
     filter:".add", preventOnFilter:false,
-    onStart(){ document.body.classList.add("dragging"); try{ navigator.vibrate && navigator.vibrate(12); }catch(e){} },
-    onMove(e){ clearHot(); if(e.to && e.to.classList.contains("drop")) e.to.closest(".dtab").classList.add("hot"); return true; },
+    onStart(){ document.body.classList.add("dragging"); document.body.style.setProperty("--dc",LINE[CUR].c); try{ navigator.vibrate && navigator.vibrate(12); }catch(e){} },
+    onMove(e){ clearHot(); if(e.to && e.to.classList.contains("drop")) e.to.closest(".dt").classList.add("hot"); if(e.to===trash) $("#trash").classList.add("hot"); return true; },
     onEnd(e){ document.body.classList.remove("dragging"); clearHot();
-      if(e.to && e.to.classList.contains("drop")) return;               // 날짜 칸에 놓은 건 onAdd가 처리
+      if(e.to && (e.to.classList.contains("drop") || e.to===trash)) return;     // 날짜 칸·빼기 칸은 onAdd가 처리
       if(e.from===pool && e.to===pool) return;
-      const ids=$$("#line > .blk").map(x=>x.dataset.id);
       const moved=e.item.dataset.id, p=place(moved);
+      const ids=$$("#line > li[data-id]").map(x=>x.dataset.id);
       removeEverywhere(moved);
       S.days[CUR]=ids.filter((x,i,a)=>a.indexOf(x)===i);
-      if(e.to===pool){ delete S.pins[moved]; setTimeout(()=>commit(`${p.n} — 보관함으로`),0); return; }
+      if(pool && e.to===pool){ delete S.pins[moved]; setTimeout(()=>commit(`${p.n} — 보관함으로`),0); return; }
       const k=S.days[CUR].indexOf(moved);
       setTimeout(()=>commit(`${p.n} → ${LINE[CUR].code}${String(k+1).padStart(2,"0")}`),0);
     }};
   if(line) SORTS.push(Sortable.create(line, common));
   if(pool) SORTS.push(Sortable.create(pool, Object.assign({}, common, {sort:false})));
-  $$(".dtab .drop").forEach(z=>SORTS.push(Sortable.create(z,{group:{name:"trip",pull:false,put:true}, draggable:".blk",
-    onAdd(e){ const id=e.item.dataset.id; e.item.remove(); document.body.classList.remove("dragging"); clearHot(); setTimeout(()=>moveTo(id,z.dataset.day),0); }})));
+  const dropOnly=(el,fn)=>SORTS.push(Sortable.create(el,{group:{name:"trip",pull:false,put:true}, draggable:"li",
+    onAdd(e){ const id=e.item.dataset.id; e.item.remove(); document.body.classList.remove("dragging"); clearHot(); setTimeout(()=>fn(id),0); }}));
+  $$(".dt .drop").forEach(z=>dropOnly(z,id=>moveTo(id,z.dataset.day)));
+  if(trash) dropOnly(trash,id=>moveTo(id,"pool"));
 }
 
 /* ── 보관함 탭 ── */
@@ -739,15 +746,17 @@ function icsText(){
 document.addEventListener("click",e=>{
   const g=e.target.closest("[data-go]"); if(g && !e.target.closest(".drop")){ e.preventDefault(); if(g.dataset.open){ TOOLS_OPEN=g.dataset.open; LS.set("tokyo-lines-open",TOOLS_OPEN); } go(g.dataset.go, g.dataset.day); return; }
   const a=e.target.closest("[data-add]"); if(a){ e.stopPropagation(); moveTo(a.dataset.add, CUR==="wed"?"thu":CUR); return; }
+  if(e.target.closest(".st .row") && e.target.closest("[data-open]")){ openSheet(e.target.closest("[data-open]").dataset.open); return; }
   const b=e.target.closest("[data-big]"); if(b){ const p=place(b.dataset.big); if(p && p.ja) bigJa(p); return; }
   const o=e.target.closest("[data-open]"); if(o && !e.target.closest(".tl")){ openSheet(o.dataset.open); return; }
 });
-document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.matches(".card[data-open]")){ e.preventDefault(); openSheet(e.target.dataset.open); } });
+document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.matches("[data-open][role=button]")){ e.preventDefault(); openSheet(e.target.dataset.open); } });
 function clock(){
   const n=tokyoNow(), N=tripNow(), el=$("#clock"); if(!el) return;
   el.textContent = `도쿄 ${fmt(n.min)}` + (N.phase==="before"?` · D-${dday()}`:N.phase==="during"?` · ${DAYKEYS.indexOf(N.dk)+1}일차`:"");
 }
-setInterval(()=>{ clock(); if(tripNow().phase==="during" && (VIEW==="home"||VIEW==="board") && !document.body.classList.contains("dragging") && !sheet.open) render(); },60000);
+setInterval(()=>{ clock(); if(tripNow().phase==="during" && (VIEW==="home"||VIEW==="board") && !document.body.classList.contains("dragging") && !sheet.open && !picker.open) render(); },60000);
+matchMedia("(min-width: 980px)").addEventListener("change",()=>render());
 
 if(tripNow().phase==="during" && LS.get("tokyo-lines-view",null)===null) VIEW="home";
 render();
