@@ -915,6 +915,30 @@ dialog.ja-dlg,.ja-card{border-radius:0 !important}
 .at-ja{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
 .at-note{margin:4px 0 0;font-size:14px;line-height:1.55;color:var(--text2)}
 .at-btn{min-height:44px;min-width:60px;padding:0 12px;font-size:14px}
+/* 사진: 받아 오면 카드 위에 크게 */
+.cover{display:block;width:100%;aspect-ratio:3/2;object-fit:cover;margin:0 0 12px;background:var(--faint);filter:saturate(.92) contrast(1.02)}
+.stop.past .cover{opacity:.5}
+/* 편집 */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.edtools{display:flex;align-items:center;gap:12px;margin:0 0 16px;font-size:13px;color:var(--muted)}
+.edtools .btn{min-height:44px}
+.edbar{display:grid;grid-template-columns:1.1fr 1fr .8fr;gap:8px;margin:12px 0 0;padding:10px 0 0;border-top:1px dashed var(--line)}
+.edbar label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)}
+.edbar input,.edbar select{font:inherit;font-size:15px;min-height:44px;padding:0 8px;border:1px solid var(--ink);border-radius:0;background:transparent;color:var(--ink);width:100%}
+.cands{margin:40px 0 0;border-top:1px solid var(--ink);padding-top:18px}
+.cands h2,.around h2{font-size:26px;margin:6px 0 2px}
+.cd-n{font:400 .8em var(--display);color:var(--accent-ink);margin-left:4px}
+.at-acts{display:flex;gap:6px}
+.at-done{font-size:12px;font-weight:600;color:var(--muted);align-self:center;white-space:nowrap}
+.addsrch{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin:16px 0 0}
+.addsrch input{font:inherit;font-size:16px;min-height:44px;padding:0 10px;border:1px solid var(--ink);border-radius:0;background:transparent;color:var(--ink);min-width:0}
+.srch-res{margin-top:10px}
+details.around{margin:40px 0 0;border-top:1px solid var(--ink);padding-top:18px}
+details.around > summary{list-style:none;cursor:pointer;position:relative;padding-right:40px}
+details.around > summary::-webkit-details-marker{display:none}
+details.around > summary::after{content:"+";position:absolute;right:0;top:50%;transform:translateY(-50%);font:400 34px/1 var(--display);color:var(--ink)}
+details.around[open] > summary::after{content:"–"}
+details.around > summary h2{display:inline}
 </style>
 </head>
 <body>
@@ -952,6 +976,8 @@ dialog.ja-dlg,.ja-card{border-radius:0 !important}
       <p id="installhow">아이폰은 사파리에서 공유 버튼을 누르고 &ldquo;홈 화면에 추가&rdquo;, 안드로이드는 크롬 메뉴에서 &ldquo;앱 설치&rdquo;를 고르세요.</p>
       <div class="acts"><button type="button" class="btn key" id="installbtn" hidden>홈 화면에 추가</button></div>
     </div>
+
+    <div class="card-box" id="mybox"></div>
 
     <div class="card-box">
       <h3>구글 장소 정보 가져오기</h3>
@@ -1189,9 +1215,6 @@ const DAYS = [
       {t:"12:00", n:"구풍 카레 본디", ja:"欧風カレー ボンディ 神保町本店", kc:"food", k:"식당, 점심",
        note:"진보초 카레의 대표. 간다 고서센터 빌딩 2층, 평일 11:00~22:00, 연중무휴. 점심때 줄이 서니 12시 전에 도착하면 좋아요.",
        q:"欧風カレー ボンディ 神保町本店", lat:35.6957, lng:139.7582},
-      {t:"13:00", n:"책거리 CHEKCCORI", ja:"チェッコリ", kc:"book", k:"서점", closed:"월·화·일 휴무",
-       note:"한국책 전문 서점. 수~토만 엽니다.",
-       q:"CHEKCCORI 神保町", id:"ChIJdwtTFhGMGGARWzRaGOwBo6s", lat:35.6957744, lng:139.7589697},
       {t:"13:45", n:"난요도 서점", ja:"南洋堂書店", kc:"book", k:"서점", closed:"목·일 휴무",
        note:"건축 전문 헌책방. 실내 촬영 금지.",
        q:"南洋堂書店", id:"ChIJC6eoXhCMGGARF9F1jKsKGEQ", lat:35.6952013, lng:139.7610973},
@@ -1213,8 +1236,15 @@ const DAYS = [
       {t:"20:30", n:"Bar Luther 赤坂", ja:"バー ルーサー 赤坂", kc:"bar", k:"LP바", ask:"영업시간 확인",
        leg:{line:"긴자선", from:"日本橋", to:"赤坂見附", note:"갈아타지 않음", v:true},
        note:"숙소 옆 블록 지하(赤坂3-20-2). 70~80년대 소울·블랙 컨템퍼러리·AOR을 아날로그로 트는 바. 일요일 휴무. 영업시간이 출처마다 달라서(19:00~03:30 / 18:00~22:00) 전화(03-6277-8016)로 확인하세요. 금요일의 끝을 숙소 앞에서.",
-       q:"Bar Luther Akasaka", lat:35.6754, lng:139.7369},
-    ]},
+       q:"Bar Luther Akasaka", lat:35.6754, lng:139.7369}
+    ],
+    // 서점은 하루 두 곳까지(Henry 요청, 2026-09-27). 뺀 곳은 spare에 두고 후보함(cands)에 띄운다
+    spare:[
+      {t:"13:00", n:"책거리 CHEKCCORI", ja:"チェッコリ", kc:"book", k:"서점", closed:"월·화·일 휴무",
+       note:"한국책 전문 서점. 수~토만 엽니다.",
+       q:"CHEKCCORI 神保町", id:"ChIJdwtTFhGMGGARWzRaGOwBo6s", lat:35.6957744, lng:139.7589697}
+    ],
+    cands:["CHEKCCORI 神保町"]},
 
   { key:"sat", wd:"토", dt:"11.21", short:"나카메구로·롯폰기·시부야", date:"2026-11-21", title:"나카메구로에서 롯폰기, 아오야마, 시부야로", summary:"나카메구로 로스터리 아침에서 롯폰기, 아오야마 은행나무길, 시부야 서점들을 지나 밤엔 시부야 LP바. 남서쪽으로 한 방향이고 가장 긴 하루예요.", walk:"도보 약 11km",
     stops:[
@@ -1246,22 +1276,28 @@ const DAYS = [
        shot:"좁은 삼각형 땅에 선 줄무늬 외관. 길 건너편에서 모서리를 정면으로.",
        note:"마리오 보타 설계. 1층 아트북숍 on Sundays가 사실상 본 무대. 은행나무길에서 걸어서 갈 수 있는 거리예요.",
        q:"ワタリウム美術館", id:"ChIJXf9Z6JiMGGARRZ0zg4fFgLU", lat:35.6707251, lng:139.7133581},
+      {t:"16:00", n:"블루보틀 시부야 카페", ja:"ブルーボトルコーヒー 渋谷カフェ", kc:"food", k:"카페", dig:"구글 지도",
+       note:"기타야 공원 안 2층 매장. 8:00~20:00. 오모테산도에서 시부야로 내려가는 길에 쉬어 가요.",
+       q:"ブルーボトルコーヒー 渋谷カフェ", lat:35.6624, lng:139.7019},
+      {t:"17:10", n:"SO BOOKS", kc:"book", k:"사진집 헌책방", closed:"일·월 휴무", close:"19:00", dig:"구글 지도", 
+       note:"사진집·아트·건축 책 전문 헌책방. 13:00~19:00. 代々木八幡역 2분, 하츠다이 가는 길에 있어요. 19시에 닫아요. 필름으로 찍는 사람에게 이번 여행 서점 중 가장 맞는 곳.",
+       q:"SO BOOKS 代々木八幡", lat:35.669, lng:139.686},
+      {t:"18:15", n:"Bookshelf Fuzkue", ja:"本の読める店 fuzkue 初台", kc:"book", k:"북카페, 저녁 겸", close:"23:00",
+       note:"하츠다이. 조용히 앉아 읽는 곳이라 오늘의 휴식 시간이기도 합니다.",
+       q:"Bookshelf Fuzkue", id:"ChIJVVVWOTLzGGARtVH01Eyw00c", lat:35.6802894, lng:139.6869601},
+      {t:"21:00", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
+       note:"지하 LP바. 8시 넘으면 자리가 찹니다. 돌아올 땐 긴자선 渋谷 → 赤坂見附 한 번이라 숙소까지 갈아타지 않아요. 막차는 준비 > 숙소·교통의 막차 안내를 보세요.",
+       q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841}
+    ],
+    spare:[
       {t:"15:50", n:"Utrecht", ja:"ユトレヒト", kc:"book", k:"서점", closed:"월 휴무",
        note:"아트북과 진. 잡화점 2층, 간판이 없어요.",
        q:"Utrecht 神宮前", id:"ChIJCwoF2qaMGGARedkSzbpnnws", lat:35.6642639, lng:139.7059777},
       {t:"17:00", n:"SPBS 본점", ja:"SHIBUYA PUBLISHING & BOOKSELLERS", kc:"book", k:"서점",
        note:"출판사가 직접 운영하는 서점.",
-       q:"SHIBUYA PUBLISHING & BOOKSELLERS", id:"ChIJ2xOID62MGGARLWvFZNk7PiA", lat:35.6642569, lng:139.6933161},
-      {t:"17:50", n:"SO BOOKS", kc:"book", k:"사진집 헌책방", closed:"일·월 휴무", close:"19:00", dig:"구글 지도", 
-       note:"사진집·아트·건축 책 전문 헌책방. 13:00~19:00. 代々木八幡역 2분이라 SPBS에서 걸어서 하츠다이 가는 길에 있어요. 필름으로 찍는 사람에게 이번 여행 서점 중 가장 맞는 곳.",
-       q:"SO BOOKS 代々木八幡", lat:35.669, lng:139.686},
-      {t:"18:45", n:"Bookshelf Fuzkue", ja:"本の読める店 fuzkue 初台", kc:"book", k:"북카페, 저녁 겸", close:"23:00",
-       note:"하츠다이. 조용히 앉아 읽는 곳이라 오늘의 휴식 시간이기도 합니다.",
-       q:"Bookshelf Fuzkue", id:"ChIJVVVWOTLzGGARtVH01Eyw00c", lat:35.6802894, lng:139.6869601},
-      {t:"21:00", n:"THE MUSIC BAR CAVE SHIBUYA", kc:"bar", k:"LP바", closed:"월·일 휴무", close:"03:00",
-       note:"지하 LP바. 8시 넘으면 자리가 찹니다. 돌아올 땐 긴자선 渋谷 → 赤坂見附 한 번이라 숙소까지 갈아타지 않아요. 막차는 준비 > 숙소·교통의 막차 안내를 보세요.",
-       q:"THE MUSIC BAR CAVE SHIBUYA", id:"ChIJSZ7DkMGNGGARDBKSX-n_p_E", lat:35.6608436, lng:139.7029841},
-    ]},
+       q:"SHIBUYA PUBLISHING & BOOKSELLERS", id:"ChIJ2xOID62MGGARLWvFZNk7PiA", lat:35.6642569, lng:139.6933161}
+    ],
+    cands:["Utrecht 神宮前","SHIBUYA PUBLISHING & BOOKSELLERS"]},
 
   { key:"sun", wd:"일", dt:"11.22", short:"도쿄역·긴자·출국", date:"2026-11-22", title:"도쿄역에서 긴자로, 출국하는 날", summary:"황궁 분수공원에서 커피, 도쿄역과 국제포럼을 지나 1936년 찻집에서 아침. 서점 둘, 갤러리 하나, 긴자 양식 점심. 18시 나리타 비행기라 13시 반 전에 긴자를 떠납니다.", walk:"아침에 지하철 한 번, 나머지는 걸어서",
     stops:[
@@ -1304,10 +1340,10 @@ const SIGHTS = [
   {n:"프라다 아오야마", ja:"プラダ 青山店", day:"sat", near:"根津美術館", by:"Herzog & de Meuron", year:2003,
    why:"마름모 격자에 볼록한 유리를 끼운 건물. 네즈미술관 앞 미유키도리에 있어요.",
    q:"プラダ 青山店", lat:35.6627, lng:139.7148, src:"https://architecturephoto.net/syasin/005/h005.htm", srcn:"architecturephoto"},
-  {n:"디올 오모테산도", ja:"ディオール表参道", day:"sat", near:"Utrecht 神宮前", by:"SANAA(妹島和世+西沢立衛)",
-   why:"유리 안쪽에 아크릴 막을 겹쳐 흰 드레이프처럼 보이는 외관. 와타리움에서 Utrecht로 걷는 오모테산도 길에.",
+  {n:"디올 오모테산도", ja:"ディオール表参道", day:"sat", near:"ワタリウム美術館", by:"SANAA(妹島和世+西沢立衛)",
+   why:"유리 안쪽에 아크릴 막을 겹쳐 흰 드레이프처럼 보이는 외관. 와타리움에서 오모테산도 길을 따라 걸으면 있어요.",
    q:"ディオール表参道", lat:35.6668, lng:139.7085, src:"https://www.tozai-as.or.jp/mytech/04/04_sejima01.html", srcn:"東西アスファルト"},
-  {n:"TOD'S 오모테산도", ja:"TOD'S表参道ビル", day:"sat", near:"Utrecht 神宮前", by:"伊東豊雄", year:2004,
+  {n:"TOD'S 오모테산도", ja:"TOD'S表参道ビル", day:"sat", near:"ワタリウム美術館", by:"伊東豊雄", year:2004,
    why:"느티나무 가로수를 닮은 나뭇가지 모양 콘크리트 외관. 디올과 같은 길이라 한 번에.",
    q:"TOD'S表参道ビル", lat:35.6679, lng:139.7093, src:"https://www.tozai-as.or.jp/mytech/06/06_ito04.html", srcn:"東西アスファルト"},
   {n:"메종 에르메스", ja:"銀座メゾンエルメス", day:"sun", near:"資生堂ギャラリー", by:"Renzo Piano", year:2001,
@@ -1478,7 +1514,7 @@ const RECS = [
 
   {n:"블루보틀 시부야 카페", ja:"ブルーボトルコーヒー 渋谷カフェ", kc:"food", k:"카페", area:"시부야", when:"sat", dig:"구글 지도", 
    why:"기타야 공원 안 2층 매장. 8:00~20:00.",
-   tip:"토요일 Utrecht에서 SPBS로 가는 길 한가운데예요.",
+   tip:"토요일 기본 일정에 16:00으로 넣었어요. 와타리움에서 SO BOOKS 가는 길이에요.",
    q:"ブルーボトルコーヒー 渋谷カフェ", src:"https://store.bluebottlecoffee.jp/pages/shibuya", srcn:"Blue Bottle 공식", lat:35.6624, lng:139.7019, slot:{day:"sat", t:"16:30"}},
 
   {n:"COW BOOKS 나카메구로", kc:"book", k:"헌책방", area:"나카메구로", when:"sat", dig:"구글 지도", 
@@ -1797,7 +1833,7 @@ DAYS.forEach(d=>{ d.orig=d.stops.slice(); d.origMeta={title:d.title, summary:d.s
 let CURPLAN="base";
 function planStop(sp){
   const {ref,keep,...ov}=sp; let o=null;
-  for(const d of DAYS){ const f=d.orig.find(x=>x.q===ref); if(f){ const {leg,num,_idx,_from,...rest}=f; o=rest; if(keep&&leg) o.leg=leg; break; } }
+  for(const d of DAYS){ const f=d.orig.find(x=>x.q===ref)||(d.spare||[]).find(x=>x.q===ref); if(f){ const {leg,num,_idx,_from,...rest}=f; o=rest; if(keep&&leg) o.leg=leg; break; } }
   if(!o){ const r=RECS.find(x=>x.q===ref);
     if(r) o={n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, q:r.q, lat:r.lat, lng:r.lng, dig:r.dig, outside:r.outside, fromRec:true}; }
   if(!o){ const g=SIGHTS.find(x=>x.q===ref);
@@ -1805,11 +1841,15 @@ function planStop(sp){
   if(!o){ console.warn("플랜에서 못 찾은 장소:",ref); return null; }
   return Object.assign(o,ov);
 }
-function planStopsFor(P,d){ const pd=P.days&&P.days[d.key]; return pd ? pd.stops.map(planStop).filter(Boolean) : d.orig.slice(); }
+function planStopsFor(P,d){
+  if(P.k==="mine"){ const v=myGet(); if(!v || !v.days[d.key]) return d.orig.slice();
+    return v.days[d.key].filter(e=>e.st==="fix").map(e=>myResolve(e,v)).filter(Boolean).sort((a,b)=>toMin(a.t)-toMin(b.t)); }
+  const pd=P.days&&P.days[d.key]; return pd ? pd.stops.map(planStop).filter(Boolean) : d.orig.slice(); }
 let ALL=[];
 function applyPlan(k){
   const P=PLANS.find(p=>p.k===k)||PLANS[0]; CURPLAN=P.k;
-  DAYS.forEach(d=>{ const pd=P.days&&P.days[d.key];
+  const MP = P.k==="mine" ? (PLANS.find(p=>p.k===(myGet()||{}).from)||{}) : P;
+  DAYS.forEach(d=>{ const pd=MP.days&&MP.days[d.key];
     d.base=planStopsFor(P,d);
     Object.assign(d, pd ? {title:pd.title, summary:pd.summary, walk:pd.walk||d.origMeta.walk, short:d.origMeta.short} : d.origMeta); });
   indexStops();
@@ -1822,6 +1862,153 @@ function everyPlace(){
   PLANS.forEach(P=>DAYS.forEach(d=>planStopsFor(P,d).forEach(s=>{ if(s.lat && !s.hotel && !m.has(pkey(s))) m.set(pkey(s),s); })));
   return [...m.values()];
 }
+
+/* ---------- 내 일정(편집본) ----------
+   처음 고치는 순간 지금 보던 플랜을 복사해 tokyo-myplan 에 "내 일정"을 만든다. 이후 편집은 전부 여기에.
+   {v:1, from, days:{thu:[{k,t,st}]}, added:{k:장소}}  k = 장소의 q(기본 일정·추천·지나가는 건물) 또는 "g:<구글 id>"
+   st: "fix" 확정(일정·지도에 나옴) | "cand" 후보(그날 후보함에만). 수요일은 도착뿐이라 고치지 않는다. */
+const EDIT_DAYS=["thu","fri","sat","sun"];
+function myGet(){ try{ const v=JSON.parse(LS.get("tokyo-myplan","null")); if(v && v.days) return v; }catch(e){} return null; }
+function mySet(v){ LS.set("tokyo-myplan",JSON.stringify(v)); syncMinePlan(); }
+function syncMinePlan(){
+  const v=myGet(), i=PLANS.findIndex(p=>p.k==="mine");
+  if(v && i<0){ const F=PLANS.find(p=>p.k===v.from);
+    PLANS.unshift({k:"mine", n:"내 일정", tag:"직접 고침", intro:`'${F?F.n:"지역별 기본"}'에서 시작해 직접 고친 일정이에요. 이 기기에 저장되고, 준비 탭에서 파일로 백업할 수 있어요.`}); }
+  if(!v && i>=0) PLANS.splice(i,1);
+}
+function myResolve(e,v){
+  const a=v.added && v.added[e.k];
+  const o = a ? Object.assign({},a) : planStop({ref:e.k});
+  if(!o) return null;
+  o.t=e.t||""; o.st=e.st; o.ek=e.k; return o;
+}
+function templateCands(P,d){ return P && P.k==="base" ? (d.cands||[]) : []; }
+function myCreate(){
+  const P=PLANS.find(p=>p.k===CURPLAN)||PLANS[0], v={v:1, from:P.k, days:{}, added:{}}, mine=getMine();
+  EDIT_DAYS.forEach(k=>{ const d=DAYS.find(x=>x.key===k);
+    const list=planStopsFor(P,d).filter(s=>s.q && !s.hotel).map(s=>({k:s.q, t:s.t, st:"fix"}));
+    templateCands(P,d).forEach(q=>{ if(!list.some(e=>e.k===q)) list.push({k:q, t:"", st:"cand"}); });
+    mine.filter(m=>m.day===k).forEach(m=>{ const r=RECS.find(x=>x.n===m.rid); if(r && !list.some(e=>e.k===r.q)) list.push({k:r.q, t:m.t, st:"fix"}); });
+    v.days[k]=list; });
+  LS.set("tokyo-mine","[]");
+  mySet(v); return v;
+}
+// 편집 한 번: 내 일정이 없으면 만들고, 다른 플랜을 보고 있었으면 내 일정으로 넘어간다
+function myEdit(fn,msg){
+  let v=myGet(); const fresh=!v; if(!v) v=myCreate();
+  const moved = CURPLAN!=="mine";
+  fn(v); mySet(v);
+  applyPlan("mine"); LS.set("tokyo-plan","mine"); refresh();
+  toast(moved ? (fresh?"지금 일정을 '내 일정'으로 복사해서 고쳤어요":"'내 일정'으로 바꿔서 고쳤어요") : (msg||"고쳤어요"));
+}
+function myFind(v,k){ for(const dk of EDIT_DAYS){ const i=(v.days[dk]||[]).findIndex(e=>e.k===k); if(i>=0) return {dk,i,e:v.days[dk][i]}; } return null; }
+function candsFor(d){
+  if(!EDIT_DAYS.includes(d.key)) return [];
+  if(CURPLAN==="mine"){ const v=myGet(); return v ? (v.days[d.key]||[]).filter(e=>e.st==="cand").map(e=>myResolve(e,v)).filter(Boolean) : []; }
+  return templateCands(PLANS.find(p=>p.k===CURPLAN),d).map(q=>{ const o=planStop({ref:q}); if(o){ o.ek=q; o.st="cand"; } return o; }).filter(Boolean);
+}
+const suggestT=(d,k)=>{ const r=RECS.find(x=>x.q===k); return r && r.slot && r.slot.day===d.key ? r.slot.t : "16:00"; };
+const hhmm=t=>{ const m=/^(\d{1,2}):(\d{2})$/.exec(t||""); return m ? m[1].padStart(2,"0")+":"+m[2] : ""; };
+function kcFromType(t){ t=String(t||"");
+  return /book/.test(t)?"book":/cafe|coffee|bakery|restaurant|food|meal|sushi|ramen/.test(t)?"food":/bar|night_club|pub|wine/.test(t)?"bar":/museum|gallery/.test(t)?"art":/park|garden/.test(t)?"leaf":"view"; }
+
+// 편집 막대(편집 모드일 때 장소 카드 안)
+function edbarHTML(d,s){
+  if(!EDITMODE || !EDIT_DAYS.includes(d.key) || !s.q || s.hotel) return "";
+  const k=s.ek||s.q;
+  return `<div class="edbar" data-ek="${esc(k)}" data-day="${d.key}">
+    <label>시간<input type="time" class="ed-t" value="${esc(hhmm(s.t))}"></label>
+    <label>상태<select class="ed-st"><option value="fix" selected>확정</option><option value="cand">후보로</option><option value="del">빼기</option></select></label>
+    <label>요일<select class="ed-day">${EDIT_DAYS.map(k2=>{ const x=DAYS.find(y=>y.key===k2); return `<option value="${k2}"${k2===d.key?" selected":""}>${x.wd}</option>`; }).join("")}</select></label>
+  </div>`;
+}
+function candsHTML(d){
+  if(!EDIT_DAYS.includes(d.key)) return "";
+  const cs=candsFor(d), key=LS.get("tokyo-gkey","");
+  const rows=cs.map(s=>`<li class="arow"><div class="at-main"><p class="at-n">${esc(s.n)}</p>${s.ja?`<p class="at-ja" lang="ja">${esc(s.ja)}</p>`:""}<p class="at-note">${esc(firstSentence(s.note||""))}</p></div>
+      <div class="at-acts"><button type="button" class="btn key at-btn" data-fix="${esc(s.ek)}" data-day="${d.key}">확정</button>${CURPLAN==="mine"?`<button type="button" class="btn at-btn" data-drop="${esc(s.ek)}">빼기</button>`:""}</div></li>`).join("");
+  return `<section class="cands" aria-labelledby="cd-${d.key}">
+    <p class="eyebrow kicker">Shortlist</p>
+    <h2 id="cd-${d.key}">후보함 <span class="cd-n">${cs.length}</span></h2>
+    <p class="at-concept">일정엔 안 넣고 담아 둔 곳이에요. 가고 싶어지면 '확정'을 누르세요. 확정한 곳은 16시 전후로 들어가니 '일정 고치기'에서 시간을 맞추세요.</p>
+    ${rows?`<ol class="alist">${rows}</ol>`:`<p class="sub">아직 없어요. 아래 '이 동네 더 보기'나 검색으로 담아 보세요.</p>`}
+    <form class="addsrch" data-day="${d.key}">
+      <label class="sr" for="q-${d.key}">장소 검색</label>
+      <input id="q-${d.key}" name="q" type="search" placeholder="장소 이름으로 찾기 (예: 代官山 蔦屋書店)" autocomplete="off">
+      <button type="submit" class="btn">${key?"구글에서 찾기":"담기"}</button>
+    </form>
+    ${key?"":`<p class="sub">구글 장소 검색은 API 키가 있어야 해요(준비 > 할 일). 키가 없으면 이름만 담기고 지도 핀은 안 생겨요.</p>`}
+    <ol class="alist srch-res" hidden></ol>
+  </section>`;
+}
+async function searchPlaces(q,d){
+  const key=LS.get("tokyo-gkey","");
+  const body={textQuery:q, languageCode:"ko", regionCode:"JP", pageSize:5, locationBias:{circle:{center:{latitude:35.6812, longitude:139.7671}, radius:30000}}};
+  const r=await fetch("https://places.googleapis.com/v1/places:searchText?key="+encodeURIComponent(key)+"&fields="+encodeURIComponent("places.id,places.displayName,places.formattedAddress,places.location,places.primaryType,places.primaryTypeDisplayName"),
+    {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)});
+  if(!r.ok) throw new Error(gErr(r.status, await r.text().catch(()=>"")));
+  const j=await r.json(); return (j.places||[]).map(p=>({id:p.id, n:(p.displayName&&p.displayName.text)||q, addr:p.formattedAddress||"",
+    lat:p.location&&p.location.latitude, lng:p.location&&p.location.longitude, kc:kcFromType(p.primaryType), k:(p.primaryTypeDisplayName&&p.primaryTypeDisplayName.text)||"장소"}));
+}
+function addCand(dayKey, place){   // place: 이미 있는 q 문자열 또는 새 장소 객체
+  myEdit(v=>{
+    let k;
+    if(typeof place==="string"){ k=place; }
+    else { k=place.id ? "g:"+place.id : "u:"+place.n; v.added=v.added||{};
+      v.added[k]={n:place.n, q:place.q||place.n, id:place.id, lat:place.lat, lng:place.lng, kc:place.kc||"view", k:place.k||"장소", note:place.addr||"", dig:"직접 추가"}; }
+    const f=myFind(v,k); if(f) v.days[f.dk].splice(f.i,1);
+    v.days[dayKey].push({k, t:"", st:"cand"});
+  }, "후보함에 담았어요");
+}
+let EDITMODE = LS.get("tokyo-edit","0")==="1";
+function wireEdit(d){
+  const eb=$("#edbtn"); if(eb) eb.addEventListener("click",()=>{ EDITMODE=!EDITMODE; LS.set("tokyo-edit",EDITMODE?"1":"0"); refresh(); });
+  $$(".edbar",panelEl).forEach(bar=>{
+    const k=bar.dataset.ek, dk=bar.dataset.day;
+    bar.querySelector(".ed-t").addEventListener("change",e=>{ const t=e.target.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return;
+      myEdit(v=>{ const f=myFind(v,k); if(f) f.e.t=t; }, `${t}로 옮겼어요`); });
+    bar.querySelector(".ed-st").addEventListener("change",e=>{ const st=e.target.value;
+      myEdit(v=>{ const f=myFind(v,k); if(!f) return; if(st==="del") v.days[f.dk].splice(f.i,1); else f.e.st=st; }, st==="del"?"일정에서 뺐어요. 동네 목록에서 다시 담을 수 있어요":"후보함으로 내렸어요"); });
+    bar.querySelector(".ed-day").addEventListener("change",e=>{ const to=e.target.value;
+      myEdit(v=>{ const f=myFind(v,k); if(!f) return; v.days[f.dk].splice(f.i,1); v.days[to].push(f.e); }, `${DAYS.find(x=>x.key===to).wd}요일로 옮겼어요`); });
+  });
+  $$("[data-fix]",panelEl).forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.fix, dk=b.dataset.day;
+    myEdit(v=>{ const f=myFind(v,k); if(f){ f.e.st="fix"; f.e.t=f.e.t||suggestT(d,k); } else v.days[dk].push({k, t:suggestT(d,k), st:"fix"}); }, "확정했어요. 시간은 '일정 고치기'에서 맞추세요"); }));
+  $$("[data-drop]",panelEl).forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.drop;
+    myEdit(v=>{ const f=myFind(v,k); if(f) v.days[f.dk].splice(f.i,1); }, "후보함에서 뺐어요"); }));
+  $$("[data-pick]",panelEl).forEach(b=>b.addEventListener("click",()=>addCand(b.dataset.day, b.dataset.pick)));
+  $$(".addsrch",panelEl).forEach(f=>f.addEventListener("submit",async e=>{
+    e.preventDefault(); const q=f.elements.q.value.trim(); if(!q) return;
+    const res=f.parentElement.querySelector(".srch-res");
+    if(!LS.get("tokyo-gkey","")){ addCand(f.dataset.day,{n:q, q}); return; }
+    res.hidden=false; res.innerHTML=`<li class="arow"><p class="at-note">찾는 중…</p></li>`;
+    try{ const list=await searchPlaces(q,d);
+      if(!list.length){ res.innerHTML=`<li class="arow"><p class="at-note">못 찾았어요. 일본어 이름으로도 찾아보세요.</p></li>`; return; }
+      res.innerHTML=list.map((p,i)=>`<li class="arow"><div class="at-main"><p class="at-n">${esc(p.n)} <em class="at-other">${esc(p.k)}</em></p><p class="at-note">${esc(p.addr)}</p></div><button type="button" class="btn key at-btn" data-res="${i}">담기</button></li>`).join("");
+      $$("[data-res]",res).forEach(b=>b.addEventListener("click",()=>addCand(f.dataset.day, list[Number(b.dataset.res)])));
+    }catch(err){ res.innerHTML=`<li class="arow"><p class="at-note">${esc(err.message||"검색이 안 돼요")}</p></li>`; }
+  }));
+}
+// 준비 탭: 내 일정 백업·복원·되돌리기
+function renderMyBox(){
+  const el=$("#mybox"); if(!el) return;
+  const v=myGet();
+  el.innerHTML=`<h3>내 일정</h3>
+    <p>${v?`'내 일정'이 이 기기에 저장돼 있어요. 다른 폰에서도 쓰려면 파일로 저장해서 옮기세요.`:`일정 탭에서 '일정 고치기'를 누르거나 후보를 확정하면 지금 보던 일정이 '내 일정'으로 복사돼요.`}</p>
+    <div class="acts">${v?`<button type="button" class="btn" id="myexp">파일로 저장</button>`:""}<label class="btn" for="myimp">파일 불러오기</label>${v?`<button type="button" class="btn" id="myreset">처음 일정으로</button>`:""}</div>
+    <input type="file" id="myimp" accept="application/json,.json" hidden>`;
+  const ex=$("#myexp"); if(ex) ex.addEventListener("click",()=>{
+    const blob=new Blob([JSON.stringify(myGet(),null,1)],{type:"application/json"});
+    const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="tokyo-my-plan.json"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1000); });
+  $("#myimp").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return;
+    try{ const v2=JSON.parse(await f.text()); if(!v2 || !v2.days) throw 0; mySet(v2); applyPlan("mine"); LS.set("tokyo-plan","mine"); renderMyBox(); toast("'내 일정'을 불러왔어요"); }
+    catch(err){ toast("이 파일은 읽을 수 없어요"); } });
+  const rs=$("#myreset"); if(rs) rs.addEventListener("click",()=>{
+    if(!confirm("고친 내용을 지우고 처음 일정으로 돌아갈까요? 먼저 파일로 저장해 두면 되돌릴 수 있어요.")) return;
+    try{ localStorage.removeItem("tokyo-myplan"); }catch(e){} syncMinePlan(); applyPlan("base"); LS.set("tokyo-plan","base"); renderMyBox(); toast("처음 일정으로 돌아갔어요"); });
+}
+
+syncMinePlan();
 applyPlan(LS.get("tokyo-plan","base"));
 
 /* ---------- 도쿄 시각 ---------- */
@@ -2127,11 +2314,13 @@ function stopHTML(d,s,prev){
   if(s.lat && !s.hotel) acts.push(`<a class="btn" href="${DIR(prev,s)}" target="_blank" rel="noopener" aria-label="${esc(s.n)}까지 길찾기">${ico("i-route")}길찾기</a>`);
   const meta=badgeHTML(s);
   const G=gCheck(d,s,P), gb=G?`<span class="badge g${G.lv}">${esc(G.msg)}</span>`:"";
-  const thumb = P && P.photo ? `<img class="thumb" src="${esc(P.photo)}" alt="" loading="lazy" decoding="async">` : "";
+  const thumb = "";   // 사진은 카드 위에 크게(.cover)
+  const cover = P && P.photo ? `<img class="cover" src="${esc(P.photo)}" alt="" loading="lazy" decoding="async">` : "";
   return `<li class="stop${plain?" plain":""}${s.opt?" opt":""}" data-idx="${s._idx}" style="--kc:${K.c}">
     <div class="time">${esc(s.t)}</div>${dot}
     <article class="card">
       <p class="nowchip" hidden></p>
+      ${cover}
       <div class="chead"><div class="cmain">
         <p class="eyebrow ko">${ico(K.i)}<span>${esc(s.k)}</span></p>
         ${nameBlock}
@@ -2143,6 +2332,7 @@ function stopHTML(d,s,prev){
       ${rainAltHTML(d,s)}
       ${meta||s.mine||s.dig||gb?`<div class="meta">${gb}${s.mine?`<span class="badge mine">내가 추가</span>`:""}${s.dig?`<span class="badge dig" title="인스타에서 저장한 곳">${esc(s.dig)}</span>`:""}${meta}</div>`:""}
       ${acts.length?`<div class="acts">${acts.join("")}</div>`:""}
+      ${edbarHTML(d,s)}
       ${s.mine?`<button type="button" class="linkish unmine" data-unmine="${esc(s.rid)}">일정에서 빼기</button>`:""}
     </article></li>`;
 }
@@ -2266,7 +2456,9 @@ function renderDay(key){
     </figure>`:""}
     <div class="daylist">
       ${hasOpt?`<div class="dayopts"><button type="button" class="linkish" id="optbtn">${hide?"선택 일정 다시 보기":"선택 일정 접기"}</button></div>`:""}
+      ${EDIT_DAYS.includes(d.key)?`<div class="edtools"><button type="button" class="btn${EDITMODE?" key":""}" id="edbtn" aria-pressed="${EDITMODE}">${EDITMODE?"고치기 끝":"일정 고치기"}</button><span>${EDITMODE?"시간·확정/후보/빼기·요일을 바꾸면 바로 저장돼요":"시간을 바꾸거나 빼고 싶을 때"}</span></div>`:""}
       <ol class="timeline">${rows}</ol>
+      ${candsHTML(d)}
       ${aroundHTML(d)}
     </div>
     ${d.key==="wed"?arrivalHTML(d):""}
@@ -2288,10 +2480,10 @@ function renderDay(key){
   const ob=$("#optbtn"); if(ob) ob.addEventListener("click",()=>{ LS.set("tokyo-hideopt", hide?"0":"1"); renderDay(d.key); });
   $$(".namebtn",panelEl).forEach(b=>b.addEventListener("click",()=>openBig(d, Number(b.dataset.big))));
   $$("[data-focus]",panelEl).forEach(b=>b.addEventListener("click",()=>focusStop(Number(b.dataset.focus))));
-  $$(".thumb, .mc-img",panelEl).forEach(im=>im.addEventListener("error",()=>{
+  $$(".thumb, .cover, .mc-img",panelEl).forEach(im=>im.addEventListener("error",()=>{
     if(im.tagName==="IMG") im.remove();
   }));
-  wireCards(); wireAround(d);
+  wireCards(); wireAround(d); wireEdit(d);
   (function(){
     const info=nowInfo();
     let pick=null;
@@ -2366,6 +2558,8 @@ document.addEventListener("submit",e=>{
   e.preventDefault();
   const t=(f.elements.t.value||"").replace(/^0(\d)/,"$1"), day=f.elements.day.value;
   if(isNaN(toMin(t))) return;
+  if(CURPLAN==="mine"){ const r=RECS.find(x=>x.n===f.dataset.rid);
+    myEdit(v=>{ const g=myFind(v,r.q); if(g) v.days[g.dk].splice(g.i,1); v.days[day].push({k:r.q, t, st:"fix"}); }, `${DAYS.find(x=>x.key===day).wd}요일 ${t}에 넣었어요`); return; }
   setMine(getMine().filter(x=>x.rid!==f.dataset.rid).concat({rid:f.dataset.rid, day, t}));
   // 바로 앞뒤 일정과 30분도 안 떨어져 있으면 알려준다
   const d=DAYS.find(x=>x.key===day), m=toMin(t);
@@ -2634,13 +2828,14 @@ function aroundFor(dayKey){
 }
 function aroundRow(d,it){
   const s=it.o, cur=d.stops.find(x=>x.q===s.q);
-  const plans=(it.plans[d.key]||[]).filter(P=>P.k!==CURPLAN).map(P=>P.n);
+  const plans=(it.plans[d.key]||[]).filter(P=>P.k!==CURPLAN && P.k!=="mine").map(P=>P.n);
   const tag = cur ? `<em class="at-in">${cur.mine?"내가 넣음":"오늘 일정"} ${esc(cur.t)}</em>`
             : plans.length ? `<em class="at-other">${esc(plans.join("·"))} 일정</em>`
             : it.src==="sight" ? `<em class="at-other">지나가며</em>` : `<em class="at-other">추천</em>`;
+  const inCand = candsFor(d).some(c=>c.ek===s.q);
   const act = cur ? `<button type="button" class="btn at-btn" data-gostop="${cur._idx}">보기</button>`
-            : (it.src==="rec" ? `<button type="button" class="btn at-btn" data-addrec="${esc(RECS.find(r=>r.q===s.q).n)}" data-day="${d.key}">넣기</button>`
-            : `<a class="btn at-btn" href="${MAPS(s.q,s.id)}" target="_blank" rel="noopener">지도</a>`);
+            : inCand ? `<span class="at-done">후보함</span>`
+            : `<button type="button" class="btn at-btn" data-pick="${esc(s.q)}" data-day="${d.key}">담기</button>`;
   return `<li class="arow"><div class="at-main">
       <p class="at-n">${esc(s.n)} ${tag}${it.far?` <em class="at-far">조금 멀어요 · ${it.fd.toFixed(1)}km</em>`:""}</p>
       ${s.ja?`<p class="at-ja" lang="ja">${esc(s.ja)}</p>`:""}
@@ -2652,24 +2847,19 @@ function aroundHTML(d){
   const groups=MOODS.map(M=>{ const its=mine.filter(it=>M.kcs.includes(it.o.kc)).sort((a,b)=>(!!a.far-!!b.far)||((d.stops.find(x=>x.q===b.o.q)?1:0)-(d.stops.find(x=>x.q===a.o.q)?1:0)));
     return its.length?`<h3 class="theme-sub">${esc(M.n)} · ${its.length}</h3><ol class="alist">${its.map(it=>aroundRow(d,it)).join("")}</ol>`:""; }).join("");
   const night=hotel;
-  return `<section class="around" aria-labelledby="ar-${d.key}">
+  const total=mine.length+hotel.length;
+  return `<details class="around"${LS.get("tokyo-around-"+d.key,"0")==="1"?" open":""} data-ak="${d.key}"><summary>
     <p class="eyebrow kicker">Neighborhood · ${esc(R.en)}</p>
-    <h2 id="ar-${d.key}">${esc(R.n)}에서 더</h2>
+    <h2 id="ar-${d.key}">이 동네 더 보기 <span class="cd-n">${total}</span></h2></summary>
     <p class="at-sub">${esc(R.sub)}</p>
-    <p class="at-concept">${esc(R.concept)} 오늘 일정 밖의 곳은 "넣기"로 끼워 넣을 수 있어요.</p>
+    <p class="at-concept">${esc(R.concept)} 마음에 드는 곳은 '담기'로 후보함에 넣어 두세요.</p>
     ${groups}
     ${night.length?`<h3 class="theme-sub">숙소 근처, 아무 날이나 · ${night.length}</h3><ol class="alist">${night.map(it=>aroundRow(d,it)).join("")}</ol>`:""}
-  </section>`;
+  </details>`;
 }
 function wireAround(d){
+  $$("details.around",panelEl).forEach(x=>x.addEventListener("toggle",()=>LS.set("tokyo-around-"+x.dataset.ak, x.open?"1":"0")));
   $$("[data-gostop]",panelEl).forEach(b=>b.addEventListener("click",()=>goStop(Number(b.dataset.gostop))));
-  $$("[data-addrec]",panelEl).forEach(b=>b.addEventListener("click",()=>{
-    const r=RECS.find(x=>x.n===b.dataset.addrec); if(!r) return;
-    const t=(r.slot&&r.slot.day===b.dataset.day)?r.slot.t:"16:00";
-    setMine(getMine().filter(m=>m.rid!==r.n).concat([{rid:r.n, day:b.dataset.day, t}]));
-    applyPlaceCoords(); ALL=DAYS.flatMap(x=>x.stops.filter(s=>s.lat && !s.hotel));
-    refresh(); toast(`${d.wd}요일 ${t}에 넣었어요. 시간은 테마 탭 추천 카드에서 바꿔요`);
-  }));
 }
 const LATWD={wed:"Wednesday",thu:"Thursday",fri:"Friday",sat:"Saturday",sun:"Sunday"};
 /* ---------- 플랜 고르기 ---------- */
@@ -2892,7 +3082,7 @@ function renderMore(tab, subKey){
     if(on) first=false;
   });
   if(active==="budget") renderBudget();
-  if(active==="todo") renderIcsMine();
+  if(active==="todo"){ renderIcsMine(); renderMyBox(); }
   if(active==="help") renderFilm();
   applyNow();
 }
@@ -3395,7 +3585,7 @@ async function fetchPlaces(key,report){
       if(pn){
         try{
           const pr=await fetch("https://places.googleapis.com/v1/"+pn
-            +"/media?maxHeightPx=240&maxWidthPx=240&skipHttpRedirect=true&key="+encodeURIComponent(key));
+            +"/media?maxHeightPx=900&maxWidthPx=1200&skipHttpRedirect=true&key="+encodeURIComponent(key));
           if(pr.ok){ const pj=await pr.json(); if(pj.photoUri) rec.photo=pj.photoUri; }
         }catch(e){}
       }
