@@ -219,7 +219,10 @@ function gOpenAt(P,date,min){
   return P.periods.some(x=>{ if(!x.c) return true; const o=x.o[0]*1440+x.o[1]*60+x.o[2]; let c=x.c[0]*1440+x.c[1]*60+x.c[2]; if(c<=o) c+=W; return (w>=o&&w<c)||(w+W>=o&&w+W<c); });
 }
 function gErr(status,body){
-  if(status===403) return "키가 거부됐어요. Places API (New)가 켜져 있는지, 키의 웹사이트 제한에 이 주소가 들어 있는지 확인하세요.";
+  if(status===403){ let m=""; try{ m=JSON.parse(body).error.message||""; }catch(e){}
+    if(/referer|referrer/i.test(m)) return `키의 웹사이트 제한에 지금 주소가 없어요. 구글 콘솔에서 키 제한에 ${location.origin}/* 를 더하세요.`;
+    if(/not been used|disabled|SERVICE_DISABLED/i.test(m)) return "이 키의 프로젝트에서 Places API (New)가 꺼져 있어요. 콘솔에서 사용을 눌러 주세요.";
+    return "키가 거부됐어요. Places API (New)가 켜져 있는지, 키의 웹사이트 제한에 이 주소가 들어 있는지 확인하세요."; }
   if(status===400) return "요청이 거부됐어요. 키를 다시 확인해 주세요.";
   if(status===429) return "요청 한도를 넘었어요. 잠시 뒤에 다시 시도하세요.";
   try{ const j=JSON.parse(body); if(j.error&&j.error.message) return "오류 "+status+": "+j.error.message; }catch(e){}
@@ -233,30 +236,36 @@ async function findId(key,p){
   if(!r.ok) return {status:r.status, body:await r.text().catch(()=>"")};
   const j=await r.json(); return {id:(j.places&&j.places[0]&&j.places[0].id)||""};
 }
+async function gPhoto(key,j){   // 사진 주소(photoUri)는 금방 만료된다 — 저장된 게 깨지면 photoFix가 다시 받는다
+  const pn=j.photos&&j.photos[0]&&j.photos[0].name; if(!pn) return "";
+  try{ const pr=await fetch("https://places.googleapis.com/v1/"+pn+"/media?maxHeightPx=900&maxWidthPx=1200&skipHttpRedirect=true&key="+encodeURIComponent(key)); if(pr.ok){ const pj=await pr.json(); return pj.photoUri||""; } }catch(e){}
+  return "";
+}
 async function fetchPlaces(key,report){
   const seen=new Set(), jobs=[];
   [...CAT.values(), ...Object.values(S.added)].forEach(p=>{ const k=pkey(p); if(p.lat && !seen.has(k)){ seen.add(k); jobs.push(p); } });
-  const out={}; let fail=0, first="", done=0;
-  for(const p of jobs){
-    report(++done, jobs.length);
+  const out={}; let fail=0, first="", done=0, stop=false, next=0;
+  async function one(p){
     try{
       let id=p.gid;
       if(!id){ const f=await findId(key,p);
-        if(f.status){ fail++; first=first||gErr(f.status,f.body); if([400,401,403].includes(f.status)){ fail=jobs.length-Object.keys(out).length; break; } continue; }
-        if(!f.id){ fail++; continue; } id=f.id; }
+        if(f.status){ fail++; first=first||gErr(f.status,f.body); if([400,401,403].includes(f.status)) stop=true; return; }
+        if(!f.id){ fail++; return; } id=f.id; }
       const r=await fetch("https://places.googleapis.com/v1/places/"+encodeURIComponent(id)+"?key="+encodeURIComponent(key)+"&languageCode=ko&regionCode=JP&fields="+encodeURIComponent(PFIELDS));
-      if(!r.ok){ fail++; first=first||gErr(r.status,await r.text().catch(()=>"")); if([400,401,403].includes(r.status)){ fail=jobs.length-Object.keys(out).length; break; } continue; }
+      if(!r.ok){ fail++; first=first||gErr(r.status,await r.text().catch(()=>"")); if([400,401,403].includes(r.status)) stop=true; return; }
       const j=await r.json();
       const rec={n:(j.displayName&&j.displayName.text)||"", rating:j.rating||0, reviews:j.userRatingCount||0,
         type:(j.primaryTypeDisplayName&&j.primaryTypeDisplayName.text)||"", hours:(j.regularOpeningHours&&j.regularOpeningHours.weekdayDescriptions)||[],
         uri:j.googleMapsUri||"", status:j.businessStatus||"", loc:j.location?{lat:j.location.latitude,lng:j.location.longitude}:null,
         periods:((j.regularOpeningHours&&j.regularOpeningHours.periods)||[]).filter(x=>x.open).map(x=>({o:[x.open.day,x.open.hour||0,x.open.minute||0], c:x.close?[x.close.day,x.close.hour||0,x.close.minute||0]:null}))};
       if(!p.gid) rec.gid=id;
-      const pn=j.photos&&j.photos[0]&&j.photos[0].name;
-      if(pn){ try{ const pr=await fetch("https://places.googleapis.com/v1/"+pn+"/media?maxHeightPx=900&maxWidthPx=1200&skipHttpRedirect=true&key="+encodeURIComponent(key)); if(pr.ok){ const pj=await pr.json(); if(pj.photoUri) rec.photo=pj.photoUri; } }catch(e){} }
+      const ph=await gPhoto(key,j); if(ph){ rec.photo=ph; rec.pat=Date.now(); }
       out[pkey(p)]=rec;
     }catch(e){ fail++; first=first||"네트워크에 닿지 못했어요."; }
   }
+  async function worker(){ while(!stop && next<jobs.length){ const p=jobs[next++]; await one(p); report(++done, jobs.length); } }
+  await Promise.all(Array.from({length:6},worker));
+  if(stop) fail=jobs.length-Object.keys(out).length;
   return {out, fail, total:jobs.length, first};
 }
 
@@ -298,23 +307,43 @@ function detour(dk,p){   // 그날 노선에 끼웠을 때 이동이 가장 적�
     const add=travel(a,p).min+travel(p,b).min-travel(a,b).min; if(!best||add<best.add) best={idx:i, add}; }
   return best ? {idx:best.idx, add:Math.max(0,Math.round(best.add))} : {idx:ids.length, add:null};
 }
-function spots(p){ return EDIT.map(dk=>Object.assign({dk, off:offOn(p,dk)}, detour(dk,p))).sort((a,b)=>(a.off-b.off)||((a.add==null?999:a.add)-(b.add==null?999:b.add))); }
-function placeInto(id,dk,quiet){   // 시간 경고가 가장 적고, 그다음 이동이 가장 적게 느는 자리에 넣는다
-  const p=place(id); if(!p) return;
-  removeEverywhere(id);
-  const list=S.days[dk]; let best=null;
+// 종류별로 보통 여는 때(분). 출처 있는 시각이 아니라서 경고엔 쓰지 않고, 넣을 자리를 고를 때만 벌점으로 쓴다
+const KWIN={art:[600,1080], book:[660,1200], bar:[1080,1740], market:[360,840], leaf:[540,1050]};
+/* fit(p,dk): 그날 모든 자리에 실제로 끼워 보고 가장 나은 자리를 고른다.
+   벌점 = 넣은 곳이 닫혀 있음(2000) + 다른 곳에 새로 생긴 경고(600) + 예약 시각이 밀린 분×12(바 같은 느슨한 고정은 ×4)
+        + 그 종류로는 이상한 시각(1000, 밤 11시 미술관 같은) + 늘어난 이동 분. 고정 시각이 10분 넘게 밀리거나 새 경고가 생기면 "밀림".
+   이동만 보던 첫 판은 꽉 찬 날이면 무엇이든 밤 LP바 뒤로 보냈다. 렌더마다 FITC를 비운다. */
+let FITC=new Map();
+const hardBad=r=>r.warn.filter(w=>w.lv==="bad" && !/늦어요/.test(w.t)).length;
+function fit(p,dk){
+  const key=dk+"|"+p.id; if(FITC.has(key)) return FITC.get(key);
+  const saved=S.days[dk], list=saved.filter(x=>x!==p.id);
+  S.days[dk]=list; const b0=new Map(schedule(dk).rows.map(r=>[r.id,{late:r.late||0, bad:hardBad(r)}]));
+  const lw=r=>(r.p.need||r.p.needId)?12:4;
+  let best=null;
   for(let i=0;i<=list.length;i++){
-    list.splice(i,0,id); const sc=schedule(dk); list.splice(i,1);
-    const bad=sc.rows.reduce((a,r)=>a+r.warn.filter(w=>w.lv==="bad").length,0);
+    const L=list.slice(); L.splice(i,0,p.id); S.days[dk]=L; const sc=schedule(dk);
+    let pen=0, own=null, flag=false, worst=null;
+    sc.rows.forEach(r=>{ if(r.id===p.id){ own=r; const hb=hardBad(r); pen+=hb*2000+(r.late||0)*12; if(hb||(r.late||0)>10) flag=true; }
+      else { const o=b0.get(r.id)||{late:0,bad:0}, dl=Math.max(0,(r.late||0)-o.late), nb=Math.max(0,hardBad(r)-o.bad);
+        pen+=dl*lw(r)+nb*600; if(dl>10||nb){ flag=true; if(!worst||dl>worst.m) worst={n:r.p.n, m:dl}; } } });
+    const w=KWIN[p.kc]; if(w && own && !p.outside && (own.start<w[0] || own.end>w[1]+30)){ pen+=1000; flag=true; }
     const pts=[HOTEL,...list.map(place),HOTEL], a=pts[i], b=pts[i+1];
     const d=(p.lat&&a&&b&&a.lat&&b.lat)?travel(a,p).min+travel(p,b).min-travel(a,b).min:0;
-    const cost=bad*1000+d; if(!best||cost<best.cost) best={i, cost, add:Math.max(0,Math.round(d))};
+    if(!best || pen+d<best.cost) best={idx:i, cost:pen+d, add:p.lat?Math.max(0,Math.round(d)):null, tight:flag, worst};
   }
-  list.splice(best.i,0,id);
-  if(!quiet) commit(`${p.n} → ${WDK[dk]} ${LINE[dk].code}${String(best.i+1).padStart(2,"0")}${p.lat?` · 이동 +${best.add}분`:""}`);
-  return best;
+  S.days[dk]=saved;
+  best.off=offOn(p,dk); FITC.set(key,best); return best;
 }
-const addTxt=x=>x.off?"휴무":x.add==null?"":`+${x.add}분`;
+function spots(p){ return EDIT.map(dk=>Object.assign({dk}, fit(p,dk))).sort((a,b)=>(a.off-b.off)||(a.cost-b.cost)); }
+function placeInto(id,dk,quiet){
+  const p=place(id); if(!p) return;
+  FITC.delete(dk+"|"+id); const f=fit(p,dk);
+  removeEverywhere(id); S.days[dk].splice(f.idx,0,id); FITC=new Map();
+  if(!quiet) commit(`${p.n} → ${WDK[dk]} ${LINE[dk].code}${String(f.idx+1).padStart(2,"0")}${f.add!=null?` · 이동 +${f.add}분`:""}${f.tight?(f.worst&&f.worst.m?` · ${f.worst.n} ${f.worst.m}분 밀려요`:" · 시간이 빠듯해요"):""}`);
+  return f;
+}
+const addTxt=x=>x.off?"휴무":x.tight?(x.add==null?"밀림":`+${x.add}분 · 밀림`):x.add==null?"":`+${x.add}분`;
 
 /* ─────────────── 변경 ─────────────── */
 function commit(msg){ save(); render(); if(msg) toast(msg); }
@@ -341,6 +370,7 @@ function go(v,dk){
   render(); window.scrollTo({top:0});
 }
 function render(){
+  FITC=new Map();
   $$(".tab").forEach(t=>t.setAttribute("aria-selected", String(t.dataset.go===VIEW)));
   document.body.dataset.view=VIEW;
   if(picker.open && VIEW!=="board") picker.close();
@@ -443,7 +473,7 @@ function stationHTML(dk,r,now){
       <span class="t"><b>${fmt(r.start)}</b><i>${c.l}${c.n}</i></span>
       <span class="dot" aria-hidden="true"></span>
       <span class="b"><span class="n">${esc(p.n)}</span><span class="m">${meta.join(" · ")}</span>${r.warn.length?`<span class="w">${r.warn.map(w=>esc(w.t)).join(" · ")}</span>`:""}</span>
-      ${P&&P.photo?`<img class="th" src="${esc(P.photo)}" alt="" loading="lazy">`:""}
+      ${P&&P.photo?`<img class="th" src="${esc(P.photo)}" data-pid="${esc(r.id)}" alt="" loading="lazy">`:""}
     </div></li>`;
 }
 function termHTML(label,time,input){
@@ -484,7 +514,7 @@ function renderBoard(){
       <button class="addst" id="addst">${ico("i-plus")}장소 추가</button>
       <p class="hint">길게 눌러 끌면 순서가 바뀌어요. 위 날짜에 놓으면 그날로, 아래 '빼기'에 놓으면 보관함으로 가요.<br>시각은 거리로 잡은 추정이고, ${ico("i-lock","ki mi")} 표시는 예약·바처럼 고정한 시각이에요.</p>`;
   }
-  main.innerHTML=`${dswHTML()}<div class="wrap">${newsHTML()}${body}</div>`;
+  main.innerHTML=`${dswHTML()}<div class="wrap">${newsHTML()}${CUR!=="wed"?gStatHTML():""}${body}</div>`;
   $$(".dt").forEach(b=>{ const f=()=>{ CUR=b.dataset.day; LS.set("tokyo-lines-day",CUR); render(); window.scrollTo({top:0}); };
     b.addEventListener("click",e=>{ if(e.target.closest(".drop li")) return; f(); });
     b.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
@@ -507,12 +537,12 @@ function poolItems(scope){
   return all;
 }
 function pkHTML(p){
-  const d=Object.assign({off:offOn(p,CUR)}, detour(CUR,p)), t=addTxt(d);
+  const d=fit(p,CUR), t=addTxt(d);
   return `<li class="pk" data-id="${esc(p.id)}"><span class="pi">${ico((KIND[p.kc]||KIND.view).i)}</span>
-    <span class="pb" role="button" tabindex="0" data-open="${esc(p.id)}"><span class="n">${S.star[p.id]?`<span class="star">${ico("i-star","ki mi")}</span>`:""}${esc(p.n)}</span><span class="m">${esc(AREANAME[areaOf(p)]||"")} · ${esc(p.k||"")}${t?` · <span class="${d.off?"bad":d.add<=10?"ok":""}">${WDK[CUR]} ${t}</span>`:""}</span></span>
+    <span class="pb" role="button" tabindex="0" data-open="${esc(p.id)}"><span class="n">${S.star[p.id]?`<span class="star">${ico("i-star","ki mi")}</span>`:""}${esc(p.n)}</span><span class="m">${esc(AREANAME[areaOf(p)]||"")} · ${esc(p.k||"")}${t?` · <span class="${d.off?"bad":d.tight?"warn":d.add<=10?"ok":""}">${WDK[CUR]} ${t}</span>`:""}</span></span>
     <button class="add" data-add="${esc(p.id)}">넣기</button></li>`;
 }
-function detourKey(p){ const d=detour(CUR,p); return (offOn(p,CUR)?1e4:0)+(d.add==null?999:d.add); }
+function detourKey(p){ const d=fit(p,CUR); return (d.off?1e5:0)+d.cost; }
 function pickerBody(){
   const scopes=[["area",AREANAME[CUR]||"이 동네"],["star","찜"],["hotel","숙소 근처"],...MOOD.map(m=>[m.k,m.n]),["all","전체"]];
   if(!scopes.some(s=>s[0]===DF)) DF="area";
@@ -622,10 +652,10 @@ function xInfo(items){   // 카드 순서와 붙일 말: 역이면 시각, 아�
   const rows={}; EDIT.forEach(dk=>{ rows[dk]=new Map(schedule(dk).rows.map(r=>[r.id,r])); });
   const one=EDIT.includes(XF.a)?XF.a:null;
   const L=items.map(p=>{ const dk=dayOf(p.id), r=dk?rows[dk].get(p.id):null;
-    const sp=dk?null:(one?Object.assign({dk:one, off:offOn(p,one)}, detour(one,p)):spots(p)[0]);
+    const sp=dk?null:(one?Object.assign({dk:one}, fit(p,one)):spots(p)[0]);
     const far=XME?km(XME,p):null;
     return {p, dk, r, sp, far}; });
-  const ord=x=>x.dk ? EDIT.indexOf(x.dk)*1000+x.r.i : 1e5+(XME?x.far*100:(x.sp.off?5e3:0)+(x.sp.add==null?999:x.sp.add));
+  const ord=x=>x.dk ? EDIT.indexOf(x.dk)*1000+x.r.i : 1e5+(x.sp.off?1e5:0)+x.sp.cost;
   if(XME) L.sort((a,b)=>a.far-b.far); else L.sort((a,b)=>ord(a)-ord(b));
   return L;
 }
@@ -643,11 +673,11 @@ function xCard(x){
   const meta=[esc(p.k||kind.n), P&&P.rating?`★ ${P.rating.toFixed(1)} (${kfmt(P.reviews)})`:"", dist].filter(Boolean).join(" · ");
   const warn = r && r.warn.some(w=>w.lv==="bad") ? `<span class="xw">${esc(r.warn.find(w=>w.lv==="bad").t)}</span>` : "";
   const act = dk ? `<button class="xa soft" data-xboard="${dk}">운행표</button>`
-                 : sp && !sp.off ? `<button class="xa" data-xput="${esc(p.id)}" data-day="${sp.dk}">${lsym(sp.dk,"sm")}${WDK[sp.dk]}에 넣기${sp.add!=null?` <small>+${sp.add}분</small>`:""}</button>`
+                 : sp && !sp.off ? `<button class="xa" data-xput="${esc(p.id)}" data-day="${sp.dk}">${lsym(sp.dk,"sm")}${WDK[sp.dk]}에 넣기${sp.add!=null||sp.tight?` <small>${esc(addTxt(sp))}</small>`:""}</button>`
                  : `<span class="xa off">${sp?WDK[sp.dk]+"요일 휴무":""}</span>`;
   return `<li class="xc${XSEL===p.id?" on":""}" data-x="${esc(p.id)}" style="--t:${tint}">
     <button class="xb" data-open="${esc(p.id)}" aria-label="${esc(p.n)} 자세히">
-      <span class="xph">${P&&P.photo?`<img src="${esc(P.photo)}" alt="" loading="lazy">`:`<span class="big">${ico(kind.i)}</span>`}${S.star[p.id]?`<span class="xst">${ico("i-star")}</span>`:""}</span>
+      <span class="xph">${P&&P.photo?`<img src="${esc(P.photo)}" data-pid="${esc(p.id)}" alt="" loading="lazy">`:`<span class="big">${ico(kind.i)}</span>`}${S.star[p.id]?`<span class="xst">${ico("i-star")}</span>`:""}</span>
       <span class="xt"><span class="xk">${where}</span><b class="xn">${esc(p.n)}</b><span class="xm">${meta}</span>${warn}</span>
     </button>${act}</li>`;
 }
@@ -688,7 +718,7 @@ function renderExplore(){
 }
 let XL=[];
 function xUpdate(fit){
-  $("#xtop").innerHTML=xChips();
+  $("#xtop").innerHTML=xChips()+gStatHTML();
   $$("[data-xc]").forEach(b=>b.addEventListener("click",()=>{ XF.c=(XF.c===b.dataset.xc&&b.dataset.xc!=="all")?"all":b.dataset.xc; LS.set("tokyo-lines-xf",JSON.stringify(XF)); XSEL=null; xUpdate(true); }));
   $$("[data-xa]").forEach(b=>b.addEventListener("click",()=>{ XF.a=(XF.a===b.dataset.xa&&b.dataset.xa!=="all")?"all":b.dataset.xa; LS.set("tokyo-lines-xf",JSON.stringify(XF)); XSEL=null; xUpdate(true); }));
   $$("#xtop .chip[aria-pressed=true]").forEach(c=>{ const row=c.parentElement; row.scrollLeft=Math.max(0,c.offsetLeft-row.clientWidth/2+c.offsetWidth/2); });
@@ -745,7 +775,7 @@ function xLocate(){
 function tileHTML(p,placed){
   const P=placeOf(p), dk=dayOf(p.id), i=dk?S.days[dk].indexOf(p.id):-1;
   return `<li><button class="tile" data-open="${esc(p.id)}">
-    <span class="im" style="--t:${LINE[areaOf(p)]?LINE[areaOf(p)].c:"var(--mute)"}">${P&&P.photo?`<img src="${esc(P.photo)}" alt="" loading="lazy">`:`<span class="big">${ico((KIND[p.kc]||KIND.view).i)}</span>`}</span>
+    <span class="im" style="--t:${LINE[areaOf(p)]?LINE[areaOf(p)].c:"var(--mute)"}">${P&&P.photo?`<img src="${esc(P.photo)}" data-pid="${esc(p.id)}" alt="" loading="lazy">`:`<span class="big">${ico((KIND[p.kc]||KIND.view).i)}</span>`}</span>
     ${dk?`<span class="on">${sta(dk,i,"sm")}</span>`:""}
     ${S.star[p.id]?`<span class="st star">${ico("i-star")}</span>`:""}
     <span class="bd"><span class="nm">${esc(p.n)}</span><span class="sub">${esc(AREANAME[areaOf(p)]||"")} · ${esc(p.k||"")}</span>${p.dig?`<span class="sub">${esc(p.dig)}</span>`:""}</span>
@@ -793,13 +823,13 @@ function openSheet(id){
   sheet.innerHTML=`<div class="sh-top">${dk?sta(dk,S.days[dk].indexOf(id)):picto(p)}<span class="num" style="font-weight:700;color:var(--sub)">${dk?`${WDK[dk]}요일 ${r?fmt(r.start)+"–"+fmt(r.end):""}`:"보관함"}</span>
       <button class="x" data-close aria-label="닫기">${ico("i-x")}</button></div>
     <div class="sh-body">
-      ${P&&P.photo?`<img class="sh-photo" src="${esc(P.photo)}" alt="">`:""}
+      ${P&&P.photo?`<img class="sh-photo" src="${esc(P.photo)}" data-pid="${esc(id)}" alt="">`:""}
       <h2 id="sh-title" tabindex="-1" autofocus>${esc(p.n)}</h2>
       ${p.ja?`<button class="jp" data-big="${esc(id)}"><u>${esc(p.ja)}</u> · 크게 보기</button>`:""}
       <div class="mt" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">${picto(p)}<span style="font-size:13px;font-weight:700;color:var(--sub)">${esc(p.k||"")} · ${esc(AREANAME[areaOf(p)]||"")}</span>${p.dig?flag("pin",p.dig):""}</div>
       <div class="ctl">
-        <div class="row"><span class="lab">노선</span><div class="daypick">${(()=>{ const sp=spots(p), best=sp.find(x=>x.dk!==dk&&!x.off); return EDIT.map(k=>{ const x=sp.find(y=>y.dk===k), t=k===dk?"":addTxt(x);
-          return `<button data-to="${k}" aria-pressed="${k===dk}"${best&&best.dk===k&&!dk?' class="best"':""}>${lsym(k,"sm")}${WDK[k]}${t?`<small class="${x.off?"bad":""}">${t}</small>`:""}</button>`; }).join(""); })()}<button data-to="pool" aria-pressed="${!dk}">${ico("i-box")}보관함</button></div></div>
+        <div class="row"><span class="lab">노선</span><div class="daypick">${(()=>{ const sp=spots(p), best=sp.find(x=>x.dk!==dk&&!x.off&&!x.tight); return EDIT.map(k=>{ const x=sp.find(y=>y.dk===k), t=k===dk?"":addTxt(x);
+          return `<button data-to="${k}" aria-pressed="${k===dk}"${best&&best.dk===k&&!dk?' class="best"':""}>${lsym(k,"sm")}${WDK[k]}${t?`<small class="${x.off?"bad":x.tight?"warn":""}">${t}</small>`:""}</button>`; }).join(""); })()}<button data-to="pool" aria-pressed="${!dk}">${ico("i-box")}보관함</button></div></div>
         ${dk?`<div class="row"><span class="lab">머무는 시간</span><div class="step"><button data-dur="-15" aria-label="15분 줄이기">−</button><span>${dur}분</span><button data-dur="15" aria-label="15분 늘리기">+</button></div></div>
         <div class="row"><span class="lab">시각 고정</span><input type="time" id="pint" value="${hhmm(S.pins[id]||(r?fmt(r.start):""))}"><button class="btn" id="pinbtn">${ico("i-lock")}${S.pins[id]?"고정 풀기":"이 시각에 고정"}</button></div>`:""}
         <div class="row"><span class="lab">찜</span><button class="btn" id="starbtn">${ico("i-star")}${S.star[id]?"찜 해제":"찜하기"}</button></div>
@@ -874,16 +904,62 @@ function applyAll(o){
   if(o.film && o.film.rolls) LS.set(FILM_KEY,JSON.stringify(o.film));
   if(o.gkey) LS.set("tokyo-gkey",o.gkey);
 }
-/* 키가 있으면 사진·영업시간을 알아서 받는다(30일 보관 규칙, 실패하면 6시간 뒤 다시) */
-let GBUSY=false;
+/* 키가 있으면 사진·영업시간을 알아서 받는다(30일 보관 규칙). 실패하면 이유를 남겨 화면에 보여 주고 6시간 뒤 다시.
+   Henry: "API 등록까지 했는데 왜 사진 안 나와?" — 키가 그 기기에 없었는지, 주소 제한인지, 사진 주소가 만료됐는지 화면에서 바로 알 수 있게 했다. */
+let GBUSY=false, GPROG="";
+const gPhotos=()=>PSTORE.byId?Object.values(PSTORE.byId).filter(x=>x.photo).length:0;
+function gState(){
+  const key=LS.get("tokyo-gkey",""), err=LS.get("tokyo-gerr","");
+  if(!key) return {k:"nokey", t:"사진은 구글 키를 이 기기에 한 번 넣으면 나와요."};
+  if(GBUSY) return {k:"busy", t:`사진 받는 중 ${GPROG||"…"}`};
+  if(err) return {k:"err", t:err};
+  if(!gPhotos() || !(PSTORE.at && Date.now()-PSTORE.at<PMAXAGE)) return {k:"none", t:"아직 사진을 받지 않았어요."};
+  return {k:"ok"};
+}
+function gStatHTML(){
+  const g=gState(); if(g.k==="ok") return "";
+  const act = g.k==="nokey" ? `<button data-gkey>키 붙여넣기</button>` : g.k==="busy" ? "" : `<button data-gretry>다시 받기</button>`;
+  return `<div class="gst ${g.k}" role="status"><span class="gt">${esc(g.t)}</span>${act}</div>`;
+}
+function gTick(){ $$(".gst .gt").forEach(el=>{ el.textContent=gState().t; }); }
+function askKey(){
+  const v=(prompt("구글 Places API 키를 붙여넣으세요 (AIza로 시작해요)")||"").trim(); if(!v) return;
+  if(!/^AIza[0-9A-Za-z_\-]{30,}$/.test(v)){ toast("키 모양이 아니에요. AIza로 시작하는 전체를 붙여넣으세요"); return; }
+  LS.set("tokyo-gkey",v); LS.del("tokyo-gerr"); autoPlaces(true);
+}
 async function autoPlaces(force){
   const key=LS.get("tokyo-gkey",""); if(!key || GBUSY || (navigator.onLine===false)) return;
-  if(!force){ if(PSTORE.at && Date.now()-PSTORE.at < PMAXAGE-2*864e5) return; if(Date.now()-(+LS.get("tokyo-gtry","0")) < 6*3600e3) return; }
-  LS.set("tokyo-gtry",String(Date.now())); GBUSY=true; toast("사진·영업시간을 받는 중…");
-  try{ const res=await fetchPlaces(key,()=>{}); const got=Object.keys(res.out).length;
-    if(got){ PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} if(!sheet.open) render(); toast(`${got}곳 사진·영업시간을 받았어요`); }
-    else if(res.fail) toast(res.first||"구글 장소 정보를 받지 못했어요"); }
-  catch(e){} GBUSY=false;
+  if(!force){
+    const fresh=PSTORE.at && Date.now()-PSTORE.at < PMAXAGE-2*864e5;
+    if(fresh && gPhotos()) return;
+    if(LS.get("tokyo-gerr","") && Date.now()-(+LS.get("tokyo-gtry","0")) < 6*3600e3) return;
+  }
+  LS.set("tokyo-gtry",String(Date.now())); GBUSY=true; GPROG=""; if(!sheet.open) render();
+  try{
+    const res=await fetchPlaces(key,(i,t)=>{ GPROG=`${i}/${t}`; gTick(); });
+    const got=Object.keys(res.out).length;
+    if(got){ PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} }
+    if(got && res.fail<=res.total/2){ LS.del("tokyo-gerr"); toast(`${got}곳 사진·영업시간을 받았어요`); }
+    else { LS.set("tokyo-gerr",res.first||"구글 장소 정보를 받지 못했어요."); toast(res.first||"구글 장소 정보를 받지 못했어요"); }
+  }catch(e){ LS.set("tokyo-gerr","네트워크에 닿지 못했어요. 인터넷이 될 때 '다시 받기'를 눌러 주세요."); }
+  GBUSY=false; GPROG=""; PHOTOFIX.clear();
+  if(!sheet.open && !document.body.classList.contains("dragging")) render();
+}
+/* 사진 주소는 짧게만 유효하다(구글 문서). 이미지가 안 뜨면 그곳만 사진을 새로 받아 바꿔 끼운다. */
+const PHOTOFIX=new Set(); let PFQ=[], PFT=0;
+document.addEventListener("error",e=>{
+  const im=e.target; if(!(im instanceof HTMLImageElement) || !im.dataset.pid) return;
+  im.classList.add("broken"); const id=im.dataset.pid; if(PHOTOFIX.has(id)) return;
+  PHOTOFIX.add(id); PFQ.push(id); clearTimeout(PFT); PFT=setTimeout(photoFix,700);
+},true);
+async function photoFix(){
+  const key=LS.get("tokyo-gkey",""), ids=PFQ.splice(0); if(!key || !ids.length || !PSTORE.byId) return;
+  let n=0, i=0;
+  async function worker(){ while(i<ids.length){ const p=place(ids[i++]); if(!p) continue; const rec=PSTORE.byId[pkey(p)]; const gid=p.gid||(rec&&rec.gid); if(!rec||!gid) continue;
+    try{ const r=await fetch("https://places.googleapis.com/v1/places/"+encodeURIComponent(gid)+"?key="+encodeURIComponent(key)+"&fields=photos"); if(!r.ok) continue;
+      const ph=await gPhoto(key,await r.json()); if(ph){ rec.photo=ph; rec.pat=Date.now(); n++; } }catch(e){} } }
+  await Promise.all(Array.from({length:4},worker));
+  if(n){ try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} if(!sheet.open && !document.body.classList.contains("dragging")) render(); }
 }
 function renderTools(keep){
   if(VIEW!=="tools") return;
@@ -918,7 +994,7 @@ function renderTools(keep){
       ${tl("google","i-pin","구글 장소 정보",n?`${n}곳`:"키 없음",
         `<p>키를 넣고 받으면 모든 블록에 사진·평점·요일별 영업시간이 붙고, 영업시간 밖이면 운행표에 경고가 떠요. 30일 동안 보관해요.</p>
          <label class="fld">Places API 키<input type="password" id="gkey" value="${esc(key)}" autocomplete="off" placeholder="AIza…"></label>
-         <div class="acts"><button class="btn ink" id="gfetch">장소 정보 받기</button>${n?`<button class="btn" id="gclear">지우기</button>`:""}</div><p id="gstat" style="margin-top:10px">${n?`${n}곳 저장됨 · ${Math.floor((Date.now()-PSTORE.at)/864e5)}일 전`:"아직 받지 않았어요."}</p>
+         <div class="acts"><button class="btn ink" id="gfetch">장소 정보 받기</button>${n?`<button class="btn" id="gclear">지우기</button>`:""}</div><p id="gstat" style="margin-top:10px">${GBUSY?`받는 중 ${GPROG}`:n?`${n}곳 저장됨 · 사진 ${gPhotos()}곳 · ${Math.floor((Date.now()-PSTORE.at)/864e5)}일 전`:"아직 받지 않았어요."}</p>${LS.get("tokyo-gerr","")?`<p class="gerr">${esc(LS.get("tokyo-gerr",""))}</p>`:""}
          <p>키 만들기: console.cloud.google.com → Places API (New) 사용 → 사용자 인증 정보에서 API 키 → 웹사이트 제한에 이 주소 추가.</p>`)}
       ${tl("backup","i-box","백업·캘린더","",
         `<p>노선을 파일로 저장해 두거나 불러와요. 다른 기기로 옮길 땐 맨 위 "다른 기기로 옮기기"가 더 쉬워요.</p>
@@ -938,14 +1014,9 @@ function renderTools(keep){
   const hb=$("[data-hotel]"); if(hb) hb.addEventListener("click",()=>bigJa({n:HOTEL.n, ja:HOTEL.ja, addr:HOTEL.addr}));
   $$("[data-tpl]").forEach(b=>b.addEventListener("click",()=>{ const P=PLANS.find(p=>p.k===b.dataset.tpl); if(!confirm(`'${P.n}'로 노선을 다시 짤까요? 지금 순서와 고정 시각은 사라져요. 먼저 파일로 저장해 두면 되돌릴 수 있어요.`)) return;
     S=fromTemplate(P.k,{star:S.star, added:S.added}); commit(`'${P.n}' 노선으로 다시 짰어요`); }));
-  const gk=$("#gkey"); if(gk) gk.addEventListener("change",()=>LS.set("tokyo-gkey",gk.value.trim()));
-  const gf=$("#gfetch"); if(gf) gf.addEventListener("click",async()=>{ const k=gk.value.trim(); if(!k){ $("#gstat").textContent="먼저 키를 넣어 주세요."; gk.focus(); return; }
-    LS.set("tokyo-gkey",k); gf.disabled=true;
-    const res=await fetchPlaces(k,(i,t)=>{ gf.textContent=`받는 중 ${i}/${t}`; });
-    gf.disabled=false; gf.textContent="장소 정보 받기";
-    const got=Object.keys(res.out).length;
-    if(got){ PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} }
-    renderTools(true); $("#gstat").textContent = res.fail ? `${got}곳 받았고 ${res.fail}곳은 실패했어요. ${res.first}` : `${got}곳 받았어요.`; });
+  const gk=$("#gkey"); if(gk) gk.addEventListener("change",()=>{ LS.set("tokyo-gkey",gk.value.trim()); LS.del("tokyo-gerr"); if(gk.value.trim()) autoPlaces(true); });
+  const gf=$("#gfetch"); if(gf) gf.addEventListener("click",()=>{ const k=gk.value.trim(); if(!k){ $("#gstat").textContent="먼저 키를 넣어 주세요."; gk.focus(); return; }
+    LS.set("tokyo-gkey",k); LS.del("tokyo-gerr"); autoPlaces(true); });
   const gc=$("#gclear"); if(gc) gc.addEventListener("click",()=>{ PSTORE={}; LS.del("tokyo-places"); renderTools(true); });
   const mstat=t=>{ const e=$("#mv-stat"); if(e) e.textContent=t; };
   $("#mv-copy").addEventListener("click",async()=>{ const code=packAll();
@@ -984,6 +1055,8 @@ document.addEventListener("click",e=>{
   const g=e.target.closest("[data-go]"); if(g && !e.target.closest(".drop")){ e.preventDefault(); if(g.dataset.open){ TOOLS_OPEN=g.dataset.open; LS.set("tokyo-lines-open",TOOLS_OPEN); } go(g.dataset.go, g.dataset.day); return; }
   const a=e.target.closest("[data-add]"); if(a){ e.stopPropagation(); moveTo(a.dataset.add, CUR==="wed"?"thu":CUR); return; }
   const nw=e.target.closest("[data-news]"); if(nw){ newsAct(nw.dataset.news); return; }
+  if(e.target.closest("[data-gkey]")){ askKey(); return; }
+  if(e.target.closest("[data-gretry]")){ LS.del("tokyo-gerr"); autoPlaces(true); return; }
   const xc=e.target.closest("#xcards .xc[data-x]"); if(xc && !xc.classList.contains("on")){ xSelect(xc.dataset.x,false); return; }   // 지도 카드는 처음 누르면 고르고, 한 번 더 누르면 자세히
   if(e.target.closest(".st .row") && e.target.closest("[data-open]")){ openSheet(e.target.closest("[data-open]").dataset.open); return; }
   const b=e.target.closest("[data-big]"); if(b){ const p=place(b.dataset.big); if(p && p.ja) bigJa(p); return; }

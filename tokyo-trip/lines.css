@@ -365,9 +365,10 @@ dialog.sheet::backdrop{background:rgba(0,0,0,.45)}
 .fact.warn,.fact.bad{padding-left:12px}
 
 /* 어디에 넣을까: +N분 */
-.pk .m .ok{color:var(--ok)} .pk .m .bad{color:var(--red)}
+.pk .m .ok{color:var(--ok)} .pk .m .bad{color:var(--red)} .pk .m .warn{color:var(--amber)}
 .daypick button small{display:block;font:700 11px/1 var(--num);color:var(--mute);margin-top:2px}
 .daypick button small.bad{color:var(--red)}
+.daypick button small.warn{color:var(--amber)}
 .daypick button.best{box-shadow:0 0 0 2px var(--ok)}
 .daypick button.best small{color:var(--ok)}
 
@@ -440,3 +441,14 @@ body[data-view="pool"][data-poolmode="map"]{overflow:hidden}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .xtiles{filter:invert(1) grayscale(1) brightness(.8) contrast(.9)}}
 :root[data-theme="dark"] .xtiles{filter:invert(1) grayscale(1) brightness(.8) contrast(.9)}
 @media (prefers-reduced-motion:reduce){.xpin{transition:none}}
+
+/* 사진 상태 줄 */
+.gst{display:flex;align-items:center;gap:10px;margin:10px 0 0;padding:10px 12px;border-radius:12px;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12);font-size:13px;font-weight:700;color:var(--sub);line-height:1.45;word-break:keep-all}
+.gst .gt{flex:1;min-width:0}
+.gst button{flex:none;min-height:36px;padding:0 14px;border-radius:999px;border:0;background:var(--ink);color:var(--card);font-weight:800;font-size:13px;cursor:pointer}
+.gst.err{color:var(--red)} .gst.busy .gt::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--amber);margin-right:8px;vertical-align:1px;animation:gblink 1s infinite}
+@keyframes gblink{50%{opacity:.2}}
+@media (prefers-reduced-motion:reduce){.gst.busy .gt::before{animation:none}}
+.xtop .gst{margin:0}
+.gerr{color:var(--red);font-weight:700;margin-top:6px}
+img.broken{visibility:hidden}
