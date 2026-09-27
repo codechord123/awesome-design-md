@@ -1,4 +1,4 @@
-/* index.html 의 DATA 블록을 읽어 두 파일을 다시 만든다.
+/* data.js 의 DATA 블록을 읽어 두 파일을 다시 만든다.
    - data/places.csv     Google My Maps 가져오기용
    - data/tokyo-trip.ics 폰 캘린더용 (예약 있는 곳은 60분 전, 나머지는 30분 전 알림)
    사용법:  node tools/make-csv.mjs      (저장소 어디서든)  */
@@ -7,11 +7,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const html = fs.readFileSync(path.join(root, "index.html"), "utf8");
+const html = fs.readFileSync(path.join(root, "data.js"), "utf8");
 
 const a = html.indexOf("/* DATA:START");
 const b = html.indexOf("/* DATA:END");
-if (a < 0 || b < 0) throw new Error("index.html 에서 DATA 블록을 찾지 못했습니다.");
+if (a < 0 || b < 0) throw new Error("data.js 에서 DATA 블록을 찾지 못했습니다.");
 const block = html.slice(html.indexOf("*/", a) + 2, b);
 
 const { HOTEL, DAYS } = new Function(block + "\nreturn {HOTEL, DAYS};")();

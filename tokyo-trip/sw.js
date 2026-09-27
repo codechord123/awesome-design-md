@@ -1,6 +1,6 @@
 /* 늦가을 도쿄 — 오프라인 캐시
    shell: 설치할 때 한 번에 저장 / tiles·fonts: 본 것만 저장 */
-const VER    = "v25";
+const VER    = "v26";
 const SHELL  = "tokyo-shell-" + VER;
 const TILES  = "tokyo-tiles-v1";
 const FONTS  = "tokyo-fonts-v1";
@@ -11,6 +11,12 @@ const MAXTILES = 900;
 const ASSETS = [
   "./",
   "index.html",
+  "lines.css",
+  "app.js",
+  "data.js",
+  "classic.html",
+  "vendor/sortable/Sortable.min.js",
+  "icons/lines.svg",
   "manifest.webmanifest",
   "vendor/leaflet.css",
   "vendor/pretendard/PretendardVariable.subset.woff2",
@@ -52,11 +58,12 @@ async function networkFirst(req){
   try{
     const res = await fetch(req);
     const c = await caches.open(SHELL);
-    c.put("index.html", res.clone());
+    // 페이지마다 제 이름으로 저장한다(예전엔 전부 index.html로 저장해서 classic.html을 열면 새 화면이 덮였다)
+    if(res && res.ok) c.put(req, res.clone());
     return res;
   }catch(err){
     const c = await caches.open(SHELL);
-    return (await c.match(req)) || (await c.match("index.html")) || (await c.match("./")) ||
+    return (await c.match(req, {ignoreSearch:true})) || (await c.match("index.html")) || (await c.match("./")) ||
       new Response("<h1>오프라인</h1><p>아직 저장되지 않았습니다.</p>",{headers:{"Content-Type":"text/html; charset=utf-8"},status:503});
   }
 }
