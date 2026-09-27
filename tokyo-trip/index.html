@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>늦가을 도쿄 — 11월 18일부터 22일까지</title>
 <meta name="description" content="2026년 11월 18일부터 22일까지, 아카사카에서 출발하는 도쿄 미술관·서점·LP바 일정.">
-<meta name="theme-color" content="#F2F4F6" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#101216" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F1EDE4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131210" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="늦가을 도쿄">
@@ -15,6 +15,9 @@
 <link rel="alternate icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <link rel="stylesheet" href="vendor/leaflet.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Noto+Serif+KR:wght@500;700;900&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="preload" href="vendor/pretendard/PretendardVariable.subset.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 /* ── 토큰 ──────────────────────────────────────────────
@@ -23,25 +26,29 @@
 @font-face{font-family:"Pretendard Variable";font-weight:45 920;font-style:normal;font-display:swap;
   src:url("vendor/pretendard/PretendardVariable.subset.woff2") format("woff2-variations"),url("vendor/pretendard/PretendardVariable.subset.woff2") format("woff2")}
 :root{
-  --paper:#F2F4F6;--surface:#FFFFFF;--ink:#191F28;--text2:#4E5968;--muted:#6B7684;--line:#E5E8EB;--faint:#F2F4F6;--soft:#EBEEF1;
-  --ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#FFF6DA;--pine:#12805C;
-  --k-art:#1F7A63;--k-book:#B06A1E;--k-food:#E0503A;--k-bar:#6B4FD8;--k-market:#0B8CA0;--k-view:#2F7CF6;--k-move:#8B95A1;--k-leaf:#6E8B2E;--k-photo:#D0457A;
+  /* 2026-09-27 편집 리디자인: 여행 매거진 문법. 신문 종이색 바탕, 먹색 글자, 붉은 주홍 하나.
+     제목은 명조(Noto Serif KR)와 Instrument Serif, 시각·번호는 IBM Plex Mono, 본문은 Pretendard. 카드 대신 괘선. */
+  --paper:#F1EDE4;--surface:#F7F4ED;--ink:#15130F;--text2:#3D3930;--muted:#766F60;--line:#D6CEBD;--faint:#E9E3D6;--soft:#E2DBCB;
+  --ginkgo:#D4432C;--ginkgo-ink:#FBF8F2;--ginkgo-soft:#F6DDD5;--pine:#2F5D50;--accent:#D4432C;
+  --k-art:#2F5D50;--k-book:#8A5A2B;--k-food:#B8432F;--k-bar:#4B3F72;--k-market:#2E6E7E;--k-view:#3C5A8A;--k-move:#8A8375;--k-leaf:#6B7A2E;--k-photo:#A8466A;
   --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Hiragino Sans","Noto Sans KR","Noto Sans JP","Malgun Gothic",system-ui,sans-serif;
-  --serif:var(--sans);--mono:var(--sans);
+  --kserif:"Noto Serif KR","Nanum Myeongjo","AppleMyungjo","Hiragino Mincho ProN",serif;
+  --display:"Instrument Serif","Noto Serif KR","AppleMyungjo",Georgia,serif;
+  --serif:var(--kserif);--mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,"Pretendard Variable",Pretendard,"Apple SD Gothic Neo",monospace;
   --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:32px;--s7:48px;--s8:64px;
-  --r-tag:8px;--r-card:18px;--r-panel:18px;--r-btn:12px;
-  --lift:0 1px 2px rgba(25,31,40,.06),0 6px 16px rgba(25,31,40,.08);
-  --gut:16px;--tabh:76px;
+  --r-tag:2px;--r-card:2px;--r-panel:2px;--r-btn:2px;
+  --lift:0 0 0 1px var(--ink);
+  --gut:18px;--tabh:72px;
   --tint:0%;--edge:0%;
   color-scheme:light dark;
   box-sizing:border-box;
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){ --paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--text2:#C4CAD3;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
-    --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--k-photo:#F07AA6;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
+  :root:not([data-theme="light"]){ --paper:#131210;--surface:#1B1A17;--ink:#EDE8DE;--text2:#CBC4B5;--muted:#989080;--line:#34302A;--faint:#211F1B;--soft:#2A2723;--ginkgo:#EC6A50;--ginkgo-ink:#131210;--ginkgo-soft:#3A221C;--accent:#EC6A50;
+    --k-art:#7FB5A3;--k-book:#D39A62;--k-food:#E8826C;--k-bar:#A99BD6;--k-market:#6FB3C2;--k-view:#8EA9D6;--k-move:#A39C8C;--k-leaf:#AEBE6E;--k-photo:#DB8AA8;--lift:0 0 0 1px var(--line);}
 }
-:root[data-theme="dark"]{ --paper:#101216;--surface:#1B1E24;--ink:#ECEEF1;--text2:#C4CAD3;--muted:#9AA1AD;--line:#2A2E36;--faint:#23272E;--soft:#2A2F37;--ginkgo:#F5B80C;--ginkgo-ink:#191F28;--ginkgo-soft:#3A3117;--pine:#4CC38A;
-  --k-art:#5FC2A6;--k-book:#E0A25E;--k-food:#FF7A66;--k-bar:#A590FF;--k-market:#4CC7D9;--k-view:#6AA6FF;--k-move:#9AA1AD;--k-leaf:#A9C46A;--k-photo:#F07AA6;--lift:0 1px 2px rgba(0,0,0,.4),0 6px 16px rgba(0,0,0,.35);}
+:root[data-theme="dark"]{ --paper:#131210;--surface:#1B1A17;--ink:#EDE8DE;--text2:#CBC4B5;--muted:#989080;--line:#34302A;--faint:#211F1B;--soft:#2A2723;--ginkgo:#EC6A50;--ginkgo-ink:#131210;--ginkgo-soft:#3A221C;--accent:#EC6A50;
+  --k-art:#7FB5A3;--k-book:#D39A62;--k-food:#E8826C;--k-bar:#A99BD6;--k-market:#6FB3C2;--k-view:#8EA9D6;--k-move:#A39C8C;--k-leaf:#AEBE6E;--k-photo:#DB8AA8;--lift:0 0 0 1px var(--line);}
 *,*::before,*::after{box-sizing:inherit}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 76px);scroll-padding-bottom:calc(var(--tabh) + 24px)}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.6;letter-spacing:-.01em;
@@ -670,6 +677,213 @@ h1,h2,h3,.dtitle,.name,.tname,.nowname,.rname{word-break:keep-all;overflow-wrap:
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── 편집 레이어 (2026-09-27) ─────────────────────────────
+   여행 매거진처럼: 카드·그림자 대신 먹색 괘선, 명조 제목, 모노 라벨, 주홍 하나.
+   위쪽 규칙을 덮어쓰는 층이라 이 블록은 <style> 맨 끝에 둔다. */
+body{font-size:16.5px;letter-spacing:-.005em}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.06;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.08 0 0 0 0 0.07 0 0 0 0 0.05 0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) body::after{opacity:.05;filter:invert(1)}}
+:root[data-theme="dark"] body::after{opacity:.05;filter:invert(1)}
+:focus-visible{outline:2px solid var(--accent);border-radius:0}
+::selection{background:var(--accent);color:var(--ginkgo-ink)}
+
+/* 글자 */
+h1,h2,h3,.dtitle,.name,.tname,.nowname,.rname,.ptitle{font-family:var(--kserif);font-weight:700;letter-spacing:-.025em}
+.eyebrow{font-family:var(--mono);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.eyebrow.ko{font-family:var(--sans);font-size:12.5px;font-weight:600;letter-spacing:.02em;text-transform:none}
+.time,.mc-t,.hop-t .num,.state b,.daymeta b,.dseg span,.tday span,.pc-days b,.qcount,.hc-count{font-family:var(--mono);letter-spacing:0}
+.ja{font-family:"Noto Serif JP",var(--kserif);letter-spacing:.02em}
+.lede{font-family:var(--kserif);font-weight:500;color:var(--text2);font-size:17px;line-height:1.7}
+
+/* 마스트헤드 */
+.mast{padding:22px 0 8px !important}
+.mast-bar{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:0 0 10px;margin:0 0 26px;border-bottom:1px solid var(--ink);
+  font:500 10.5px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
+.mast-title{margin:0;font-family:var(--display);font-weight:400;letter-spacing:-.035em;line-height:.86;font-size:clamp(84px,27vw,152px)}
+.mast-title span{display:block}
+.mast-title em{display:block;font-style:italic;font-size:.42em;letter-spacing:-.02em;line-height:1.05;margin:.18em 0 0 .06em;color:var(--accent)}
+.mast-ko{margin:22px 0 10px;font:700 21px/1.4 var(--kserif);letter-spacing:-.02em}
+.mast .lede{margin:0 0 18px;max-width:26em}
+.mast .state{padding-top:12px;border-top:1px dashed var(--line)}
+.home .hero .leaf{display:none}
+
+/* 섹션 머리: 한글 제목 위에 영문 모노 라벨 */
+[data-en]::before{content:attr(data-en);display:block;margin:0 0 6px;font:500 10.5px/1.2 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.hsec{margin:44px 0 0}
+.hs-top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding:0 0 12px;margin:0 0 4px;border-bottom:1px solid var(--ink)}
+.hcard h2,.hs-top h2{font-size:26px;font-weight:700;letter-spacing:-.03em;line-height:1.2}
+.hs-top .sub{font-size:12.5px;text-align:right}
+
+/* 카드 → 괘선 */
+.hcard{background:transparent;border-radius:0;padding:20px 0 24px;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);margin:28px 0 0}
+.hcard .bar{border-radius:0;height:3px}
+.hcard .bar i{background:var(--accent);border-radius:0}
+.resv-list b{font-family:var(--kserif)}
+
+/* 목차(닷새 한눈에) */
+.dcards{gap:0}
+.dcard{background:transparent;border-radius:0;padding:18px 0;border-bottom:1px solid var(--line);grid-template-columns:64px minmax(0,1fr)}
+.dcards li:last-child .dcard{border-bottom:0}
+.dcard:hover{background:transparent}
+.dcard:hover .dtitle{color:var(--accent)}
+.dnum{background:transparent !important;border-radius:0 !important;align-items:flex-start !important;justify-content:flex-start !important;height:auto !important}
+.dnum b{font:400 46px/0.9 var(--display) !important;letter-spacing:-.04em;color:var(--ink)}
+.dnum span{font:500 10.5px/1.6 var(--mono) !important;letter-spacing:.12em;color:var(--muted) !important}
+.dcard.today{box-shadow:none}
+.dcard.today .dnum b{color:var(--accent)}
+.dtitle{font-size:19px !important;line-height:1.35}
+.dstrip i{border-radius:0 !important;height:3px !important}
+.dmeta,.ddate{font-size:12.5px !important}
+
+/* 플랜 */
+.plancards{gap:0}
+.plancard{background:transparent;border-radius:0;box-shadow:none;border-bottom:1px solid var(--line);padding:20px 0}
+.plancards li:last-child .plancard{border-bottom:0}
+.plancard.on{box-shadow:none}
+.plancard.on .pc-top b{color:var(--accent)}
+.pc-top b{font:700 21px/1.3 var(--kserif)}
+.pc-top em{background:transparent;border:1px solid var(--line);border-radius:0;font:600 11.5px/1.5 var(--sans);letter-spacing:0;color:var(--muted)}
+.pc-top i{background:var(--accent);color:var(--ginkgo-ink);border-radius:0;font:600 11.5px/1.5 var(--sans);letter-spacing:0}
+.pp{border-radius:0;background:transparent;box-shadow:none;border:1px solid var(--line);font-size:13.5px;min-height:34px;padding:6px 12px}
+.pp.on{background:var(--ink);border-color:var(--ink)}
+.planintro{font-family:var(--kserif);font-weight:500;border-left:2px solid var(--accent);padding-left:12px}
+
+/* 칩 */
+.tchip{border-radius:0;background:transparent;border:1px solid var(--line);min-height:36px;font-size:13.5px}
+.tchip b{font-family:var(--mono);font-weight:500;font-size:12px}
+.themes .tchips{border-bottom:1px solid var(--ink)}
+
+/* 버튼 */
+.btn,.card .btn,.card-box .btn,.ja-card .btn{background:transparent;border:1px solid var(--ink);border-radius:0;color:var(--ink);font-weight:600;min-height:42px}
+.btn:hover{background:var(--ink);color:var(--paper)}
+.btn.key{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.btn.key:hover{background:var(--accent);border-color:var(--accent);color:var(--ginkgo-ink);opacity:1}
+.linkish{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
+
+/* 아래 탭 */
+nav.days{background:var(--paper);border-top:1px solid var(--ink);box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+.tab{border-radius:0;color:var(--muted)}
+.tab .lb{font-size:11.5px;letter-spacing:.02em}
+.tab[aria-selected="true"]{color:var(--ink);box-shadow:inset 0 2px 0 var(--accent)}
+
+/* 위 날짜 막대 */
+.daybar{border-bottom:1px solid var(--ink);-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--paper)}
+.dseg{border-radius:0}
+.dseg b{font-family:var(--kserif);font-weight:700}
+.dseg[aria-selected="true"]{background:transparent;color:var(--ink);box-shadow:inset 0 -3px 0 var(--accent)}
+.dseg.today::after{background:var(--accent);border-radius:0}
+.db-wd{font-family:var(--kserif)}
+
+/* 하루 머리 */
+.day .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.chap-lat{margin:10px 0 0;font:italic 400 clamp(54px,16vw,84px)/.9 var(--display);letter-spacing:-.03em;color:var(--ink)}
+.day h2{font-size:clamp(26px,7vw,34px);line-height:1.25;margin-top:10px}
+.day .summary{font-family:var(--kserif);font-weight:500;color:var(--text2);line-height:1.75}
+.daymeta span{border-radius:0}
+.dayhead{border-bottom:1px solid var(--ink);padding-bottom:18px;margin-bottom:22px}
+
+/* 지도: 신문 인쇄처럼 흑백 */
+.mapbox{border-radius:0;border:1px solid var(--ink);box-shadow:none}
+.leaflet-tile-pane{filter:grayscale(1) sepia(.18) contrast(.95) brightness(1.04)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .leaflet-tile-pane{filter:invert(1) grayscale(1) brightness(.85) contrast(.9)}}
+:root[data-theme="dark"] .leaflet-tile-pane{filter:invert(1) grayscale(1) brightness(.85) contrast(.9)}
+.leaflet-bar{border-radius:0 !important;box-shadow:none !important;border:1px solid var(--ink) !important}
+.leaflet-bar a{border-radius:0 !important}
+.leaflet-popup-content-wrapper{border-radius:0 !important;box-shadow:0 0 0 1px var(--ink) !important}
+.mc{border-radius:0;background:var(--paper);box-shadow:0 0 0 1px var(--line)}
+.mc.on{box-shadow:0 0 0 1.5px var(--ink)}
+.mc-img{border-radius:0 !important}
+.mc-n{font-family:var(--kserif)}
+
+/* 타임라인 */
+ol.timeline::before{width:1px;background:var(--ink);opacity:.35}
+.time{font-weight:500;font-size:13px}
+.dot.n{font-family:var(--mono);font-weight:500}
+.card{background:transparent;border-radius:0;box-shadow:none;border:0;border-top:1px solid var(--ink)}
+ol.timeline .card{padding:14px 0 6px}
+.stop.plain .card{border-top-color:var(--line)}
+.stop.now .card{background:transparent;box-shadow:inset 3px 0 0 var(--accent);padding-left:14px}
+.stop.next .card{background:transparent}
+.name{font-size:21px;line-height:1.3}
+.note{color:var(--text2)}
+.hop-t{font-size:12.5px}
+.hop.far .hop-t{background:transparent;border:1px dashed var(--ink);border-radius:0}
+.hop.far .hop-t b{color:var(--accent)}
+.thumb{border-radius:0 !important;filter:saturate(.85) contrast(1.02)}
+
+/* 배지·메모 */
+.badge{border-radius:0;background:transparent;border:1px solid var(--line);font-family:var(--sans);font-size:12px;padding:2px 7px}
+.badge.need{border-color:var(--accent);color:var(--accent);background:transparent}
+.badge.done{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.badge.mine,.badge.dig{border:0}
+.tdig,.tname .tdig{border-radius:0}
+.photobox{background:transparent;border-radius:0;border-left:2px solid var(--k-photo);padding:4px 0 4px 12px}
+.shot{font-family:var(--kserif);font-weight:500;font-size:14.5px}
+.sights a{border-radius:0;background:transparent;border:1px solid var(--line)}
+.sights a b{font-family:var(--kserif)}
+.tipline{border-radius:0}
+.lightline b{font-family:var(--mono);font-weight:500}
+.lightline .ki{color:var(--accent)}
+
+/* 테마(가이드) */
+.pagehead{border-bottom:1px solid var(--ink);padding-bottom:18px}
+.ptitle{font-size:clamp(32px,9vw,44px)}
+.theme{margin:52px 0 0}
+.theme-h{display:block}
+.theme-ic{display:none}
+.theme-en{margin:0 0 4px;font:italic 400 clamp(40px,11vw,60px)/.95 var(--display);letter-spacing:-.03em;color:var(--kc)}
+.theme h2{font-size:24px;font-weight:700}
+.theme-n{font-family:var(--sans);font-size:12.5px;letter-spacing:0;font-weight:600;margin:6px 0 0}
+.theme-intro{font-family:var(--kserif);font-weight:500;border-top:1px solid var(--ink);padding-top:12px}
+.tlist{background:transparent;border-radius:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line)}
+.trow{padding:14px 0}
+.trow:hover{background:transparent}
+.trow:hover .tname{color:var(--accent)}
+.tday{background:transparent;border-radius:0;border-right:1px solid var(--line)}
+.tday b{font-family:var(--kserif)}
+.theme-sub{font:500 11px/1.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);margin:28px 0 8px}
+.lightgrid span{border-radius:0 !important;background:transparent !important;border:1px solid var(--line)}
+.rec .card{border-top:1px solid var(--ink);padding:18px 0}
+.srow{padding-right:0}
+
+/* 준비·도움 */
+.block h2{font-size:26px;font-weight:700}
+.block .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.block{border-top:1px solid var(--ink);margin-top:36px}
+.subtabs{border-radius:0;background:transparent;border-bottom:1px solid var(--ink)}
+.subtab{border-radius:0}
+.subtab[aria-selected="true"]{background:transparent;box-shadow:inset 0 -2px 0 var(--accent)}
+.card-box{border-radius:0;background:transparent;border-top:1px solid var(--line)}
+.check{border-radius:0}
+.sos a,.phr,.wxd,.aroute,.qbtn,.field select,.field input{border-radius:0 !important}
+.qbtn{background:transparent !important;border:1px solid var(--ink) !important;box-shadow:none !important}
+.qbtn .ki{color:var(--accent)}
+
+/* 지금 카드: 먹색 판 */
+.nowcard{border-radius:0;background:var(--ink);box-shadow:none}
+.nowcard .btn{border-color:rgba(255,255,255,.35);color:var(--paper);background:transparent}
+.nowcard .btn.key{background:var(--accent);border-color:var(--accent);color:var(--ginkgo-ink)}
+.nowname{font-family:var(--kserif)}
+dialog.ja-dlg,.ja-card{border-radius:0 !important}
+.toast{border-radius:0 !important;font-family:var(--sans)}
+
+/* 편집 레이어 2 */
+.tdig,.tname .tdig{font:600 11px/1.5 var(--sans) !important;letter-spacing:0;padding:1px 6px}
+.shot,.lede,.summary,.planintro,.theme-intro,.mast-ko,.pc-intro{word-break:keep-all}
+.phr-t,.phr-say{border-radius:0;background:transparent;border:1px solid var(--line)}
+.phr-t b{font-family:var(--kserif)}
+.filmbox{border-radius:0 !important;background:transparent !important;border-top:1px solid var(--line);padding-left:0 !important;padding-right:0 !important}
+.filmbox input,.filmbox select,.field select,.field input,.pastelab textarea{border-radius:0 !important;background:transparent !important;border:1px solid var(--ink) !important}
+.film-count b{font:400 72px/0.9 var(--display);letter-spacing:-.03em}
+.film-count span{font-family:var(--mono);font-weight:500;font-size:16px}
+.check input{border-radius:0}
+.themes .tchips{top:calc(env(safe-area-inset-top,0px) + var(--dbh,53px));border-bottom:1px solid var(--line)}
+.mc-img.ph{border-radius:0;background:transparent !important;border-right:1px solid var(--line);color:var(--mck) !important;font:400 40px/1 var(--display) !important}
+.bar,.bar i{border-radius:0 !important}
+.bar{height:3px !important}
+.bar i{background:var(--accent) !important}
 </style>
 </head>
 <body>
@@ -1953,7 +2167,8 @@ function renderDay(key){
   panelEl.innerHTML=`<section class="day" role="tabpanel" aria-labelledby="tab-${d.key}" tabindex="-1">
     <header class="dayhead">
       ${planPickHTML()}
-      <p class="eyebrow kicker">${dayNo}일차 &middot; ${d.dt} ${d.wd}요일</p>
+      <p class="eyebrow kicker">Chapter ${String(dayNo).padStart(2,"0")} &middot; ${d.dt} ${d.wd}요일</p>
+      <p class="chap-lat" aria-hidden="true">${LATWD[d.key]||""}</p>
       <h2>${esc(d.title)}</h2>
       <p class="summary">${esc(d.summary)}</p>
       <div class="daymeta">
@@ -2221,19 +2436,19 @@ function rainAltHTML(d,s){
 
 /* ---------- 테마: 여행 책자처럼 종류별로 ---------- */
 const THEMES=[
-  {k:"photo", n:"건축·사진",     kcs:["photo"],        ic:"i-camera",
+  {k:"photo",  en:"Architecture & Film",n:"건축·사진",     kcs:["photo"],        ic:"i-camera",
    intro:"필름으로 남길 건물과 장면. 일정 속 건축가의 건물, 가는 길에 지나치는 건물, 사진 스팟을 모았어요. 해시태그는 누르면 복사돼요."},
-  {k:"dig",  n:"내가 저장한 곳",  kcs:[],             ic:"i-pin", c:"var(--k-photo)",
+  {k:"dig",   en:"Saved places",n:"내가 저장한 곳",  kcs:[],             ic:"i-pin", c:"var(--k-photo)",
    intro:"인스타에서 디깅해 둔 곳과 구글 지도 '도쿄 서점 앤 북카페' 목록. 동선에 맞는 곳은 일정에 넣었고, 지나가는 건물은 가는 길에, 멀거나 시간이 안 맞는 곳은 추천으로 남겼어요. 분홍 태그는 저장한 계정이에요."},
-  {k:"art",  n:"미술관·박물관",   kcs:["art"],          ic:"i-art",
+  {k:"art",   en:"Museums",n:"미술관·박물관",   kcs:["art"],          ic:"i-art",
    intro:"이번 여행의 뼈대예요. 11월 셋째 주에 열리는 특별전에 날짜를 맞췄습니다. 대부분 월요일에 쉬어서 수~일 일정과는 겹치지 않아요."},
-  {k:"book", n:"서점·북카페",     kcs:["book"],         ic:"i-book",
+  {k:"book",  en:"Books",n:"서점·북카페",     kcs:["book"],         ic:"i-book",
    intro:"진보초 헌책방 거리부터 책 한 권만 파는 긴자 서점까지. 금요일은 사실상 서점의 날이에요."},
-  {k:"bar",  n:"LP바",            kcs:["bar"],          ic:"i-bar",
+  {k:"bar",   en:"Listening bars",n:"LP바",            kcs:["bar"],          ic:"i-bar",
    intro:"밤마다 한 곳. 목·금요일은 숙소에서 걸어서 2분, 토요일 시부야도 긴자선 한 번이라 갈아타지 않아요."},
-  {k:"food", n:"먹을 곳",         kcs:["food","market"],ic:"i-food",
+  {k:"food",  en:"Eat & drink",n:"먹을 곳",         kcs:["food","market"],ic:"i-food",
    intro:"새벽 츠키지부터 1801년에 문을 연 미꾸라지 요리집, 에도마에 스시, 긴자 양식까지. 예약할 곳은 준비 탭에 모아 뒀어요."},
-  {k:"green",n:"정원·단풍·전망",  kcs:["leaf","view"],  ic:"i-leaf",
+  {k:"green", en:"Gardens & views",n:"정원·단풍·전망",  kcs:["leaf","view"],  ic:"i-leaf",
    intro:"늦가을이라 넣은 곳들이에요. 은행잎은 절정 직전이고, 해는 16:30쯤 집니다."}
 ];
 // 테마별로 모으는 규칙. 사진은 건축·촬영 메모가 있는 곳, 디깅은 dig가 있는 곳, 나머지는 종류(kc)
@@ -2274,7 +2489,7 @@ function renderThemes(){
         <span class="tfee">${esc(g.by)}${g.year?`<br>${g.year}`:""}</span></a>
         <button type="button" class="tagbtn" data-tags="${esc(tagsFor(g))}" aria-label="${esc(g.n)} 해시태그 복사">#</button></li>`; }).join("");
     return `<section class="theme" id="th-${t.k}" style="--kc:${themeColor(t)}">
-      <header class="theme-h"><span class="theme-ic">${ico(t.ic)}</span><div><h2>${esc(t.n)}</h2><p class="theme-n">일정 ${items.length}곳${sights.length?` · 가는 길 ${sights.length}곳`:""}${recs.length?` · 추천 ${recs.length}곳`:""}</p></div></header>
+      <header class="theme-h"><span class="theme-ic">${ico(t.ic)}</span><div><p class="theme-en" aria-hidden="true">${esc(t.en||"")}</p><h2>${esc(t.n)}</h2><p class="theme-n">일정 ${items.length}곳${sights.length?` · 가는 길 ${sights.length}곳`:""}${recs.length?` · 추천 ${recs.length}곳`:""}</p></div></header>
       <p class="theme-intro">${esc(t.intro)}</p>
       ${t.k==="photo"?`<div class="lightgrid">${DAYS.slice(1).map(d=>{ const L=lightOf(d.date); return `<span><b>${d.wd}</b> 골든 ${L.gold}–${L.set}<br>블루 ~${L.blue}</span>`; }).join("")}</div>`:""}
       ${items.length?`<ol class="tlist">${rows}</ol>`:""}
@@ -2286,7 +2501,7 @@ function renderThemes(){
     return `<a class="tchip" href="#th-${t.k}" style="--kc:${themeColor(t)}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${n}</b></a>`; }).join("");
   panelEl.innerHTML=`<section class="themes" role="tabpanel" aria-labelledby="nav-themes">
     <header class="pagehead">
-      <p class="eyebrow">가이드북</p>
+      <p class="eyebrow">The guide · 가이드북</p>
       <h1 class="ptitle">테마로 보는 도쿄</h1>
       <p class="lede">일정에 넣은 ${all.length}곳과 추천 ${RECS.filter(r=>!inPlan(r)).length}곳을 종류별로 모았어요. 누르면 그날 일정의 그 자리로 갑니다.</p>
     </header>
@@ -2300,6 +2515,7 @@ function renderThemes(){
   }));
 }
 
+const LATWD={wed:"Wednesday",thu:"Thursday",fri:"Friday",sat:"Saturday",sun:"Sunday"};
 /* ---------- 플랜 고르기 ---------- */
 function planPickHTML(){
   const P=PLANS.find(p=>p.k===CURPLAN)||PLANS[0];
@@ -2349,38 +2565,35 @@ function renderHome(){
   const all=[]; DAYS.forEach(d=>d.stops.forEach(s=>{ if(s.lat && !s.hotel) all.push(s); }));
   const chips=THEMES.map(t=>`<button type="button" class="tchip" data-theme="${t.k}" style="--kc:${themeColor(t)}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${themeStops(t,all).length+themeSights(t).length+(t.k==="dig"?RECS.filter(r=>r.dig&&!DAYS.some(d=>(d.base||d.stops).some(s=>s.q===r.q))).length:0)}</b></button>`).join("");
   panelEl.innerHTML=`<section class="home${phase==="during"?" during":""}" role="tabpanel" aria-labelledby="nav-home">
-    <header class="hero">
-      <svg class="leaf" viewBox="0 0 64 64" aria-hidden="true">
-        <path d="M32 46 L32 59" stroke="var(--ginkgo)" stroke-width="3.2" stroke-linecap="round" fill="none"/>
-        <path d="M32 46 L6.5 36 A27 27 0 0 1 29.6 19.6 L32 33 L34.4 19.6 A27 27 0 0 1 57.5 36 Z" fill="var(--ginkgo)"/>
-      </svg>
-      <p class="eyebrow">2026.11.18 &ndash; 11.22 · 아카사카 출발</p>
-      <h1>늦가을 도쿄</h1>
-      <p class="lede">미술관 아홉, 서점 아홉, LP바 셋. 은행잎이 물드는 닷새.</p>
+    <header class="hero mast">
+      <div class="mast-bar"><span>No.01 · Field notes</span><span>Nov 18–22, 2026</span><span>Akasaka</span></div>
+      <h1 class="mast-title"><span>Tokyo</span><em>in late autumn</em></h1>
+      <p class="mast-ko">늦가을 도쿄, 닷새의 편집 노트</p>
+      <p class="lede">미술관과 헌책방, 레코드 바, 필름으로 남길 건물들. 은행잎이 물드는 닷새.</p>
       <p class="state" id="state"></p>
     </header>
     <div id="homenow"></div>
     ${left.length && phase!=="after" ? `<section class="hcard resv" aria-labelledby="resv-h">
-      <div class="hc-top"><h2 id="resv-h">예약 현황</h2><span class="hc-count"><b>${done}</b>/${CHECKS.length}</span></div>
+      <div class="hc-top"><h2 data-en="Reservations" id="resv-h">예약 현황</h2><span class="hc-count"><b>${done}</b>/${CHECKS.length}</span></div>
       <div class="bar" aria-hidden="true"><i style="width:${Math.round(done/CHECKS.length*100)}%"></i></div>
       <ul class="resv-list">${left.slice(0,4).map(c=>`<li><b>${esc(c.t)}</b><span>${esc(c.d)}</span></li>`).join("")}</ul>
       ${left.length>4?`<p class="more">외 ${left.length-4}건 더</p>`:""}
       <div class="acts"><button type="button" class="btn key" data-gotab="prep">준비 탭에서 체크하기</button></div>
     </section>` : ""}
     <section class="hsec" aria-labelledby="plan-h">
-      <div class="hs-top"><h2 id="plan-h">일정 고르기</h2><span class="sub">지역은 같고 보는 것만 달라요</span></div>
+      <div class="hs-top"><h2 data-en="Choose your edit" id="plan-h">일정 고르기</h2><span class="sub">지역은 같고 보는 것만 달라요</span></div>
       <ol class="plancards">${planCardsHTML()}</ol>
     </section>
     <section class="hsec" aria-labelledby="days-h">
-      <div class="hs-top"><h2 id="days-h">닷새 한눈에</h2><span class="sub">${esc((PLANS.find(p=>p.k===CURPLAN)||PLANS[0]).n)} · 누르면 그날 일정</span></div>
+      <div class="hs-top"><h2 data-en="Contents" id="days-h">닷새 한눈에</h2><span class="sub">${esc((PLANS.find(p=>p.k===CURPLAN)||PLANS[0]).n)} · 누르면 그날 일정</span></div>
       <ol class="dcards">${DAYS.map(dayCardHTML).join("")}</ol>
     </section>
     <section class="hsec" aria-labelledby="th-h">
-      <div class="hs-top"><h2 id="th-h">테마로 보기</h2></div>
+      <div class="hs-top"><h2 data-en="Index" id="th-h">테마로 보기</h2></div>
       <div class="tchips wrapchips">${chips}</div>
     </section>
     <section class="hsec" aria-labelledby="qk-h">
-      <div class="hs-top"><h2 id="qk-h">길에서 바로</h2></div>
+      <div class="hs-top"><h2 data-en="On the street" id="qk-h">길에서 바로</h2></div>
       <div class="quick">
         <button type="button" class="qbtn" id="q-addr">${ico("i-hotel")}<span>숙소 주소<br>크게 보기</span></button>
         <button type="button" class="qbtn" data-gotab="help">${ico("i-sound")}<span>일본어<br>한마디</span></button>
@@ -2697,6 +2910,7 @@ function renderTabs(active){
 }
 function renderBar(){
   const bar=$("#daybar-in");
+  requestAnimationFrame(()=>{ const h=$("#daybar"); if(h && !h.hidden) document.documentElement.style.setProperty("--dbh",h.offsetHeight+"px"); });
   $("#daybar").hidden = CURTAB==="home";
   if(CURTAB==="plan"){
     const today=tripYmd();
