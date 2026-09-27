@@ -62,7 +62,7 @@ DAYS.forEach(d=>{
   (d.spare||[]).forEach(s=>catAdd(asStop(s,d.key)));
 });
 RECS.forEach(r=>catAdd({q:r.q, n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, tip:r.tip, src:r.src, srcn:r.srcn, lat:r.lat, lng:r.lng, dig:r.dig,
-  outside:r.outside, fee:r.fee, feeNote:r.feeNote, slot:r.slot, rec:true}));
+  outside:r.outside, fee:r.fee, feeNote:r.feeNote, slot:r.slot, gone:r.gone, goneSrc:r.goneSrc, rec:true}));
 SIGHTS.forEach(g=>catAdd({q:g.q, n:g.n, ja:g.ja, kc:"photo", k:"건축", arch:{by:g.by, year:g.year}, note:g.why, src:g.src, srcn:g.srcn,
   lat:g.lat, lng:g.lng, dig:g.dig, outside:true, sday:g.day}));
 // 블록 id는 q. 원래 id 필드(구글 place_id)는 gid로 옮겼다
@@ -83,7 +83,7 @@ function fromTemplate(k, keep){
   const s=blank(); s.tpl=P.k;
   if(keep){ s.star=keep.star||{}; s.added=keep.added||{}; }
   EDIT.forEach(dk=>{
-    const st=tplStops(P,dk).filter(x=>place(x.q)||(keep&&keep.added&&keep.added[x.q]));
+    const st=tplStops(P,dk).filter(x=>(place(x.q)&&!place(x.q).gone)||(keep&&keep.added&&keep.added[x.q]));
     s.days[dk]=st.map(x=>x.q);
     st.forEach(x=>{ const p=place(x.q); if(p && (p.need||p.needId||p.kc==="bar")) s.pins[x.q]=x.t; });
     if(st[0]) s.start[dk]=fmt(round5(toMin(st[0].t)-travel(HOTEL,place(st[0].q)).min));
@@ -160,6 +160,7 @@ function schedule(dk){
     if(pin && open!=null && toMin(pin)<open) warn.push({lv:"bad", t:`${H.o}에 열어요`});
     if(late>2) warn.push({lv:"bad", t:`${pin}보다 ${late}분 늦어요`});
     const g=gOpenAt(placeOf(p), date, start); if(g===false && !p.outside) warn.push({lv:"warn", t:"구글: 이 시각엔 닫혀 있음"});
+    if(p.gone) warn.push({lv:"bad", t:"문 닫은 곳이에요"});
     const G=placeOf(p); if(G && G.status==="CLOSED_PERMANENTLY") warn.push({lv:"bad", t:"구글: 폐업"}); else if(G && G.status==="CLOSED_TEMPORARILY") warn.push({lv:"bad", t:"구글: 임시 휴업"});
     if(dk==="sun" && end>toMin(SUN_LEAVE)) warn.push({lv:end-toMin(SUN_LEAVE)>10?"bad":"warn", t:`${SUN_LEAVE}엔 긴자를 떠나야 해요`});
     rows.push({id, p, i, tr, arr, start, end, dur, wait, late, pin, warn, from:prev});
@@ -454,7 +455,7 @@ let DF=LS.get("tokyo-lines-df","area");
 const wide=()=>matchMedia("(min-width: 980px)").matches;
 function poolItems(scope){
   const placed=new Set(EDIT.flatMap(dk=>S.days[dk]));
-  const all=[...CAT.values(), ...Object.values(S.added)].filter(p=>!placed.has(p.id));
+  const all=[...CAT.values(), ...Object.values(S.added)].filter(p=>!placed.has(p.id) && !p.gone);
   if(scope==="area") return all.filter(p=>areaOf(p)===CUR);
   if(scope==="star") return all.filter(p=>S.star[p.id]);
   if(scope==="hotel") return all.filter(p=>areaOf(p)==="hotel");
@@ -531,7 +532,7 @@ function renderPool(){
   const areas=[["all","전체"],...EDIT.map(dk=>[dk,`${WDK[dk]} · ${AREANAME[dk]}`]),["hotel","숙소 근처"],["far","먼 곳"]];
   const moods=[["all","모든 종류"],...MOOD.map(m=>[m.k,m.n])];
   const stats=[["left","아직 안 넣은 곳"],["star","찜"],["in","노선에 있는 곳"],["all","전부"]];
-  const f=all.filter(p=>(PF.a==="all"||areaOf(p)===PF.a) && (PF.m==="all"||MOOD.find(m=>m.k===PF.m).kc.includes(p.kc))
+  const f=all.filter(p=>(!p.gone||placed.has(p.id)) && (PF.a==="all"||areaOf(p)===PF.a) && (PF.m==="all"||MOOD.find(m=>m.k===PF.m).kc.includes(p.kc))
     && (PF.s==="all"||(PF.s==="left"&&!placed.has(p.id))||(PF.s==="in"&&placed.has(p.id))||(PF.s==="star"&&S.star[p.id])))
     .sort((a,b)=>(!!S.star[b.id]-!!S.star[a.id])||(EDIT.indexOf(areaOf(a))-EDIT.indexOf(areaOf(b)))||a.n.localeCompare(b.n,"ko"));
   const key=LS.get("tokyo-gkey","");
@@ -583,6 +584,7 @@ function openSheet(id){
   const sc=dk?schedule(dk):null, r=sc?sc.rows.find(x=>x.id===id):null;
   const facts=[];
   if(r && r.warn.length) facts.push(`<div class="fact ${r.warn.some(w=>w.lv==="bad")?"bad":"warn"}"><b>Check</b>${r.warn.map(w=>esc(w.t)).join("<br>")}</div>`);
+  if(p.gone) facts.push(`<div class="fact bad"><b>Closed</b>${esc(p.gone)}${p.goneSrc?` <a href="${esc(p.goneSrc)}" target="_blank" rel="noopener">공지</a>`:""}</div>`);
   if(p.note) facts.push(`<div class="fact"><b>Note</b>${esc(p.note)}</div>`);
   if(p.tip) facts.push(`<div class="fact"><b>Tip</b>${esc(p.tip)}</div>`);
   if(p.shot) facts.push(`<div class="fact"><b>Shot · 찍을 자리</b>${esc(p.shot)}</div>`);
@@ -668,6 +670,31 @@ function filmText(){
   return v.rolls.filter(r=>r.frames.length).map(r=>[`■ 롤 ${r.id}${r.film?" · "+r.film:""}`,...r.frames.map(x=>`#${x.n}  ${f.format(new Date(x.ts))}  ${x.place||"-"}${x.ja?" ("+x.ja+")":""}`)].join("\n")).join("\n\n");
 }
 let TOOLS_OPEN=LS.get("tokyo-lines-open","");
+/* 다른 기기로 옮기기 — 서버가 없어서 복사·붙여넣기 글자로 옮긴다.
+   노선(S)·예약 체크·필름·구글 키만. 구글 장소 정보(tokyo-places)는 30일 보관 규칙이 있어 기기마다 새로 받는다. */
+const MOVE_TAG="TOKYOLINES1.";
+let MOVED=false;
+function packAll(){
+  const o={v:1, at:Date.now(), lines:S, checks:CHECKED, film:filmGet(), gkey:LS.get("tokyo-gkey","")};
+  const b=new TextEncoder().encode(JSON.stringify(o)); let bin=""; b.forEach(x=>{ bin+=String.fromCharCode(x); });
+  return MOVE_TAG+btoa(bin);
+}
+function unpackAll(text){
+  const t=String(text||"").replace(/\s+/g,"");
+  try{
+    const i=t.indexOf(MOVE_TAG);
+    if(i>=0){ const bin=atob(t.slice(i+MOVE_TAG.length).replace(/[^A-Za-z0-9+/=]/g,"")); const o=JSON.parse(new TextDecoder().decode(Uint8Array.from(bin,c=>c.charCodeAt(0))));
+      return o && o.lines && o.lines.days ? o : null; }
+    const v=JSON.parse(text); return v && v.days ? {lines:v} : null;     // 예전 백업 파일 내용을 붙여넣은 경우
+  }catch(e){ return null; }
+}
+function useLines(v){ S=v; EDIT.forEach(k=>{ S.days[k]=(S.days[k]||[]).filter(id=>place(id)); }); ["start","pins","dur","star","added"].forEach(k=>S[k]=S[k]||{}); }
+function applyAll(o){
+  useLines(o.lines);
+  if(o.checks){ CHECKED=o.checks; LS.set("tokyo-checks",JSON.stringify(CHECKED)); }
+  if(o.film && o.film.rolls) LS.set(FILM_KEY,JSON.stringify(o.film));
+  if(o.gkey) LS.set("tokyo-gkey",o.gkey);
+}
 function renderTools(keep){
   if(VIEW!=="tools") return;
   const openNow=keep?$$(".tl[open]").map(x=>x.dataset.k):[TOOLS_OPEN];
@@ -676,6 +703,13 @@ function renderTools(keep){
   main.innerHTML=`<div class="wrap">
     <section class="hero"><p class="hero-date num">Tools</p><h1 class="hero-t">여행 도구</h1><p class="hero-s">예약 체크, 일본어, 긴급 연락처, 필름 기록, 구글 장소 정보, 노선 템플릿과 백업.</p></section>
     <div class="tools">
+      ${tl("move","i-network","다른 기기로 옮기기",MOVED?"가져옴":"",
+        `<p>노선·찜·예약 체크·필름 기록·구글 키는 <b>이 기기에만</b> 저장돼요. 아이폰과 아이패드는 서로의 내용을 모르고, 같은 기기라도 사파리와 홈 화면 아이콘은 저장소가 따로예요.</p>
+         <p><b>1. 보내는 기기</b>에서 복사하고 <b>2. 받는 기기</b>에서 붙여넣으세요. 같은 Apple ID로 로그인돼 있으면 아이폰에서 복사한 걸 아이패드에서 바로 붙여넣을 수 있어요.</p>
+         <div class="acts"><button class="btn ink" id="mv-copy">이 기기 내용 복사</button>${navigator.share?`<button class="btn" id="mv-share">공유로 보내기</button>`:""}</div>
+         <label class="fld" style="margin-top:14px">받는 기기: 여기에 붙여넣기<textarea id="mv-in" rows="3" placeholder="TOKYOLINES1.…" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></textarea></label>
+         <div class="acts"><button class="btn" id="mv-paste">클립보드에서 붙여넣기</button><button class="btn ink" id="mv-go">가져오기</button></div>
+         <p id="mv-stat" style="margin-top:10px"></p>`)}
       ${tl("resv","i-check","예약 체크",`${CHECKS.filter(c=>CHECKED[c.id]).length}/${CHECKS.length}`,
         CHECKS.map(c=>`<label class="chk"><input type="checkbox" data-chk="${c.id}"${CHECKED[c.id]?" checked":""}><span><b>${esc(c.t)}</b>${esc(c.d)}</span></label>`).join(""))}
       ${tl("film","i-camera","필름 기록",`${roll.frames.length}/${roll.exp}`,
@@ -697,7 +731,7 @@ function renderTools(keep){
          <div class="acts"><button class="btn ink" id="gfetch">장소 정보 받기</button>${n?`<button class="btn" id="gclear">지우기</button>`:""}</div><p id="gstat" style="margin-top:10px">${n?`${n}곳 저장됨 · ${Math.floor((Date.now()-PSTORE.at)/864e5)}일 전`:"아직 받지 않았어요."}</p>
          <p>키 만들기: console.cloud.google.com → Places API (New) 사용 → 사용자 인증 정보에서 API 키 → 웹사이트 제한에 이 주소 추가.</p>`)}
       ${tl("backup","i-box","백업·캘린더","",
-        `<p>노선은 이 기기에 저장돼요. 다른 폰으로 옮기려면 파일로 저장하세요.</p>
+        `<p>노선을 파일로 저장해 두거나 불러와요. 다른 기기로 옮길 땐 맨 위 "다른 기기로 옮기기"가 더 쉬워요.</p>
          <div class="acts"><button class="btn" id="exp">파일로 저장</button><label class="btn" for="imp">불러오기</label><button class="btn" id="ics">${ico("i-cal")}캘린더 파일</button><button class="btn" id="reset">처음 노선으로</button></div><input type="file" id="imp" accept=".json,application/json" hidden>`)}
       <a class="tl" href="classic.html" style="display:flex;align-items:center;gap:12px;min-height:64px;padding:0 16px;font-weight:800;text-decoration:none"><span class="picto" style="width:30px;height:30px;border-radius:9px">${ico("i-more")}</span>예산·교통·공항·날씨 (이전 화면)</a>
     </div><div style="height:28px"></div></div>`;
@@ -723,8 +757,22 @@ function renderTools(keep){
     if(got){ PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} }
     renderTools(true); $("#gstat").textContent = res.fail ? `${got}곳 받았고 ${res.fail}곳은 실패했어요. ${res.first}` : `${got}곳 받았어요.`; });
   const gc=$("#gclear"); if(gc) gc.addEventListener("click",()=>{ PSTORE={}; LS.del("tokyo-places"); renderTools(true); });
+  const mstat=t=>{ const e=$("#mv-stat"); if(e) e.textContent=t; };
+  $("#mv-copy").addEventListener("click",async()=>{ const code=packAll();
+    try{ await navigator.clipboard.writeText(code); mstat("복사했어요. 이제 받는 기기에서 붙여넣으세요."); toast("복사했어요"); }
+    catch(e){ const ta=$("#mv-in"); ta.value=code; ta.focus(); ta.select(); mstat("자동 복사가 막혀서 아래 칸에 넣었어요. 길게 눌러 '복사'하세요."); } });
+  const msh=$("#mv-share"); if(msh) msh.addEventListener("click",async()=>{ try{ await navigator.share({title:"Tokyo Lines 옮기기", text:packAll()}); }catch(e){} });
+  $("#mv-paste").addEventListener("click",async()=>{ try{ const t=await navigator.clipboard.readText(); if(t) $("#mv-in").value=t; mstat(t?"붙여넣었어요. '가져오기'를 누르세요.":"클립보드가 비어 있어요."); }
+    catch(e){ $("#mv-in").focus(); mstat("칸을 길게 눌러 '붙여넣기'를 고르세요."); } });
+  $("#mv-go").addEventListener("click",()=>{ const o=unpackAll($("#mv-in").value);
+    if(!o){ mstat("옮기기 글자를 읽지 못했어요. 'TOKYOLINES1.'로 시작하는 전체를 붙여넣었는지 확인하세요."); return; }
+    const n=EDIT.reduce((a,k)=>a+((o.lines.days||{})[k]||[]).length,0);
+    if(!confirm(`가져온 노선(${n}역)으로 이 기기 내용을 바꿀까요? 이 기기의 지금 노선은 사라져요.`)) return;
+    applyAll(o); MOVED=true;
+    if(o.gkey && !(PSTORE.byId && Object.keys(PSTORE.byId).length)){ TOOLS_OPEN="google"; LS.set("tokyo-lines-open","google"); }
+    commit(o.gkey?"가져왔어요. 사진은 '장소 정보 받기'를 한 번 눌러 주세요":"다른 기기 내용을 가져왔어요"); });
   $("#exp").addEventListener("click",()=>download("tokyo-lines.json",JSON.stringify(S,null,1),"application/json"));
-  $("#imp").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; try{ const v=JSON.parse(await f.text()); if(!v||!v.days) throw 0; S=v; EDIT.forEach(k=>{ S.days[k]=(S.days[k]||[]).filter(id=>place(id)); }); ["start","pins","dur","star","added"].forEach(k=>S[k]=S[k]||{}); commit("노선을 불러왔어요"); }catch(err){ toast("이 파일은 읽을 수 없어요"); } });
+  $("#imp").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; try{ const v=JSON.parse(await f.text()); if(!v||!v.days) throw 0; useLines(v); commit("노선을 불러왔어요"); }catch(err){ toast("이 파일은 읽을 수 없어요"); } });
   $("#ics").addEventListener("click",()=>download("tokyo-lines.ics",icsText(),"text/calendar;charset=utf-8"));
   $("#reset").addEventListener("click",()=>{ if(!confirm("처음 노선(지역별 기본)으로 돌아갈까요? 찜과 직접 담은 곳은 남아요.")) return; S=fromTemplate("base",{star:S.star, added:S.added}); commit("처음 노선으로 돌아갔어요"); });
 }

@@ -2120,7 +2120,7 @@ function renderThemes(){
   const inPlan=r=>DAYS.some(d=>(d.base||d.stops).some(s=>s.q===r.q));
   const secs=THEMES.map(t=>{
     const items=themeStops(t,all,x=>x.s);
-    const recs=RECS.filter(r=>(t.k==="dig"?r.dig:t.kcs.includes(r.kc)) && !inPlan(r));
+    const recs=RECS.filter(r=>(t.k==="dig"?r.dig:t.kcs.includes(r.kc)) && !inPlan(r) && !r.gone);
     const sights=themeSights(t);
     const rows=items.map(({d,s})=>`<li><button type="button" class="trow${s.opt?" opt":""}" data-see="${d.key}" data-q="${esc(s.q)}">
         <span class="tday"><b>${d.wd}</b><span>${esc(s.t)}</span></span>
@@ -2144,13 +2144,13 @@ function renderThemes(){
       ${recs.length?`<h3 class="theme-sub">일정 밖 추천</h3><ol class="reclist">${recs.map(recCardHTML).join("")}</ol>`:""}
     </section>`;
   }).join("");
-  const chips=THEMES.map(t=>{ const n=themeStops(t,all,x=>x.s).length+themeSights(t).length+(t.k==="dig"?RECS.filter(r=>r.dig&&!inPlan(r)).length:0);
+  const chips=THEMES.map(t=>{ const n=themeStops(t,all,x=>x.s).length+themeSights(t).length+(t.k==="dig"?RECS.filter(r=>r.dig&&!inPlan(r) && !r.gone).length:0);
     return `<a class="tchip" href="#th-${t.k}" style="--kc:${themeColor(t)}">${ico(t.ic)}<span>${esc(t.n)}</span><b>${n}</b></a>`; }).join("");
   panelEl.innerHTML=`<section class="themes" role="tabpanel" aria-labelledby="nav-themes">
     <header class="pagehead">
       <p class="eyebrow">The guide · 가이드북</p>
       <h1 class="ptitle">테마로 보는 도쿄</h1>
-      <p class="lede">일정에 넣은 ${all.length}곳과 추천 ${RECS.filter(r=>!inPlan(r)).length}곳을 종류별로 모았어요. 누르면 그날 일정의 그 자리로 갑니다.</p>
+      <p class="lede">일정에 넣은 ${all.length}곳과 추천 ${RECS.filter(r=>!inPlan(r) && !r.gone).length}곳을 종류별로 모았어요. 누르면 그날 일정의 그 자리로 갑니다.</p>
     </header>
     <nav class="tchips" aria-label="테마 바로 가기">${chips}</nav>
     ${secs}
