@@ -884,6 +884,15 @@ dialog.ja-dlg,.ja-card{border-radius:0 !important}
 .bar,.bar i{border-radius:0 !important}
 .bar{height:3px !important}
 .bar i{background:var(--accent) !important}
+.badge.gbad{border-color:var(--accent);background:var(--accent);color:var(--ginkgo-ink)}
+.badge.gwarn{border-color:var(--accent);color:var(--accent)}
+.gcheck .gck{border-top:1px solid var(--line);padding:10px 0}
+.gck-h{margin:0;font:700 15px/1.4 var(--kserif)}
+.gck-h em{font:600 12px var(--sans);font-style:normal;color:var(--muted);margin-left:6px}
+.gck ul{list-style:none;margin:6px 0 0;padding:0;display:grid;gap:6px}
+.gck li{font-size:14px;line-height:1.5}
+.gck li b{font-family:var(--mono);font-weight:500;margin-right:4px}
+.gck li span{display:block;color:var(--accent);font-size:13px}
 </style>
 </head>
 <body>
@@ -933,6 +942,8 @@ dialog.ja-dlg,.ja-card{border-radius:0 !important}
         <button type="button" class="btn" id="gclear">지우기</button>
       </div>
       <p class="gstat" id="gstat"></p>
+      <h3 style="margin-top:20px">영업시간 검사</h3>
+      <div id="gcheck" class="gcheck"></div>
       <details class="ghelp">
         <summary>키 없이 넣기 &mdash; 클로드 채팅에서 받아 붙여넣기</summary>
         <p>클로드 채팅에는 구글 지도 커넥터가 붙어 있습니다. 거기서 한 번 물어보고 결과를 여기에 붙여넣으면 키 없이도 평점이 들어갑니다. 사진은 이 방법으로 가져올 수 없어요.</p>
@@ -1203,7 +1214,7 @@ const DAYS = [
        leg:{line:"치요다선", from:"노기자카역", to:"오모테산도역", v:true},
        note:"칠기 전시(10/24–11/23). 쿠마 겐고 건물에 일본 정원, 11월 하순이면 단풍 절정. 정원을 먼저 돌고 카페는 나중에.",
        q:"根津美術館", id:"ChIJxU48-2OLGGARHMtB5RAhytA", lat:35.6622568, lng:139.7170937},
-      {t:"14:00", n:"진구가이엔 은행나무길", ja:"神宮外苑いちょう並木", kc:"leaf", k:"사진 스팟, 단풍",
+      {t:"14:00", n:"진구가이엔 은행나무길", ja:"神宮外苑いちょう並木", kc:"leaf", k:"사진 스팟, 단풍", outside:true,
        shot:"아오야마도리 쪽 입구에서 길 끝 회화관까지 원근감으로. 차도 가운데는 위험하니 보도에서. 노란 잎은 역광일 때 빛나요.",
        rain:"비가 오면 길 끝에서 사진만 찍고, 네즈 카페에서 더 머물거나 선택 일정인 와타리움을 넉넉히 보세요.",
        note:"아오야마도리에서 이어지는 300m 은행나무 터널. 절정은 11월 하순~12월 상순이라 21일은 노랗게 물드는 중일 거예요. 토요일이라 붐비니 길 가운데보다 양 끝에서 찍으세요. 은행나무 축제가 이맘때 열리는 해가 많습니다(올해 날짜는 공식 사이트 확인).",
@@ -1341,7 +1352,7 @@ const RECS = [
   {n:"짓켄바시 역스카이트리", ja:"十間橋", kc:"photo", k:"사진 스팟", area:"오시아게", when:"thu",
    why:"기타짓켄강 작은 다리. 물에 비친 거꾸로 선 스카이트리를 타워와 함께 찍는 유명한 자리예요. 스카이트리에서 걸어서 7~10분, 해 질 무렵이 좋아요.",
    tip:"목요일엔 해 질 때 타워 위에 있어서 둘 다는 어려워요. 필름으로 타워를 찍고 싶으면 입장을 한 시간 당기고 16:40쯤 여기로 오세요(블루아워는 17시 전까지). 타워와 반영을 다 넣으려면 광각(18mm쯤)으로 세로.",
-   q:"十間橋", src:"https://yakei.jp/japan/spot.php?i=jyukken", srcn:"夜景INFO", lat:35.7093, lng:139.8196, slot:{day:"thu", t:"16:40"}},
+   q:"十間橋", outside:true, src:"https://yakei.jp/japan/spot.php?i=jyukken", srcn:"夜景INFO", lat:35.7093, lng:139.8196, slot:{day:"thu", t:"16:40"}},
 
   {n:"카메라노 키타무라 시부야점", ja:"カメラのキタムラ 渋谷店", kc:"photo", k:"필름 현상", area:"시부야", when:"sat",
    why:"컬러 네거티브·일회용 카메라 현상을 1층에서 받아요. 빠르면 당일에 끝나고 스마트폰으로 받는 데이터도 돼요.",
@@ -1496,22 +1507,22 @@ const RECS = [
   {n:"도쿄대 은행나무길과 야스다 강당", ja:"東京大学 銀杏並木", kc:"leaf", k:"은행잎, 건축", area:"혼고", when:"thu", dig:"구글 지도", 
    why:"정문에서 야스다 강당까지 이어지는 은행나무 길. 일반인도 7:00~18:00에 볼 수 있어요(시험 기간 등은 예외).",
    tip:"절정은 예년 11월 하순~12월 초라 19일엔 조금 이를 수 있어요. 목요일 리쿠기엔과 우에노 사이에 있어요.",
-   q:"東京大学 本郷キャンパス 銀杏並木", src:"https://www.u-tokyo.ac.jp/ja/about/campus-guide/public02_05.html", srcn:"도쿄대 공식", lat:35.7128, lng:139.7605, slot:{day:"thu", t:"10:00"}},
+   q:"東京大学 本郷キャンパス 銀杏並木", outside:true, src:"https://www.u-tokyo.ac.jp/ja/about/campus-guide/public02_05.html", srcn:"도쿄대 공식", lat:35.7128, lng:139.7605, slot:{day:"thu", t:"10:00"}},
 
   {n:"12 KANDA", kc:"photo", k:"건축", area:"간다", when:"fri", dig:"구글 지도", 
    why:"sinato(오노 지카라) 설계. 바깥 피난 계단과 발코니가 층마다 다르게 튀어나온 공유 오피스. 밖에서 보는 건물이에요.",
    tip:"금요일 진보초에서 동쪽으로 조금. 아티존 가는 길에 돌아가도 돼요.",
-   q:"12 KANDA 神田須田町", src:"https://architecturephoto.net/216957/", srcn:"architecturephoto", lat:35.6955, lng:139.7695, slot:{day:"fri", t:"15:15"}},
+   q:"12 KANDA 神田須田町", outside:true, src:"https://architecturephoto.net/216957/", srcn:"architecturephoto", lat:35.6955, lng:139.7695, slot:{day:"fri", t:"15:15"}},
 
   {n:"MONOSPINAL", kc:"photo", k:"건축", area:"아사쿠사바시", when:"thu", dig:"구글 지도", 
    why:"야마구치 마코토 설계(2023). 기울어진 벽 아홉 장이 둘러싼 게임 회사 본사. 고가 선로 옆. 밖에서 보는 건물이에요.",
    tip:"목요일 호쿠사이 미술관(료고쿠)에서 강 건너편이에요.",
-   q:"MONOSPINAL 浅草橋", src:"https://architecturephoto.net/207637/", srcn:"architecturephoto", lat:35.697, lng:139.7845, slot:{day:"thu", t:"13:50"}},
+   q:"MONOSPINAL 浅草橋", outside:true, src:"https://architecturephoto.net/207637/", srcn:"architecturephoto", lat:35.697, lng:139.7845, slot:{day:"thu", t:"13:50"}},
 
   {n:"에비스 가든 플레이스", ja:"恵比寿ガーデンプレイス", kc:"photo", k:"사진 스팟", area:"에비스", when:"sat", dig:"구글 지도", 
    why:"겨울마다 세계 최대급 바카라 샹들리에를 광장에 켜요. 2025년엔 11/8~1/12, 11:00~23:00.",
    tip:"2026년 일정은 아직 발표 전이에요. 사진미술관이 바로 여기라 같이 묶으세요.",
-   q:"恵比寿ガーデンプレイス", src:"https://event.gardenplace.jp/special/2025baccarat/", srcn:"공식", lat:35.6421, lng:139.7137, slot:{day:"sat", t:"17:30"}},
+   q:"恵比寿ガーデンプレイス", outside:true, src:"https://event.gardenplace.jp/special/2025baccarat/", srcn:"공식", lat:35.6421, lng:139.7137, slot:{day:"sat", t:"17:30"}},
 
   {n:"도쿄 타워", ja:"東京タワー", kc:"view", k:"전망대, 야경", area:"시바공원", when:"any", dig:"구글 지도", 
    why:"메인데크(150m) 9:00~23:00, 어른 1,500엔부터.",
@@ -1766,9 +1777,9 @@ function planStop(sp){
   const {ref,keep,...ov}=sp; let o=null;
   for(const d of DAYS){ const f=d.orig.find(x=>x.q===ref); if(f){ const {leg,num,_idx,_from,...rest}=f; o=rest; if(keep&&leg) o.leg=leg; break; } }
   if(!o){ const r=RECS.find(x=>x.q===ref);
-    if(r) o={n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, q:r.q, lat:r.lat, lng:r.lng, dig:r.dig, fromRec:true}; }
+    if(r) o={n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, q:r.q, lat:r.lat, lng:r.lng, dig:r.dig, outside:r.outside, fromRec:true}; }
   if(!o){ const g=SIGHTS.find(x=>x.q===ref);
-    if(g) o={n:g.n, ja:g.ja, kc:"photo", k:"건축", arch:{by:g.by, year:g.year}, note:g.why, q:g.q, lat:g.lat, lng:g.lng, dig:g.dig}; }
+    if(g) o={outside:true, n:g.n, ja:g.ja, kc:"photo", k:"건축", arch:{by:g.by, year:g.year}, note:g.why, q:g.q, lat:g.lat, lng:g.lng, dig:g.dig}; }
   if(!o){ console.warn("플랜에서 못 찾은 장소:",ref); return null; }
   return Object.assign(o,ov);
 }
@@ -1780,6 +1791,7 @@ function applyPlan(k){
     d.base=planStopsFor(P,d);
     Object.assign(d, pd ? {title:pd.title, summary:pd.summary, walk:pd.walk||d.origMeta.walk, short:d.origMeta.short} : d.origMeta); });
   indexStops();
+  applyPlaceCoords();   // 처음 불릴 땐 PSTORE가 아직 없어 안에서 조용히 넘어간다
   ALL=DAYS.flatMap(d=>d.stops.filter(s=>s.lat && !s.hotel));
 }
 // 모든 플랜의 장소(구글 장소 정보 받기·붙여넣기용). pkey가 같은 곳은 한 번만
@@ -1977,7 +1989,7 @@ function wireCards(){
 const PMAXAGE = 30*864e5;
 const PRICE = {PRICE_LEVEL_FREE:"무료",PRICE_LEVEL_INEXPENSIVE:"¥",PRICE_LEVEL_MODERATE:"¥¥",
                PRICE_LEVEL_EXPENSIVE:"¥¥¥",PRICE_LEVEL_VERY_EXPENSIVE:"¥¥¥¥"};
-const PFIELDS = "id,displayName,rating,userRatingCount,primaryTypeDisplayName,regularOpeningHours,priceLevel,photos,googleMapsUri";
+const PFIELDS = "id,displayName,rating,userRatingCount,primaryTypeDisplayName,regularOpeningHours,priceLevel,photos,googleMapsUri,businessStatus,location";
 let PSTORE = (()=>{ try{ return JSON.parse(LS.get("tokyo-places","{}"))||{}; }catch(e){ return {}; } })();
 const pAge   = ()=> PSTORE.at ? Date.now()-PSTORE.at : Infinity;
 const pStale = ()=> pAge() > PMAXAGE;
@@ -2001,6 +2013,41 @@ function cardLine(s,P){
   bits.push(esc((P&&P.type)||s.k));
   return bits.join(" · ");
 }
+/* ---------- 구글 영업시간·상태 검사 ----------
+   받아 둔 요일별 영업시간(periods, day 0=일)으로 일정 시각에 열려 있는지 본다. 모르면 null.
+   밖에서 보는 건물·길(outside)은 영업시간을 보지 않는다. */
+function gOpenAt(P,date,t){
+  if(!P || !P.periods || !P.periods.length) return null;
+  const dow=new Date(date+"T12:00:00+09:00").getUTCDay(), [h,m]=t.split(":").map(Number), W=7*1440, w=dow*1440+h*60+m;
+  return P.periods.some(x=>{ if(!x.c) return true;
+    const o=x.o[0]*1440+x.o[1]*60+x.o[2]; let c=x.c[0]*1440+x.c[1]*60+x.c[2]; if(c<=o) c+=W;
+    return (w>=o && w<c) || (w+W>=o && w+W<c); });
+}
+function gCheck(d,s,P){
+  if(!P || s.hotel || !s.lat) return null;
+  if(P.status==="CLOSED_PERMANENTLY") return {lv:"bad", msg:"구글: 폐업"};
+  if(P.status==="CLOSED_TEMPORARILY") return {lv:"bad", msg:"구글: 임시 휴업"};
+  if(P.loc && s.lat && km(s,P.loc)>=2) return {lv:"warn", msg:`구글 위치가 ${km(s,P.loc).toFixed(1)}km 떨어져 있어요. 다른 곳이 잡혔을 수 있어요`};
+  if(!s.outside && gOpenAt(P,d.date,s.t)===false){ const h=todayHours(d,P); return {lv:"warn", msg:`구글: ${s.t}엔 닫혀 있어요${h?` (${h})`:""}`}; }
+  return null;
+}
+// place_id가 없어 대략 좌표였던 곳은 구글 좌표로 바꾼다(2km 넘게 다르면 다른 곳이 잡혔다고 보고 두지 않는다)
+function applyPlaceCoords(){
+  try{ DAYS.forEach(d=>d.stops.forEach(s=>{ if(s.id || s.hotel || !s.lat) return;
+    const P=placeOf(s); if(P && P.loc && km(s,P.loc)<2){ s.lat=P.loc.lat; s.lng=P.loc.lng; s.gpos=true; } })); }catch(e){}
+}
+function renderGCheck(){
+  const el=$("#gcheck"); if(!el) return;
+  if(!PSTORE.byId || pStale()){ el.innerHTML=`<p class="sub">장소 정보를 받으면 네 가지 일정 전체를 구글 영업시간·영업 상태와 맞춰 봐요.</p>`; return; }
+  let unknown=new Set();
+  const secs=PLANS.map(P=>{ const rows=[];
+    DAYS.forEach(d=>planStopsFor(P,d).forEach(s=>{ if(!s.lat||s.hotel) return; const G=gCheck(d,s,placeOf(s));
+      const Pl=placeOf(s); if(!s.outside && (!Pl || !Pl.periods || !Pl.periods.length)) unknown.add(s.n);
+      if(G) rows.push(`<li class="${G.lv}"><b>${d.wd} ${esc(s.t)}</b> ${esc(s.n)}<span>${esc(G.msg)}</span></li>`); }));
+    return `<div class="gck"><p class="gck-h">${esc(P.n)} <em>${rows.length?rows.length+"곳 확인":"문제 없음"}</em></p>${rows.length?`<ul>${rows.join("")}</ul>`:""}</div>`; }).join("");
+  el.innerHTML=secs+(unknown.size?`<p class="sub">구글에 영업시간이 없어 못 본 곳 ${unknown.size}곳: ${esc([...unknown].slice(0,8).join(", "))}${unknown.size>8?" 외":""}</p>`:"");
+}
+
 function placeRow(d,s,P){
   if(!P) return "";
   const bits=[];
@@ -2057,6 +2104,7 @@ function stopHTML(d,s,prev){
   if(s.q) acts.push(`<a class="btn" href="${MAPS(s.q||s.n,s.id||(P&&P.gid))}" target="_blank" rel="noopener">${ico("i-map")}지도</a>`);
   if(s.lat && !s.hotel) acts.push(`<a class="btn" href="${DIR(prev,s)}" target="_blank" rel="noopener" aria-label="${esc(s.n)}까지 길찾기">${ico("i-route")}길찾기</a>`);
   const meta=badgeHTML(s);
+  const G=gCheck(d,s,P), gb=G?`<span class="badge g${G.lv}">${esc(G.msg)}</span>`:"";
   const thumb = P && P.photo ? `<img class="thumb" src="${esc(P.photo)}" alt="" loading="lazy" decoding="async">` : "";
   return `<li class="stop${plain?" plain":""}${s.opt?" opt":""}" data-idx="${s._idx}" style="--kc:${K.c}">
     <div class="time">${esc(s.t)}</div>${dot}
@@ -2071,7 +2119,7 @@ function stopHTML(d,s,prev){
       ${s.note?`<p class="note">${esc(s.note)}</p>`:""}
       ${photoHTML(d,s)}
       ${rainAltHTML(d,s)}
-      ${meta||s.mine||s.dig?`<div class="meta">${s.mine?`<span class="badge mine">내가 추가</span>`:""}${s.dig?`<span class="badge dig" title="인스타에서 저장한 곳">${esc(s.dig)}</span>`:""}${meta}</div>`:""}
+      ${meta||s.mine||s.dig||gb?`<div class="meta">${gb}${s.mine?`<span class="badge mine">내가 추가</span>`:""}${s.dig?`<span class="badge dig" title="인스타에서 저장한 곳">${esc(s.dig)}</span>`:""}${meta}</div>`:""}
       ${acts.length?`<div class="acts">${acts.join("")}</div>`:""}
       ${s.mine?`<button type="button" class="linkish unmine" data-unmine="${esc(s.rid)}">일정에서 빼기</button>`:""}
     </article></li>`;
@@ -3229,7 +3277,11 @@ async function fetchPlaces(key,report){
         type:(j.primaryTypeDisplayName&&j.primaryTypeDisplayName.text)||"",
         price:PRICE[j.priceLevel]||"",
         hours:(j.regularOpeningHours&&j.regularOpeningHours.weekdayDescriptions)||[],
-        uri:j.googleMapsUri||""
+        uri:j.googleMapsUri||"",
+        status:j.businessStatus||"",
+        loc:j.location?{lat:j.location.latitude, lng:j.location.longitude}:null,
+        periods:((j.regularOpeningHours&&j.regularOpeningHours.periods)||[]).filter(x=>x.open)
+          .map(x=>({o:[x.open.day,x.open.hour||0,x.open.minute||0], c:x.close?[x.close.day,x.close.hour||0,x.close.minute||0]:null}))
       };
       const pn=j.photos&&j.photos[0]&&j.photos[0].name;
       if(pn){
@@ -3246,6 +3298,7 @@ async function fetchPlaces(key,report){
   return {out, fail, total, firstErr};
 }
 function gStatus(msg,bad){
+  renderGCheck();
   const el=$("#gstat"); if(!el) return;
   if(msg!==undefined){ el.textContent=msg; el.classList.toggle("bad",!!bad); return; }
   const n=PSTORE.byId?Object.keys(PSTORE.byId).length:0;
@@ -3274,7 +3327,7 @@ function gStatus(msg,bad){
       PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)};
       try{ LS.set("tokyo-places",JSON.stringify(PSTORE)); }
       catch(e){ gStatus("기기 저장 공간이 모자라 일부만 저장됐어요.",true); }
-      refresh();
+      applyPlan(CURPLAN); refresh();
     }
     if(res.fail) gStatus(`${got}곳 받았고 ${res.fail}곳은 실패했어요. ${res.firstErr}`, got===0);
     else gStatus();

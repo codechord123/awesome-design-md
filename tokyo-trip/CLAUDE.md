@@ -91,6 +91,8 @@ Henry의 개인 여행용 모바일 웹페이지. 2026년 11월 18일(수)~22일
   - 키가 400/401/403을 주면 바로 멈춘다(26번 두드리지 않는다).
   - **키 없이 넣는 길도 있다.** "물어볼 문장 복사" 버튼이 일정의 27곳 이름을 넣은 프롬프트를 만들어 주고, 클로드 채팅(구글 지도 커넥터가 붙어 있다)에서 받은 JSON을 붙여넣으면 `importPasted()`가 이름으로 맞춰 넣는다. 코드펜스와 앞뒤 설명은 알아서 걷어내고, 못 맞춘 이름은 화면에 알려준다. 사진은 이 방법으로 못 가져온다.
   - 저장 키는 `pkey(s) = s.id || "n:"+s.n`이다. 그래서 `place_id`가 없는 국립신미술관도 붙여넣기로는 들어간다. API 경로만 `place_id`를 요구한다.
+  - **영업시간 검사(2026-09-27)** — `PFIELDS`에 `businessStatus`, `location`을 더했고 `regularOpeningHours.periods`를 `{o:[요일,시,분], c:[…]|null}`로 줄여 저장한다(요일 0=일, `c`가 없으면 24시간). `gOpenAt`이 그 시각에 열려 있는지, `gCheck`가 폐업·임시휴업·2km 넘는 위치 차이·닫힌 시각을 판단한다. 카드에는 주홍 배지로, 준비 > 할 일의 "영업시간 검사"(`renderGCheck`)에는 네 플랜 전체를 모아 보여준다. 밖에서 보는 건물·길은 `outside:true`로 영업시간을 보지 않는다(SIGHTS에서 온 곳은 자동). 자정 넘은 영업(목 19:00~금 04:00)과 토→일 넘어가는 영업을 검사해 두었다.
+  - **좌표 보정** — place_id 없이 대략 좌표였던 곳은 받은 구글 좌표가 2km 안이면 그걸로 바꾼다(`applyPlaceCoords`, `applyPlan` 끝과 받은 직후). 2km 넘게 다르면 바꾸지 않고 검사에 "다른 곳이 잡혔을 수 있어요"로 띄운다.
   - `place_id`가 없는 곳은 **Text Search(New)** `places:searchText`로 `q`와 좌표 1km 안에서 한 곳을 찾아 ID를 얻는다(`findPlaceId`). POST+JSON이라 프리플라이트가 생기지만 places.googleapis.com이 CORS를 허용한다(2026-09-25 OPTIONS로 확인). 찾은 ID는 `gid`로 저장되고 지도 버튼도 그 ID를 쓴다. 이름이 비슷한 다른 곳이 잡힐 수 있으니, 맞는 ID를 확인하면 `DAYS`의 `id`에 넣을 것. 2026-09-25 기준 34곳 중 12곳이 이름 검색으로 받는다.
 - `data/places.csv`는 Google My Maps 가져오기용, `data/tokyo-trip.ics`는 폰 캘린더용. `DAYS`를 바꿨으면 `node tools/make-csv.mjs`로 둘 다 다시 뽑을 것.
 
