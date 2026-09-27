@@ -28,7 +28,7 @@
 :root{
   /* 2026-09-27 편집 리디자인: 여행 매거진 문법. 신문 종이색 바탕, 먹색 글자, 붉은 주홍 하나.
      제목은 명조(Noto Serif KR)와 Instrument Serif, 시각·번호는 IBM Plex Mono, 본문은 Pretendard. 카드 대신 괘선. */
-  --paper:#F1EDE4;--surface:#F7F4ED;--ink:#15130F;--text2:#3D3930;--muted:#766F60;--line:#D6CEBD;--faint:#E9E3D6;--soft:#E2DBCB;
+  --paper:#F1EDE4;--surface:#F7F4ED;--ink:#15130F;--text2:#3D3930;--muted:#6B6455;--accent-ink:#B83A24;--line:#D6CEBD;--faint:#E9E3D6;--soft:#E2DBCB;
   --ginkgo:#D4432C;--ginkgo-ink:#FBF8F2;--ginkgo-soft:#F6DDD5;--pine:#2F5D50;--accent:#D4432C;
   --k-art:#2F5D50;--k-book:#8A5A2B;--k-food:#B8432F;--k-bar:#4B3F72;--k-market:#2E6E7E;--k-view:#3C5A8A;--k-move:#8A8375;--k-leaf:#6B7A2E;--k-photo:#A8466A;
   --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Hiragino Sans","Noto Sans KR","Noto Sans JP","Malgun Gothic",system-ui,sans-serif;
@@ -893,6 +893,28 @@ dialog.ja-dlg,.ja-card{border-radius:0 !important}
 .gck li{font-size:14px;line-height:1.5}
 .gck li b{font-family:var(--mono);font-weight:500;margin-right:4px}
 .gck li span{display:block;color:var(--accent);font-size:13px}
+/* 작은 글씨 주홍은 대비 4.5를 넘는 진한 주홍(--accent-ink). 다크는 원래 주홍이 충분하다 */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--accent-ink:#EC6A50}}
+:root[data-theme="dark"]{--accent-ink:#EC6A50}
+[data-en]::before,.day .kicker,.block .kicker,.badge.gwarn,.gck li span,.hop.far .hop-t b{color:var(--accent-ink)}
+.badge.gwarn{border-color:var(--accent-ink)}
+.pp{min-height:44px}
+.region{margin:12px 0 0;font:600 13px/1.4 var(--sans);color:var(--text2);display:inline-block;border-top:1px solid var(--ink);padding-top:6px}
+/* 동네 안내 */
+.around{margin:48px 0 0;border-top:1px solid var(--ink);padding-top:18px}
+.around h2{font-size:26px;margin:6px 0 2px}
+.at-sub{margin:0;font-size:13px;color:var(--muted);font-weight:600}
+.at-concept{margin:12px 0 0;font:500 15.5px/1.7 var(--kserif);color:var(--text2);word-break:keep-all}
+.alist{list-style:none;margin:0;padding:0;border-top:1px solid var(--ink)}
+.arow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.at-n{margin:0;font:700 16.5px/1.4 var(--kserif);word-break:keep-all}
+.at-n em{font:600 11px/1.5 var(--sans);font-style:normal;padding:1px 6px;margin-left:4px;vertical-align:2px;white-space:nowrap}
+.at-in{background:var(--ink);color:var(--paper)}
+.at-other{border:1px solid var(--line);color:var(--muted)}
+.at-far{color:var(--accent-ink);border:1px solid var(--accent-ink)}
+.at-ja{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.at-note{margin:4px 0 0;font-size:14px;line-height:1.55;color:var(--text2)}
+.at-btn{min-height:44px;min-width:60px;padding:0 12px;font-size:14px}
 </style>
 </head>
 <body>
@@ -2217,6 +2239,7 @@ function renderDay(key){
       ${planPickHTML()}
       <p class="eyebrow kicker">Chapter ${String(dayNo).padStart(2,"0")} &middot; ${d.dt} ${d.wd}요일</p>
       <p class="chap-lat" aria-hidden="true">${LATWD[d.key]||""}</p>
+      ${REGIONS[d.key]?`<p class="region">${esc(REGIONS[d.key].n)} · ${esc(REGIONS[d.key].sub)}</p>`:""}
       <h2>${esc(d.title)}</h2>
       <p class="summary">${esc(d.summary)}</p>
       <div class="daymeta">
@@ -2244,6 +2267,7 @@ function renderDay(key){
     <div class="daylist">
       ${hasOpt?`<div class="dayopts"><button type="button" class="linkish" id="optbtn">${hide?"선택 일정 다시 보기":"선택 일정 접기"}</button></div>`:""}
       <ol class="timeline">${rows}</ol>
+      ${aroundHTML(d)}
     </div>
     ${d.key==="wed"?arrivalHTML(d):""}
     ${d.key==="sun"?sundayHTML():""}
@@ -2267,7 +2291,7 @@ function renderDay(key){
   $$(".thumb, .mc-img",panelEl).forEach(im=>im.addEventListener("error",()=>{
     if(im.tagName==="IMG") im.remove();
   }));
-  wireCards();
+  wireCards(); wireAround(d);
   (function(){
     const info=nowInfo();
     let pick=null;
@@ -2563,6 +2587,90 @@ function renderThemes(){
   }));
 }
 
+/* ---------- 동네 안내 ----------
+   날짜마다 지역이 하나다(REGIONS). 네 플랜의 장소·추천·지나가는 건물을 지도 거리로 그날 지역에 나누고
+   (어느 플랜이든 그날 일정 → 지나가는 건물의 날 → 숙소 2.5km 안은 "숙소 근처" → 가장 가까운 날, 3km 넘으면 "조금 멀어요").
+   그 안에서 보고 찍기 / 읽기 / 먹고 마시기 / 듣기 / 걷기로 묶는다. */
+const REGIONS={
+  thu:{n:"북동쪽", sub:"우에노 · 스미다 · 아사쿠사", en:"Ueno to Asakusa",
+       concept:"에도의 동쪽. 박물관 숲 우에노, 호쿠사이의 스미다, 강 건너 스카이트리, 저녁은 아사쿠사 노포에서."},
+  fri:{n:"동쪽 도심", sub:"츠키지 · 진보초 · 마루노우치 · 니혼바시", en:"Old downtown",
+       concept:"새벽 시장과 헌책방 거리, 붉은 벽돌 도쿄역, 증권가 가부토초에 들어선 새 가게들."},
+  sat:{n:"남서쪽", sub:"나카메구로 · 롯폰기 · 아오야마 · 시부야", en:"West side",
+       concept:"강가 로스터리에서 롯폰기 미술관, 오모테산도 건축, 시부야의 서점과 레코드 바까지."},
+  sun:{n:"긴자", sub:"도쿄역 · 유라쿠초 · 긴자", en:"Ginza",
+       concept:"떠나는 날 오전. 1936년 찻집, 사진집 서가, 책 한 권만 파는 서점."}
+};
+const MOODS=[
+  {k:"see",  n:"보고 찍기",     kcs:["art","photo"]},
+  {k:"read", n:"읽기",          kcs:["book"]},
+  {k:"eat",  n:"먹고 마시기",   kcs:["food","market"]},
+  {k:"listen",n:"듣기",         kcs:["bar"]},
+  {k:"walk", n:"걷기",          kcs:["leaf","view"]}
+];
+const NEAR_HOTEL_KM=2.5, FAR_FROM_DAY_KM=3;
+function aroundPool(){
+  const m=new Map(), add=(o,src)=>{ if(!o||!o.lat||o.hotel) return; if(!m.has(o.q)) m.set(o.q,{o,src,plans:{}}); };
+  PLANS.forEach(P=>DAYS.forEach(d=>planStopsFor(P,d).forEach(s=>{ add(s,"stop"); if(m.has(s.q)) (m.get(s.q).plans[d.key]=m.get(s.q).plans[d.key]||[]).push(P); })));
+  RECS.forEach(r=>add({n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, q:r.q, lat:r.lat, lng:r.lng, dig:r.dig},"rec"));
+  SIGHTS.forEach(g=>add({n:g.n, ja:g.ja, kc:"photo", k:"건축", note:g.why, q:g.q, lat:g.lat, lng:g.lng, dig:g.dig, by:g.by, day:g.day},"sight"));
+  return [...m.values()];
+}
+function aroundFor(dayKey){
+  const days=Object.keys(REGIONS);
+  const anchors={}; days.forEach(k=>{ const d=DAYS.find(x=>x.key===k);
+    anchors[k]=PLANS.flatMap(P=>planStopsFor(P,d)).filter(s=>s.lat&&!s.hotel&&km(s,HOTEL)>=NEAR_HOTEL_KM); });
+  const dist=(it,k)=>Math.min(...anchors[k].map(a=>km(a,it.o)));
+  const mine=[], hotel=[];
+  aroundPool().forEach(it=>{
+    // 어느 플랜이든 그날 일정에 있으면 그날 → 지나가는 건물은 제 날 → 숙소 근처 → 가장 가까운 날
+    const onDays=Object.keys(it.plans).filter(k=>days.includes(k));
+    let best=onDays.length?onDays:(it.o.day&&days.includes(it.o.day)?[it.o.day]:null);
+    if(!best && km(it.o,HOTEL)<NEAR_HOTEL_KM){ hotel.push(it); return; }
+    if(!best){ let bk=null,bd=Infinity; days.forEach(k=>{ const x=dist(it,k); if(x<bd){bd=x;bk=k;} }); best=[bk]; it.far=bd>=FAR_FROM_DAY_KM; it.fd=bd; }
+    if(best.includes(dayKey)) mine.push(it);
+  });
+  return {mine, hotel};
+}
+function aroundRow(d,it){
+  const s=it.o, cur=d.stops.find(x=>x.q===s.q);
+  const plans=(it.plans[d.key]||[]).filter(P=>P.k!==CURPLAN).map(P=>P.n);
+  const tag = cur ? `<em class="at-in">${cur.mine?"내가 넣음":"오늘 일정"} ${esc(cur.t)}</em>`
+            : plans.length ? `<em class="at-other">${esc(plans.join("·"))} 일정</em>`
+            : it.src==="sight" ? `<em class="at-other">지나가며</em>` : `<em class="at-other">추천</em>`;
+  const act = cur ? `<button type="button" class="btn at-btn" data-gostop="${cur._idx}">보기</button>`
+            : (it.src==="rec" ? `<button type="button" class="btn at-btn" data-addrec="${esc(RECS.find(r=>r.q===s.q).n)}" data-day="${d.key}">넣기</button>`
+            : `<a class="btn at-btn" href="${MAPS(s.q,s.id)}" target="_blank" rel="noopener">지도</a>`);
+  return `<li class="arow"><div class="at-main">
+      <p class="at-n">${esc(s.n)} ${tag}${it.far?` <em class="at-far">조금 멀어요 · ${it.fd.toFixed(1)}km</em>`:""}</p>
+      ${s.ja?`<p class="at-ja" lang="ja">${esc(s.ja)}</p>`:""}
+      <p class="at-note">${esc(firstSentence(s.note||""))}</p></div>${act}</li>`;
+}
+function aroundHTML(d){
+  const R=REGIONS[d.key]; if(!R) return "";
+  const {mine,hotel}=aroundFor(d.key);
+  const groups=MOODS.map(M=>{ const its=mine.filter(it=>M.kcs.includes(it.o.kc)).sort((a,b)=>(!!a.far-!!b.far)||((d.stops.find(x=>x.q===b.o.q)?1:0)-(d.stops.find(x=>x.q===a.o.q)?1:0)));
+    return its.length?`<h3 class="theme-sub">${esc(M.n)} · ${its.length}</h3><ol class="alist">${its.map(it=>aroundRow(d,it)).join("")}</ol>`:""; }).join("");
+  const night=hotel;
+  return `<section class="around" aria-labelledby="ar-${d.key}">
+    <p class="eyebrow kicker">Neighborhood · ${esc(R.en)}</p>
+    <h2 id="ar-${d.key}">${esc(R.n)}에서 더</h2>
+    <p class="at-sub">${esc(R.sub)}</p>
+    <p class="at-concept">${esc(R.concept)} 오늘 일정 밖의 곳은 "넣기"로 끼워 넣을 수 있어요.</p>
+    ${groups}
+    ${night.length?`<h3 class="theme-sub">숙소 근처, 아무 날이나 · ${night.length}</h3><ol class="alist">${night.map(it=>aroundRow(d,it)).join("")}</ol>`:""}
+  </section>`;
+}
+function wireAround(d){
+  $$("[data-gostop]",panelEl).forEach(b=>b.addEventListener("click",()=>goStop(Number(b.dataset.gostop))));
+  $$("[data-addrec]",panelEl).forEach(b=>b.addEventListener("click",()=>{
+    const r=RECS.find(x=>x.n===b.dataset.addrec); if(!r) return;
+    const t=(r.slot&&r.slot.day===b.dataset.day)?r.slot.t:"16:00";
+    setMine(getMine().filter(m=>m.rid!==r.n).concat([{rid:r.n, day:b.dataset.day, t}]));
+    applyPlaceCoords(); ALL=DAYS.flatMap(x=>x.stops.filter(s=>s.lat && !s.hotel));
+    refresh(); toast(`${d.wd}요일 ${t}에 넣었어요. 시간은 테마 탭 추천 카드에서 바꿔요`);
+  }));
+}
 const LATWD={wed:"Wednesday",thu:"Thursday",fri:"Friday",sat:"Saturday",sun:"Sunday"};
 /* ---------- 플랜 고르기 ---------- */
 function planPickHTML(){
