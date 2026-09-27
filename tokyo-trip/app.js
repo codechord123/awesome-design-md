@@ -50,7 +50,7 @@ const KIND={art:{i:"i-art",n:"미술·건축"},photo:{i:"i-camera",n:"건축·�
   market:{i:"i-market",n:"시장"},bar:{i:"i-record",n:"음악"},leaf:{i:"i-leaf",n:"정원"},view:{i:"i-view",n:"전망"},hotel:{i:"i-hotel",n:"숙소"},move:{i:"i-move",n:"이동"}};
 const MOOD=[{k:"see",n:"보고 찍기",kc:["art","photo"]},{k:"read",n:"읽기",kc:["book"]},{k:"eat",n:"먹고 마시기",kc:["food","market"]},{k:"listen",n:"듣기",kc:["bar"]},{k:"walk",n:"걷기",kc:["leaf","view"]}];
 function catAdd(o){
-  if(!o || !o.q || !o.lat) return;
+  if(!o || !o.q || !(o.lat || o.gid)) return;
   const cur=CAT.get(o.q);
   if(!cur){ CAT.set(o.q, Object.assign({id:o.q}, o)); return; }
   for(const k in o) if(cur[k]===undefined) cur[k]=o[k];
@@ -61,9 +61,9 @@ DAYS.forEach(d=>{
   (d.stops||[]).forEach(s=>{ if(!s.hotel && s.q) catAdd(asStop(s,d.key)); });
   (d.spare||[]).forEach(s=>catAdd(asStop(s,d.key)));
 });
-RECS.forEach(r=>catAdd({q:r.q, n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, tip:r.tip, src:r.src, srcn:r.srcn, lat:r.lat, lng:r.lng, dig:r.dig,
+RECS.forEach(r=>catAdd({q:r.q, n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, tip:r.tip, src:r.src, srcn:r.srcn, lat:r.lat, lng:r.lng, dig:r.dig, gid:r.id, found:r.found, shot:r.shot, fee:r.fee, feeNote:r.feeNote,
   outside:r.outside, fee:r.fee, feeNote:r.feeNote, slot:r.slot, gone:r.gone, goneSrc:r.goneSrc, rec:true}));
-SIGHTS.forEach(g=>catAdd({q:g.q, n:g.n, ja:g.ja, kc:"photo", k:"건축", arch:{by:g.by, year:g.year}, note:g.why, src:g.src, srcn:g.srcn,
+SIGHTS.forEach(g=>catAdd({q:g.q, n:g.n, ja:g.ja, kc:"photo", k:"건축", arch:{by:g.by, year:g.year}, note:g.why, src:g.src, srcn:g.srcn, gid:g.id,
   lat:g.lat, lng:g.lng, dig:g.dig, outside:true, sday:g.day}));
 // 블록 id는 q. 원래 id 필드(구글 place_id)는 gid로 옮겼다
 CAT.forEach((p,k)=>{ p.id=k; });
@@ -212,7 +212,7 @@ function dday(){ const n=tokyoNow(); const a=new Date(n.ymd+"T00:00:00+09:00"), 
 const PMAXAGE=30*864e5;
 let PSTORE=(()=>{ try{ return JSON.parse(LS.get("tokyo-places","{}"))||{}; }catch(e){ return {}; } })();
 const pkey=p=>p.gid || ("n:"+p.n);
-function placeOf(p){ if(!p || !PSTORE.byId || !PSTORE.at || Date.now()-PSTORE.at>PMAXAGE) return null; return PSTORE.byId[pkey(p)]||null; }
+function placeOf(p){ if(!p || !PSTORE.byId || !PSTORE.at || Date.now()-PSTORE.at>PMAXAGE) return null; return PSTORE.byId[pkey(p)]||PSTORE.byId["n:"+p.n]||null; }   // 예전엔 추천을 이름으로 저장했다
 function gOpenAt(P,date,min){
   if(!P || !P.periods || !P.periods.length) return null;
   const dow=new Date(date+"T12:00:00+09:00").getUTCDay(), W=7*1440, w=dow*1440+(min%1440)+(min>=1440?1440:0);
@@ -243,7 +243,7 @@ async function gPhoto(key,j){   // 사진 주소(photoUri)는 금방 만료된�
 }
 async function fetchPlaces(key,report){
   const seen=new Set(), jobs=[];
-  [...CAT.values(), ...Object.values(S.added)].forEach(p=>{ const k=pkey(p); if(p.lat && !seen.has(k)){ seen.add(k); jobs.push(p); } });
+  [...CAT.values(), ...Object.values(S.added)].forEach(p=>{ const k=pkey(p); if((p.lat||p.gid) && !seen.has(k)){ seen.add(k); jobs.push(p); } });
   const out={}; let fail=0, first="", done=0, stop=false, next=0;
   async function one(p){
     try{
@@ -272,7 +272,7 @@ async function fetchPlaces(key,report){
 /* ─────────────── 지역(보관함 필터) ───────────────
    기본 일정의 날 → 지나가는 건물의 날 → 숙소 2.5km 안 → 가장 가까운 날(3km 넘으면 "먼 곳") */
 const AREA=new Map();
-(function(){
+function buildArea(){
   const anchors={}; EDIT.forEach(dk=>{ anchors[dk]=DAY[dk].stops.filter(s=>s.lat && !s.hotel && km(s,HOTEL)>=2.5); });
   CAT.forEach(p=>{
     let a=p.home || p.sday || null;
@@ -280,7 +280,13 @@ const AREA=new Map();
     if(!a){ let best=null,bd=1e9; EDIT.forEach(dk=>anchors[dk].forEach(s=>{ const x=km(s,p); if(x<bd){bd=x;best=dk;} })); a = bd<=3 ? best : "far"; }
     AREA.set(p.id,a);
   });
-})();
+}
+/* 발견 장소처럼 좌표 없이 place ID만 있는 곳은 받아 둔 구글 정보(30일 보관)의 위치로 채운다 */
+function hydrateLoc(){
+  let n=0; CAT.forEach(p=>{ if(p.lat || !p.gid) return; const P=PSTORE.byId && (PSTORE.byId[pkey(p)]||PSTORE.byId["n:"+p.n]); if(P && P.loc && PSTORE.at && Date.now()-PSTORE.at<PMAXAGE){ p.lat=P.loc.lat; p.lng=P.loc.lng; p.gloc=true; n++; } });
+  if(n) buildArea(); return n;
+}
+buildArea(); hydrateLoc();
 function areaOf(p){ if(AREA.has(p.id)) return AREA.get(p.id); if(!p.lat) return "far"; if(km(p,HOTEL)<2.5) return "hotel"; let best="far",bd=3; EDIT.forEach(dk=>(S.days[dk]||[]).forEach(id=>{ const q=place(id); if(q && q.lat){ const x=km(q,p); if(x<bd){bd=x;best=dk;} } })); return best; }
 const AREANAME={thu:"북동쪽",fri:"동쪽 도심",sat:"남서쪽",sun:"긴자",hotel:"숙소 근처",far:"먼 곳"};
 function dayOf(id){ return EDIT.find(dk=>S.days[dk].includes(id))||null; }
@@ -313,6 +319,10 @@ const KWIN={art:[600,1080], book:[660,1200], bar:[1080,1740], market:[360,840], 
    벌점 = 넣은 곳이 닫혀 있음(2000) + 다른 곳에 새로 생긴 경고(600) + 예약 시각이 밀린 분×12(바 같은 느슨한 고정은 ×4)
         + 그 종류로는 이상한 시각(1000, 밤 11시 미술관 같은) + 늘어난 이동 분. 고정 시각이 10분 넘게 밀리거나 새 경고가 생기면 "밀림".
    이동만 보던 첫 판은 꽉 찬 날이면 무엇이든 밤 LP바 뒤로 보냈다. 렌더마다 FITC를 비운다. */
+// 이 곳을 둘 만한 때: 종류에 아침·점심·저녁이 적혀 있으면 식사 시간, 출처 있는 여는 시각이 있으면 그걸 따르고(여기선 안 봄), 아니면 종류별 보통 시각
+function kwin(p){ if(p.outside) return null; const k=p.k||"";
+  if(/아침/.test(k)) return [360,630]; if(/점심/.test(k)) return [660,870]; if(/저녁/.test(k)) return [1020,1290];
+  if(hoursOf(p).o) return null; return KWIN[p.kc]||null; }
 let FITC=new Map();
 const hardBad=r=>r.warn.filter(w=>w.lv==="bad" && !/늦어요/.test(w.t)).length;
 function fit(p,dk){
@@ -327,7 +337,7 @@ function fit(p,dk){
     sc.rows.forEach(r=>{ if(r.id===p.id){ own=r; const hb=hardBad(r); pen+=hb*2000+(r.late||0)*12; if(hb||(r.late||0)>10) flag=true; }
       else { const o=b0.get(r.id)||{late:0,bad:0}, dl=Math.max(0,(r.late||0)-o.late), nb=Math.max(0,hardBad(r)-o.bad);
         pen+=dl*lw(r)+nb*600; if(dl>10||nb){ flag=true; if(!worst||dl>worst.m) worst={n:r.p.n, m:dl}; } } });
-    const w=KWIN[p.kc]; if(w && own && !p.outside && (own.start<w[0] || own.end>w[1]+30)){ pen+=1000; flag=true; }
+    const w=kwin(p); if(w && own && (own.start<w[0] || own.end>w[1]+30)){ pen+=1000; flag=true; }
     const pts=[HOTEL,...list.map(place),HOTEL], a=pts[i], b=pts[i+1];
     const d=(p.lat&&a&&b&&a.lat&&b.lat)?travel(a,p).min+travel(p,b).min-travel(a,b).min:0;
     if(!best || pen+d<best.cost) best={idx:i, cost:pen+d, add:p.lat?Math.max(0,Math.round(d)):null, tight:flag, worst};
@@ -343,10 +353,60 @@ function placeInto(id,dk,quiet){
   if(!quiet) commit(`${p.n} → ${WDK[dk]} ${LINE[dk].code}${String(f.idx+1).padStart(2,"0")}${f.add!=null?` · 이동 +${f.add}분`:""}${f.tight?(f.worst&&f.worst.m?` · ${f.worst.n} ${f.worst.m}분 밀려요`:" · 시간이 빠듯해요"):""}`);
   return f;
 }
+/* ─────────────── 동선 최적화 ───────────────
+   Henry: "동선을 가장 최소화하는 일정표가 있으면 좋겠어." 그날 역 순서만 바꿔서 이동 시간을 줄인다.
+   점수 = 닫혀 있음·출국 넘김 같은 빨간 경고 2000 + 노란 경고 150 + 예약 시각에 늦은 분×12 + 그 종류로 이상한 시각 1000
+        + 이동 분 + 기다리는 분×0.3. 지금 순서와 가까운 곳부터 잇는 순서에서 출발해 옮기기·바꾸기·뒤집기를 더 나아지지 않을 때까지. */
+function dayScore(dk){
+  const sc=schedule(dk); let pen=0, mv=0, wait=0;
+  sc.rows.forEach(r=>{ pen+=hardBad(r)*2000+r.warn.filter(w=>w.lv!=="bad").length*150+(r.late||0)*12; mv+=r.tr.min; wait+=r.wait||0;
+    const w=kwin(r.p); if(w && (r.start<w[0] || r.end>w[1]+30)) pen+=1000; });
+  mv+=sc.back.min;
+  return {score:pen+mv+wait*0.3, mv, km:sc.dist, pen};
+}
+function optimizeDay(dk){
+  const orig=S.days[dk].slice(); if(orig.length<3) return null;
+  const evalO=o=>{ S.days[dk]=o; return dayScore(dk).score; };
+  const nn=(()=>{ const left=orig.slice(), out=[]; let cur=HOTEL;          // 가까운 곳부터(고정 시각이 있으면 그 시각 순서를 먼저 지킨다)
+    const pinned=left.filter(id=>S.pins[id]).sort((a,b)=>toMin(S.pins[a])-toMin(S.pins[b]));
+    while(left.length){ let bi=0,bd=1e9; left.forEach((id,i)=>{ const p=place(id); const d=(p&&p.lat&&cur.lat)?km(cur,p):0; const pk=pinned.indexOf(id); const pen=pk>0&&!out.includes(pinned[pk-1])?1e3:0; if(d+pen<bd){bd=d+pen;bi=i;} });
+      const id=left.splice(bi,1)[0]; out.push(id); cur=place(id)||cur; }
+    return out; })();
+  let best=orig.slice(), bestS=evalO(orig);
+  for(const start of [orig, nn]){
+    let cur=start.slice(), curS=evalO(cur), improved=true, guard=0;
+    while(improved && guard++<60){
+      improved=false;
+      const n=cur.length;
+      for(let i=0;i<n && !improved;i++) for(let j=0;j<n && !improved;j++){ if(i===j) continue;
+        const o=cur.slice(); const [x]=o.splice(i,1); o.splice(j,0,x); const sc=evalO(o); if(sc<curS-0.5){ cur=o; curS=sc; improved=true; } }
+      for(let i=0;i<n-1 && !improved;i++) for(let j=i+2;j<=n && !improved;j++){
+        const o=cur.slice(0,i).concat(cur.slice(i,j).reverse(),cur.slice(j)); const sc=evalO(o); if(sc<curS-0.5){ cur=o; curS=sc; improved=true; } }
+    }
+    if(curS<bestS-0.5){ best=cur; bestS=curS; }
+  }
+  S.days[dk]=orig; const before=dayScore(dk);
+  S.days[dk]=best; const after=dayScore(dk); S.days[dk]=orig;
+  return {order:best, before, after, changed:best.join("|")!==orig.join("|")};
+}
+let OPTRES=null;   // 방금 최적화한 날의 이전 순서(되돌리기)
+function runOptimize(dk){
+  const r=optimizeDay(dk);
+  if(!r || !r.changed || r.after.mv>=r.before.mv && r.after.pen>=r.before.pen){ toast("이미 가장 덜 움직이는 순서예요"); return; }
+  OPTRES={dk, prev:S.days[dk].slice(), before:r.before, after:r.after};
+  S.days[dk]=r.order; commit(`이동 ${r.before.mv}분 → ${r.after.mv}분`);
+}
+function optHTML(){
+  if(!OPTRES || OPTRES.dk!==CUR) return "";
+  const {before:b, after:a}=OPTRES, d=b.mv-a.mv;
+  return `<div class="news opt" role="status"><p><b>동선을 다시 짰어요 · 이동 ${d>=0?"−":"+"}${Math.abs(d)}분</b>이동 ${b.mv}분(${b.km.toFixed(1)}km) → ${a.mv}분(${a.km.toFixed(1)}km). 예약 시각과 여는 시각은 그대로 지켰어요.</p>
+    <div class="acts"><button class="btn" data-opt="undo">되돌리기</button><button class="btn ink" data-opt="ok">좋아요</button></div></div>`;
+}
+
 const addTxt=x=>x.off?"휴무":x.tight?(x.add==null?"밀림":`+${x.add}분 · 밀림`):x.add==null?"":`+${x.add}분`;
 
 /* ─────────────── 변경 ─────────────── */
-function commit(msg){ save(); render(); if(msg) toast(msg); }
+function commit(msg){ if(OPTRES && OPTRES.prev && S.days[OPTRES.dk] && OPTRES.shown && S.days[OPTRES.dk].join("|")!==OPTRES.shown) OPTRES=null; if(OPTRES) OPTRES.shown=S.days[OPTRES.dk].join("|"); save(); render(); if(msg) toast(msg); }
 function removeEverywhere(id){ EDIT.forEach(dk=>{ S.days[dk]=S.days[dk].filter(x=>x!==id); }); }
 function moveTo(id,dk,idx){
   const p=place(id); if(!p) return;
@@ -506,7 +566,7 @@ function renderBoard(){
         <p class="k">${lsym(dk,"sm")}<span>${esc(R.n)} · ${esc(R.sub)}</span></p>
         <h1>${WDK[dk]}요일 <span class="num">${DAY[dk].dt}</span></h1>
         <p class="meta">${n?`<b>${n}</b>역 · <b>${fmt(sc.depart)}–${fmt(sc.home)}</b> · ${sc.dist.toFixed(1)}km · ${status}`:"아직 비어 있어요"}</p>
-        ${n?`<p class="links"><button class="lk" id="mapbtn">${ico("i-map")}지도로 보기</button><a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a></p>`:""}
+        ${n?`<p class="links"><button class="lk" id="mapbtn">${ico("i-map")}지도로 보기</button><button class="lk" id="optbtn">${ico("i-route")}동선 최적화</button><a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a></p>`:""}
       </header>
       ${now.N.dk===dk?lcdHTML():""}
       <div class="lw" style="--c:${LINE[dk].c}">
@@ -517,13 +577,14 @@ function renderBoard(){
       <button class="addst" id="addst">${ico("i-plus")}장소 추가</button>
       <p class="hint">길게 눌러 끌면 순서가 바뀌어요. 위 날짜에 놓으면 그날로, 아래 '빼기'에 놓으면 보관함으로 가요.<br>시각은 거리로 잡은 추정이고, ${ico("i-lock","ki mi")} 표시는 예약·바처럼 고정한 시각이에요.</p>`;
   }
-  main.innerHTML=`${dswHTML()}<div class="wrap">${newsHTML()}${CUR!=="wed"?gStatHTML():""}${body}</div>`;
+  main.innerHTML=`${dswHTML()}<div class="wrap">${newsHTML()}${optHTML()}${CUR!=="wed"?gStatHTML():""}${body}</div>`;
   $$(".dt").forEach(b=>{ const f=()=>{ CUR=b.dataset.day; LS.set("tokyo-lines-day",CUR); render(); window.scrollTo({top:0}); };
     b.addEventListener("click",e=>{ if(e.target.closest(".drop li")) return; f(); });
     b.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
   const dep=$("#depart"); if(dep) dep.addEventListener("click",()=>{ try{ dep.showPicker(); }catch(e){} });
   if(dep) dep.addEventListener("change",()=>{ const t=dep.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return; S.start[CUR]=t; commit(`숙소 출발 ${t}`); });
   const mb=$("#mapbtn"); if(mb) mb.addEventListener("click",()=>setBM(true));
+  const ob=$("#optbtn"); if(ob) ob.addEventListener("click",()=>runOptimize(CUR));
   const ad=$("#addst"); if(ad) ad.addEventListener("click",()=>openPicker());
 }
 
@@ -635,7 +696,7 @@ function renderPoolList(){
    컨셉 칩 × 지역 칩으로 거른 곳만 핀으로 찍고, 아래엔 사진 카드. 지역 칩은 곧 그날 노선이라
    날을 고르면 그날 역 순서와 시각이, 아직 안 넣은 곳엔 "그날에 넣기 +N분"이 붙는다.
    지도는 한 번만 만들고 칩을 바꿀 때는 핀·카드만 다시 그린다. */
-const XC=[{k:"all",n:"전체"},{k:"star",n:"찜",i:"i-star"},{k:"art",n:"미술관·건축",i:"i-art",kc:["art","photo"]},{k:"book",n:"서점·북카페",i:"i-book",kc:["book"]},
+const XC=[{k:"all",n:"전체"},{k:"star",n:"찜",i:"i-star"},{k:"found",n:"새로 발견",i:"i-compass"},{k:"art",n:"미술관·건축",i:"i-art",kc:["art","photo"]},{k:"book",n:"서점·북카페",i:"i-book",kc:["book"]},
   {k:"bar",n:"LP바",i:"i-record",kc:["bar"]},{k:"food",n:"먹고 마시기",i:"i-food",kc:["food","market"]},{k:"walk",n:"단풍·전망",i:"i-leaf",kc:["leaf","view"]}];
 const XA=["all",...EDIT,"hotel","far"];
 let XF=(()=>{ try{ return Object.assign({c:"all",a:"all"},JSON.parse(LS.get("tokyo-lines-xf","{}"))); }catch(e){ return {c:"all",a:"all"}; } })();
@@ -649,7 +710,7 @@ function xItems(){
   if(XMODE==="route") return S.days[CUR].map(place).filter(p=>p&&p.lat);
   const placed=new Set(EDIT.flatMap(dk=>S.days[dk])), c=XC.find(x=>x.k===XF.c)||XC[0], a=XF.a;
   return [...CAT.values(), ...Object.values(S.added)].filter(p=>p.lat && (!p.gone||placed.has(p.id))
-    && (c.k==="all" || (c.k==="star" ? S.star[p.id] : c.kc.includes(p.kc)))
+    && (c.k==="all" || (c.k==="star" ? S.star[p.id] : c.k==="found" ? p.found : c.kc.includes(p.kc)))
     && (a==="all" || (EDIT.includes(a) ? (placed.has(p.id) ? dayOf(p.id)===a : areaOf(p)===a) : areaOf(p)===a)));
 }
 function xInfo(items){   // 카드 순서와 붙일 말: 역이면 시각, 아니면 넣을 날 +N분(또는 내 위치에서 거리)
@@ -674,7 +735,7 @@ function xCard(x){
   const {p,dk,r,sp,far}=x, P=placeOf(p), kind=KIND[p.kc]||KIND.view, tint=dk?LINE[dk].c:(LINE[areaOf(p)]?LINE[areaOf(p)].c:"var(--mute)");
   const where = XMODE==="route" && r ? `${sta(dk,r.i,"sm")}<span>${fmt(r.start)}–${fmt(r.end)}</span>`
               : dk ? `${sta(dk,S.days[dk].indexOf(p.id),"sm")}<span>${WDK[dk]}요일 ${r?fmt(r.start):""}</span>`
-                   : `<span class="xk-a">${esc(AREANAME[areaOf(p)]||"")}</span>`;
+                   : `<span class="xk-a">${esc(AREANAME[areaOf(p)]||"")}</span>${p.found?`<span class="xf">발견</span>`:""}`;
   const dist = far!=null ? (far<1.2?`도보 ${Math.max(1,Math.round(far*1000/72))}분`:`${far.toFixed(1)}km`) : "";
   const meta=[esc(p.k||kind.n), P&&P.rating?`★ ${P.rating.toFixed(1)} (${kfmt(P.reviews)})`:"", dist].filter(Boolean).join(" · ");
   const warn = r && r.warn.some(w=>w.lv==="bad") ? `<span class="xw">${esc(r.warn.find(w=>w.lv==="bad").t)}</span>` : "";
@@ -1004,7 +1065,7 @@ async function autoPlaces(force){
   try{
     const res=await fetchPlaces(key,(i,t)=>{ GPROG=`${i}/${t}`; gTick(); });
     const got=Object.keys(res.out).length;
-    if(got){ PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} }
+    if(got){ PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} hydrateLoc(); }
     if(got && res.fail<=res.total/2){ LS.del("tokyo-gerr"); toast(`${got}곳 사진·영업시간을 받았어요`); }
     else { LS.set("tokyo-gerr",res.first||"구글 장소 정보를 받지 못했어요."); toast(res.first||"구글 장소 정보를 받지 못했어요"); }
   }catch(e){ LS.set("tokyo-gerr","네트워크에 닿지 못했어요. 인터넷이 될 때 '다시 받기'를 눌러 주세요."); }
@@ -1021,7 +1082,7 @@ document.addEventListener("error",e=>{
 async function photoFix(){
   const key=LS.get("tokyo-gkey",""), ids=PFQ.splice(0); if(!key || !ids.length || !PSTORE.byId) return;
   let n=0, i=0;
-  async function worker(){ while(i<ids.length){ const p=place(ids[i++]); if(!p) continue; const rec=PSTORE.byId[pkey(p)]; const gid=p.gid||(rec&&rec.gid); if(!rec||!gid) continue;
+  async function worker(){ while(i<ids.length){ const p=place(ids[i++]); if(!p) continue; const rec=PSTORE.byId[pkey(p)]||PSTORE.byId["n:"+p.n]; const gid=p.gid||(rec&&rec.gid); if(!rec||!gid) continue;
     try{ const r=await fetch("https://places.googleapis.com/v1/places/"+encodeURIComponent(gid)+"?key="+encodeURIComponent(key)+"&fields=photos"); if(!r.ok) continue;
       const ph=await gPhoto(key,await r.json()); if(ph){ rec.photo=ph; rec.pat=Date.now(); n++; } }catch(e){} } }
   await Promise.all(Array.from({length:4},worker));
@@ -1122,6 +1183,7 @@ document.addEventListener("click",e=>{
   const a=e.target.closest("[data-add]"); if(a){ e.stopPropagation(); moveTo(a.dataset.add, CUR==="wed"?"thu":CUR); return; }
   const nw=e.target.closest("[data-news]"); if(nw){ newsAct(nw.dataset.news); return; }
   if(e.target.closest("[data-gkey]")){ askKey(); return; }
+  const op=e.target.closest("[data-opt]"); if(op){ if(op.dataset.opt==="undo" && OPTRES){ S.days[OPTRES.dk]=OPTRES.prev; OPTRES=null; commit("원래 순서로 돌아갔어요"); } else { OPTRES=null; render(); } return; }
   if(e.target.closest("[data-gretry]")){ LS.del("tokyo-gerr"); autoPlaces(true); return; }
   const xc=e.target.closest("#xcards .xc[data-x]"); if(xc && !xc.classList.contains("on")){ xSelect(xc.dataset.x,false); return; }   // 지도 카드는 처음 누르면 고르고, 한 번 더 누르면 자세히
   if(e.target.closest(".st .row") && e.target.closest("[data-open]")){ openSheet(e.target.closest("[data-open]").dataset.open); return; }

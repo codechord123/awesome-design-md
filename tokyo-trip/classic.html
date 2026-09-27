@@ -1138,6 +1138,9 @@ details.around > summary h2{display:inline}
 
 <script src="vendor/leaflet.js"></script>
 <script src="data.js"></script>
+<script>/* 새 화면의 "Claude 발견" 장소는 좌표 없이 place ID만 있어서(구글 좌표 30일 규칙) 이전 화면에선 뺀다 */
+for(let i=RECS.length-1;i>=0;i--) if(!RECS[i].lat) RECS.splice(i,1);
+for(let i=PLANS.length-1;i>=0;i--) if(PLANS[i].k==="found") PLANS.splice(i,1);</script>
 <script>
 /* 데이터는 data.js */
 
