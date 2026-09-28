@@ -506,3 +506,28 @@ body.withside .xp{right:380px}
 .side-h.sub{position:static;padding-top:4px}
 body[data-boardmap="1"] .toast,body[data-view="pool"][data-poolmode="map"] .toast{bottom:auto;top:calc(env(safe-area-inset-top,0px) + 132px)}
 body.withside .toast{left:calc(50% - 190px)}
+/* 도구: 예산·교통·공항·날씨 */
+.bt{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 14px;margin:0 0 14px;border-radius:14px;background:var(--ink);color:var(--card)}
+.bt span{font-size:13px;font-weight:700;opacity:.8}.bt b{font:800 26px/1 var(--num);letter-spacing:-.02em}
+.bd{margin:0 0 14px}
+.bd .bh{display:flex;align-items:center;gap:8px;margin:0 0 4px;color:var(--ink)}
+.bd .bh b{font-size:14.5px;font-weight:850}.bd .bh span:last-child{margin-left:auto;font:700 14px var(--num);color:var(--mute)}
+.bd ul{list-style:none;margin:0;padding:0}
+.bd li{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--rule);font-size:13.5px}
+.bd li:last-child{border-bottom:0}
+.bd li b{font:700 13.5px var(--num);color:var(--ink);white-space:nowrap}
+.bd li em{font-style:normal;color:var(--mute);font-size:12px}
+.bd .nt li{justify-content:flex-start;align-items:center}
+.bd .nt li b{font:800 13.5px inherit;font-family:inherit}
+.bu{font-size:13px}.bu b{color:var(--ink);margin-right:4px}
+.tc{border:1.5px solid var(--rule);border-radius:14px;padding:12px 14px;margin:0 0 10px}
+.tc.best{border-color:var(--ink)}
+.tc p{margin:0 0 6px}.tc p:last-child{margin:0}
+.th{font-weight:850;color:var(--ink);font-size:14.5px;margin:0 0 6px}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tl .in .bad{color:var(--red);font-weight:700}
+.wxg{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:0 0 12px}
+.wxc{display:flex;flex-direction:column;gap:3px;align-items:center;text-align:center;padding:10px 4px;border-radius:12px;background:var(--hi);border:1.5px solid var(--rule)}
+.wxc.wet{border-color:var(--L-fri,#0aa)}
+.wxc b{font-size:12.5px;color:var(--ink)}.wxc .wc{font-size:12.5px;font-weight:700;color:var(--ink)}
+.wxc .wt{font:700 13px var(--num)}.wxc .wr,.wxc .ws{font-size:11px;color:var(--mute);font-weight:600}

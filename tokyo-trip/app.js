@@ -41,7 +41,10 @@ const REGION={
 const DAY=Object.fromEntries(DAYS.map(d=>[d.key,d]));
 const WDK={wed:"수",thu:"목",fri:"금",sat:"토",sun:"일"};
 // 일요일: 나리타 18:00편 기준으로 긴자를 떠날 시각(숙소에서 짐 찾기 포함, 이동 시간은 추정). 이전 화면의 계산과 같다.
-const SUN_LEAVE="13:25";
+// 일요일: 숙소에서 공항으로 떠날 시각 = 비행기 − 공항 여유 − 이동 − 15분(도구 > 공항에서 바꿈, 이전 화면과 같은 저장 키)
+function airOut(){ const a=LS.get("tokyo-air",LS.get("tokyo-air-in","nrt")); return AIRPORTS[a]?a:"nrt"; }
+function sunLeaveMin(){ const ap=airOut(), ft=LS.get("tokyo-flight","18:00")||"18:00", buf=+LS.get("tokyo-buffer","150")||150, mv=+LS.get("tokyo-move",String(AIRPORTS[ap].mins))||AIRPORTS[ap].mins;
+  return toMin(ft)-buf-mv-15; }
 
 /* ─────────────── 장소 목록(블록) ───────────────
    id = 장소의 q. 기본 일정 → 빠진 곳(spare) → 추천 → 지나가는 건물 순서로 모으고, 먼저 들어온 값을 우선한다. */
@@ -172,7 +175,7 @@ function schedule(dk){
     const g=gOpenAt(placeOf(p), date, start); if(g===false && !p.outside) warn.push({lv:"warn", t:"구글: 이 시각엔 닫혀 있음"});
     if(p.gone) warn.push({lv:"bad", t:"문 닫은 곳이에요"});
     const G=placeOf(p); if(G && G.status==="CLOSED_PERMANENTLY") warn.push({lv:"bad", t:"구글: 폐업"}); else if(G && G.status==="CLOSED_TEMPORARILY") warn.push({lv:"bad", t:"구글: 임시 휴업"});
-    if(dk==="sun" && end>toMin(SUN_LEAVE)) warn.push({lv:end-toMin(SUN_LEAVE)>10?"bad":"warn", t:`${SUN_LEAVE}엔 짐 찾으러 숙소로 떠나야 해요`});
+    if(dk==="sun"){ const lv=sunLeaveMin(), lim=lv-travel(p,HOTEL).min-10; if(end>lim) warn.push({lv:end-lim>10?"bad":"warn", t:`${fmt(lv)}엔 숙소에서 공항으로 떠나야 해요`}); }
     rows.push({id, p, i, tr, arr, start, end, dur, wait, late, pin, warn, from:prev});
     t=end; prev=p;
   });
@@ -537,7 +540,7 @@ function renderHome(){
     <section class="sec"><div class="sec-h"><h2>예약</h2><span class="en">Reservations</span></div>
       <button class="lrow" style="--c:var(--ink)" data-go="tools" data-open="resv"><span class="picto" style="width:34px;height:34px;border-radius:10px">${ico("i-check")}</span>
         <span><span class="t">${done}/${CK.length} 완료</span><span class="s">${esc(CK.filter(c=>!CHECKED[c.id]).slice(0,3).map(c=>c.t).join(" · ")||"모두 끝났어요")}</span></span><span class="m"></span></button></section>
-    <p class="src" style="margin:28px 0 20px">이전 화면(예산·교통·공항·날씨 안내)은 <a href="classic.html">여기</a>에 그대로 있어요.</p>
+    <p class="src" style="margin:28px 0 20px">예산·교통·공항·날씨는 도구 탭에 있어요. 이전 화면은 <a href="classic.html">여기</a>.</p>
   </div>`;
   $$(".netmap .ln").forEach(g=>{ const f=()=>go("board",g.dataset.day); g.addEventListener("click",f); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
 }
@@ -569,7 +572,7 @@ function wedHTML(){
     <div class="lw" style="--c:${LINE.wed.c}"><ol class="line">${w.stops.map((x,i)=>`<li class="st"><p class="mv"></p><div class="row" style="cursor:default">
       <span class="t"><b>${esc(x.t)}</b><i>KS${String(i+1).padStart(2,"0")}</i></span><span class="dot"></span>
       <span class="b"><span class="n">${esc(x.n)}</span><span class="m" style="white-space:normal">${esc(x.note||"")}</span></span></div></li>`).join("")}</ol></div>
-    <p class="src">공항 접근·막차 안내는 <a href="classic.html">이전 화면</a>의 수요일에 자세히 있어요.</p>`;
+    <p class="src">공항에서 숙소까지 가는 법과 막차는 <a href="#" data-go="tools" data-open="air">도구 &gt; 공항</a>에 있어요.</p>`;
 }
 function dswHTML(){
   return `<nav class="dsw" aria-label="날짜 노선"><div class="wrap" role="tablist">${DAYKEYS.map(dk=>`<div class="dt" role="tab" tabindex="0" data-day="${dk}" style="--c:${LINE[dk].c}" aria-selected="${dk===CUR}" aria-label="${WDK[dk]}요일 ${LINE[dk].code} 노선">
@@ -1283,6 +1286,110 @@ async function photoFix(){
   await Promise.all(Array.from({length:4},worker));
   if(n){ try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} if(!sheet.open && !document.body.classList.contains("dragging")) render(); }
 }
+/* ─────────────── 예산·교통·공항·날씨(2026-09-28) ───────────────
+   Henry: "예산·교통·공항·날씨 이전 화면에 있는 걸 업데이트해 줘." → 도구 탭으로 옮기고 지금 노선에서 계산한다.
+   입장료·식사는 출처 있는 fee만 더하고, 없으면 "확인 전"으로 이름만. 공항 요금은 AIRPORTS 추천 경로의 fare. */
+const yen=n=>n.toLocaleString("ko-KR")+"엔";
+const fareNum=f=>{ const m=String(f||"").match(/([\d,]+)\s*엔/); return m?+m[1].replace(/,/g,""):null; };
+function budgetData(){
+  const days=EDIT.map(dk=>{ const items=[], unk=[];
+    S.days[dk].map(place).filter(Boolean).forEach(p=>{
+      if(typeof p.fee==="number"){ if(p.fee>0) items.push({p, fee:p.fee, food:p.kc==="food"||p.kc==="market"}); }
+      else if(["food","bar"].includes(p.kc)) unk.push({p, food:true});
+      else if(["art","view","photo","leaf"].includes(p.kc) && !p.outside) unk.push({p, food:false}); });
+    return {dk, items, unk, sum:items.reduce((a,x)=>a+x.fee,0)}; });
+  const air=[["도착",LS.get("tokyo-air-in","nrt")],["출국",airOut()]].map(([k,a])=>{ const A=AIRPORTS[a]||AIRPORTS.nrt, r=A.routes.find(x=>x.best)||A.routes[0]; return {k, a:A.n, r:r.n, fee:fareNum(r.fare)}; });
+  const total=days.reduce((a,d)=>a+d.sum,0)+air.reduce((a,x)=>a+(x.fee||0),0);
+  return {days, air, total};
+}
+const BUDGET_V=()=>yen(budgetData().total);
+function infoBudget(){
+  const B=budgetData();
+  const unk=B.days.flatMap(d=>d.unk.map(x=>({...x, dk:d.dk})));
+  return `<div class="bt"><span>출처로 확인된 합계</span><b>${yen(B.total)}</b></div>
+    ${B.days.filter(d=>d.items.length).map(d=>`<div class="bd"><p class="bh">${lsym(d.dk,"sm")}<b>${WDK[d.dk]}요일</b><span>${yen(d.sum)}</span></p>
+      <ul>${d.items.map(x=>`<li><span>${esc(x.p.n)}${x.p.feeNote?` <em>${esc(x.p.feeNote)}</em>`:""}</span><b>${yen(x.fee)}</b></li>`).join("")}</ul></div>`).join("")}
+    <div class="bd"><p class="bh"><b>공항 오가기</b><span>${yen(B.air.reduce((a,x)=>a+(x.fee||0),0))}</span></p>
+      <ul>${B.air.map(x=>`<li><span>${x.k} · ${esc(x.a)} ${esc(x.r)}</span><b>${x.fee!=null?yen(x.fee):"확인 전"}</b></li>`).join("")}</ul></div>
+    ${unk.length?`<p class="bu"><b>입장료 확인 전</b> ${unk.filter(x=>!x.food).map(x=>`${WDK[x.dk]} ${esc(x.p.n)}`).join(", ")||"없음"}</p>
+      <p class="bu"><b>식사·바 값 미정</b> ${unk.filter(x=>x.food).map(x=>`${WDK[x.dk]} ${esc(x.p.n)}`).join(", ")||"없음"}</p>`:""}
+    <p>전철은 도쿄 서브웨이 티켓(아래 교통)이나 교통카드로 따로 잡으세요. 노선을 바꾸면 합계도 따라 바뀌어요.</p>`;
+}
+// 그날 전철 구간(앱의 추정: 1.2km 넘으면 전철). 좌표가 없는 구간은 모름
+function dayTrains(dk){
+  const sc=schedule(dk), legs=[]; let walk=0, unknown=0;
+  // 1.6km 안쪽은 걸어갈 만한 거리로 친다(Henry 코스의 규칙). 계산은 여전히 앱의 추정을 쓴다
+  const add=(from,to,tr)=>{ if(tr.mode==="train" && tr.d>1.6) legs.push({from, to, min:tr.min, d:tr.d}); else if(tr.mode==="train"||tr.mode==="walk") walk+=tr.d; else if(tr.mode==="noloc") unknown++; };
+  sc.rows.forEach(r=>add(r.i?r.from.n:"숙소", r.p.n, r.tr));
+  if(sc.rows.length) add(sc.rows[sc.rows.length-1].p.n, "숙소", sc.back);
+  return {n:legs.length, legs, walk, unknown, sc};
+}
+function infoTransit(){
+  const T=EDIT.map(dk=>({dk, ...dayTrains(dk)}));
+  const nights=T.filter(t=>t.sc.rows.length).map(t=>{ const l=t.sc.rows[t.sc.rows.length-1]; const far=l.p.lat?km(l.p,HOTEL):null;
+    return `<li>${lsym(t.dk,"sm")}<span><b>${WDK[t.dk]} ${esc(l.p.n)}</b> ${fmt(t.sc.home)} 숙소 · ${far==null?"거리 모름":far<=0.6?"걸어서 숙소":`숙소까지 ${far.toFixed(1)}km — 막차 확인`}</span></li>`; }).join("");
+  const card=x=>`<div class="tc"><p class="th">${esc(x.t)}</p>${x.body.map(b=>`<p>${esc(b)}</p>`).join("")}${x.src?`<p class="src"><a href="${esc(x.src)}" target="_blank" rel="noopener">${esc(x.srcn||"출처")}</a></p>`:""}</div>`;
+  return `${T.map(t=>`<div class="bd"><p class="bh">${lsym(t.dk,"sm")}<b>${WDK[t.dk]}요일 전철 ${t.n}번</b><span>걸어서 ${t.walk.toFixed(1)}km${t.unknown?` · 모름 ${t.unknown}`:""}</span></p>
+      ${t.legs.length?`<ul>${t.legs.map(l=>`<li><span>${esc(l.from)} → ${esc(l.to)}</span><b>약 ${l.min}분</b></li>`).join("")}</ul>`:""}</div>`).join("")}
+    <p class="src" style="margin:-4px 0 12px">1.6km 안쪽은 걸어서(분속 72m)로 셌어요. 전철 분은 앱의 추정(역까지 걷기·기다림 10분 + km당 2.6분)이라 실제 노선은 운행표의 길찾기로.</p>
+    <div class="bd"><p class="bh"><b>밤의 끝</b></p><ul class="nt">${nights}</ul></div>
+    ${TRANSIT.map(card).join("")}`;
+}
+function infoAir(){
+  const ai=LS.get("tokyo-air-in","nrt"), A=AIRPORTS[ai]||AIRPORTS.nrt, ao=airOut(), ft=LS.get("tokyo-flight","18:00"), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ao].mins));
+  const sc=schedule("sun"), lv=sunLeaveMin(), back=sc.rows.length?sc.home:null, slack=back!=null?lv-back:null;
+  const opt=(v,cur)=>Object.entries(AIRPORTS).map(([k,x])=>`<option value="${k}"${k===cur?" selected":""}>${x.n}</option>`).join("");
+  return `<p class="th">수요일 도착 · 공항에서 숙소까지</p>
+    <label class="fld">도착 공항<select id="ai-in">${opt(0,ai)}</select></label>
+    ${A.routes.map(r=>`<div class="tc${r.best?" best":""}"><p class="th">${esc(r.n)}${r.best?" · 추천":""}</p><p><b>${esc(r.d||"")}</b>${r.fare?` · ${esc(r.fare)}`:""}</p><p>${esc(r.note)}</p></div>`).join("")}
+    <p>${esc(A.last)}</p>
+    <div class="acts"><a class="btn" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(A.q)}&destination=${encodeURIComponent(HOTEL.q||HOTEL.addr)}&travelmode=transit" target="_blank" rel="noopener">${ico("i-route")}${esc(A.n)} → 숙소 길찾기</a></div>
+    <p class="th" style="margin-top:18px">일요일 출국 · 언제 숙소를 나설까</p>
+    <div class="f2"><label class="fld">공항<select id="ai-out">${opt(0,ao)}</select></label><label class="fld">비행기 출발<input type="time" id="ai-ft" value="${esc(ft)}"></label></div>
+    <div class="f2"><label class="fld">공항 도착 여유<select id="ai-buf">${[["120","2시간 전"],["150","2시간 30분 전"],["180","3시간 전"]].map(([v,n])=>`<option value="${v}"${v===buf?" selected":""}>${n}</option>`).join("")}</select></label>
+      <label class="fld">숙소 → 공항(분)<input type="number" id="ai-mv" min="10" max="180" step="5" value="${esc(mv)}"></label></div>
+    <div class="bt"><span>숙소에서 공항으로</span><b>${fmt(lv)}</b></div>
+    <p>${back==null?"일요일 노선이 비어 있어요.":slack>=20?`지금 노선은 <b>${fmt(back)}</b>에 숙소로 돌아와요. <b>${slack}분</b> 여유가 있어요.`:slack>=0?`지금 노선은 <b>${fmt(back)}</b>에 숙소로 돌아와요. 여유가 ${slack}분뿐이라 마지막 역을 줄이는 게 좋아요.`:`<span class="bad">지금 노선은 ${fmt(back)}에 숙소로 돌아와서 ${-slack}분 늦어요.</span> 운행표 일요일에서 역을 빼 주세요.`}</p>
+    <p class="src">이동 분은 추정이에요. 출발 전날 실제 경로로 한 번 확인하세요. 요금·운행: 2026년 9월 확인 · <a href="https://www.kkday.com/ko/blog/27152/asia-japan-tokyo-limousinebus" target="_blank" rel="noopener">나리타</a> · <a href="https://www.haneda-tokyo-access.com/kr/ride/fares.html" target="_blank" rel="noopener">하네다</a></p>`;
+}
+// 날씨: Open-Meteo 16일 예보(이전 화면과 같은 저장 tokyo-wx) + 평년값 + 해 지는 시각(NOAA 식 계산)
+const WX_KEY="tokyo-wx";
+function wxGet(){ try{ const w=JSON.parse(LS.get(WX_KEY,"null")); return w && w.at && Date.now()-w.at<72*3600e3 ? w : null; }catch(e){ return null; } }
+async function wxFetch(){
+  const w=wxGet(); if(navigator.onLine===false || (w && Date.now()-w.at<3600e3)) return;
+  try{ const r=await fetch("https://api.open-meteo.com/v1/forecast?latitude="+HOTEL.lat+"&longitude="+HOTEL.lng+"&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&current=temperature_2m,weather_code&timezone=Asia%2FTokyo&forecast_days=16");
+    if(!r.ok) return; const j=await r.json(); if(!j||!j.daily) return; LS.set(WX_KEY,JSON.stringify({at:Date.now(), daily:j.daily, current:j.current||null})); if(VIEW==="tools") renderTools(true); }catch(e){}
+}
+const WMO=c=>c<=1?"맑음":c===2?"구름 조금":c===3?"흐림":(c===45||c===48)?"안개":(c>=51&&c<=57)?"이슬비":(c>=61&&c<=67)?"비":(c>=71&&c<=77)?"눈":(c>=80&&c<=82)?"소나기":(c===85||c===86)?"눈":c>=95?"뇌우":"";
+function sunset(date){   // NOAA 일반 식, 숙소 좌표·일본 표준시. ±1분 정도
+  const d=new Date(date+"T12:00:00+09:00"), N=Math.round((d-new Date(d.getUTCFullYear()+"-01-01T00:00:00Z"))/864e5)+1, g=2*Math.PI/365*(N-1), R=Math.PI/180;
+  const eq=229.18*(0.000075+0.001868*Math.cos(g)-0.032077*Math.sin(g)-0.014615*Math.cos(2*g)-0.040849*Math.sin(2*g));
+  const dec=0.006918-0.399912*Math.cos(g)+0.070257*Math.sin(g)-0.006758*Math.cos(2*g)+0.000907*Math.sin(2*g)-0.002697*Math.cos(3*g)+0.00148*Math.sin(3*g);
+  const ha=Math.acos(Math.cos(90.833*R)/(Math.cos(HOTEL.lat*R)*Math.cos(dec))-Math.tan(HOTEL.lat*R)*Math.tan(dec))/R;
+  return Math.round(720-4*(HOTEL.lng-ha)-eq+540);
+}
+function wxDays(){ const w=wxGet(); return ["wed",...EDIT].map(k=>{ const D=w&&w.daily, i=D?D.time.indexOf(DAY[k].date):-1;
+  return {k, date:DAY[k].date, ss:sunset(DAY[k].date), f:i>=0?{c:D.weather_code[i], hi:D.temperature_2m_max[i], lo:D.temperature_2m_min[i], rain:D.precipitation_probability_max?D.precipitation_probability_max[i]:null}:null}; }); }
+function wxSummary(){ const d=wxDays(), f=d.filter(x=>x.f); return f.length?`${Math.round(Math.max(...f.map(x=>x.f.hi)))}°/${Math.round(Math.min(...f.map(x=>x.f.lo)))}°`:`평년 ${NORMALS.hi}°/${NORMALS.lo}°`; }
+function infoWx(){
+  const d=wxDays(), w=wxGet(), open=new Date(new Date(DAY.wed.date+"T00:00:00+09:00").getTime()-16*864e5);
+  return `<div class="wxg">${d.map(x=>`<div class="wxc${x.f&&x.f.rain>=50?" wet":""}"><b>${WDK[x.k]} ${DAY[x.k].dt.split(".")[1]}</b>
+      ${x.f?`<span class="wc">${esc(WMO(x.f.c))}</span><span class="wt">${Math.round(x.f.hi)}°/${Math.round(x.f.lo)}°</span>${x.f.rain!=null?`<span class="wr">비 ${x.f.rain}%</span>`:""}`:`<span class="wc">예보 전</span><span class="wt">–</span>`}
+      <span class="ws">해 짐 ${fmt(x.ss)}</span></div>`).join("")}</div>
+    ${d.some(x=>x.f)?"":`<p>예보는 16일 앞까지만 나와서 <b>${open.getMonth()+1}월 ${open.getDate()}일쯤</b>부터 날짜별로 채워져요.</p>`}
+    <p>11월 평년값은 낮 <b>${NORMALS.hi}°C</b>, 밤 <b>${NORMALS.lo}°C</b>예요. 하순은 달 평균보다 조금 더 쌀쌀해요. 낮엔 니트나 가벼운 겉옷, 전망대 노을(16시 반쯤)과 밤 LP바엔 한 겹 더.</p>
+    <p class="src">예보 <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>${w?` · ${new Date(w.at).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})} 받음`:""} · 평년값 <a href="${esc(NORMALS.src)}" target="_blank" rel="noopener">${esc(NORMALS.srcn)}</a> · 해 지는 시각은 NOAA 식으로 계산한 값(±1분)</p>`;
+}
+function wireInfo(){
+  const on=(id,fn)=>{ const el=$(id); if(el) el.addEventListener("change",fn); };
+  on("#ai-in",e=>{ LS.set("tokyo-air-in",e.target.value); if(LS.get("tokyo-air-manual","")!=="1") LS.set("tokyo-air",e.target.value); renderTools(true); });
+  on("#ai-out",e=>{ LS.set("tokyo-air",e.target.value); LS.set("tokyo-air-manual","1"); LS.set("tokyo-move",String(AIRPORTS[e.target.value].mins)); renderTools(true); });
+  on("#ai-ft",e=>{ LS.set("tokyo-flight",e.target.value||"18:00"); renderTools(true); });
+  on("#ai-buf",e=>{ LS.set("tokyo-buffer",e.target.value); renderTools(true); });
+  on("#ai-mv",e=>{ LS.set("tokyo-move",String(Math.max(10,+e.target.value||0))); renderTools(true); });
+  if(TOOLS_OPEN==="wx" || $(".tl[data-k=wx][open]")) wxFetch();
+  const wx=$(".tl[data-k=wx]"); if(wx) wx.addEventListener("toggle",()=>{ if(wx.open) wxFetch(); });
+}
 function renderTools(keep){
   if(VIEW!=="tools") return;
   const openNow=keep?$$(".tl[open]").map(x=>x.dataset.k):[TOOLS_OPEN];
@@ -1301,6 +1408,10 @@ function renderTools(keep){
          <p id="mv-stat" style="margin-top:10px"></p>`)}
       ${tl("resv","i-check","예약 체크",`${checksNow().filter(c=>CHECKED[c.id]).length}/${checksNow().length}`,
         checksNow().map(c=>`<label class="chk"><input type="checkbox" data-chk="${c.id}"${CHECKED[c.id]?" checked":""}><span><b>${esc(c.t)}</b>${esc(c.d)}</span></label>`).join(""))}
+      ${tl("budget","i-tool","예산",BUDGET_V(),infoBudget())}
+      ${tl("transit","i-train","교통",`전철 ${EDIT.reduce((a,dk)=>a+dayTrains(dk).n,0)}번`,infoTransit())}
+      ${tl("air","i-move","공항",`${AIRPORTS[LS.get("tokyo-air-in","nrt")]?.n||"나리타"} · 일 ${fmt(sunLeaveMin())} 출발`,infoAir())}
+      ${tl("wx","i-sun","날씨",wxSummary(),infoWx())}
       ${tl("film","i-camera","필름 기록",`${roll.frames.length}/${roll.exp}`,
         `<div class="film"><b>${roll.frames.length}</b><span>/ ${roll.exp} · 롤 ${roll.id}</span></div>
          <div class="acts"><button class="btn ink" data-film="1">${ico("i-camera")}한 컷</button><button class="btn" data-film="-1"${roll.frames.length?"":" disabled"}>되돌리기</button><button class="btn" data-film="new">새 롤</button><button class="btn" data-film="copy"${film.rolls.some(r=>r.frames.length)?"":" disabled"}>기록 복사</button></div>
@@ -1322,7 +1433,7 @@ function renderTools(keep){
       ${tl("backup","i-box","백업·캘린더","",
         `<p>노선을 파일로 저장해 두거나 불러와요. 다른 기기로 옮길 땐 맨 위 "다른 기기로 옮기기"가 더 쉬워요.</p>
          <div class="acts"><button class="btn" id="exp">파일로 저장</button><label class="btn" for="imp">불러오기</label><button class="btn" id="ics">${ico("i-cal")}캘린더 파일</button><button class="btn" id="reset">처음 노선으로</button></div><input type="file" id="imp" accept=".json,application/json" hidden>`)}
-      <a class="tl" href="classic.html" style="display:flex;align-items:center;gap:12px;min-height:64px;padding:0 16px;font-weight:800;text-decoration:none"><span class="picto" style="width:30px;height:30px;border-radius:9px">${ico("i-more")}</span>예산·교통·공항·날씨 (이전 화면)</a>
+      <a class="tl" href="classic.html" style="display:flex;align-items:center;gap:12px;min-height:64px;padding:0 16px;font-weight:800;text-decoration:none"><span class="picto" style="width:30px;height:30px;border-radius:9px">${ico("i-more")}</span>이전 화면</a>
     </div><div style="height:28px"></div></div>`;
   $$(".tl").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open){ TOOLS_OPEN=d.dataset.k; LS.set("tokyo-lines-open",TOOLS_OPEN); } }));
   $$("[data-chk]").forEach(c=>c.addEventListener("change",()=>{ if(c.checked) CHECKED[c.dataset.chk]=true; else delete CHECKED[c.dataset.chk]; LS.set("tokyo-checks",JSON.stringify(CHECKED)); renderTools(true); }));
@@ -1342,6 +1453,7 @@ function renderTools(keep){
     LS.set("tokyo-gkey",k); LS.del("tokyo-gkey-src"); LS.del("tokyo-gerr"); autoPlaces(true); });
   const gc=$("#gclear"); if(gc) gc.addEventListener("click",()=>{ PSTORE={}; LS.del("tokyo-places"); renderTools(true); });
   const mstat=t=>{ const e=$("#mv-stat"); if(e) e.textContent=t; };
+  wireInfo();
   const syOn=$("#sy-on"); if(syOn) syOn.addEventListener("click",syncStart);
   const syNow=$("#sy-now"); if(syNow) syNow.addEventListener("click",()=>{ if(gTok()) syncNow(); else gLogin(false).then(()=>syncNow()).catch(e=>toast(e.message)); });
   const syOff=$("#sy-off"); if(syOff) syOff.addEventListener("click",syncOff);

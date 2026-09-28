@@ -449,7 +449,7 @@ const RECS = [
   {n:"도쿄 타워", ja:"東京タワー", kc:"view", k:"전망대, 야경", area:"시바공원", when:"any", dig:"구글 지도", 
    why:"메인데크(150m) 9:00~23:00, 어른 1,500엔부터.",
    tip:"숙소에서 가까워요. 올라가는 것보다 시바공원이나 조조지 쪽에서 불 켜진 타워를 필름으로 찍는 게 나을 수도 있어요.",
-   id:"ChIJCewJkL2LGGAR3Qmk0vCTGkg", q:"東京タワー", src:"https://www.tokyotower.co.jp/fee/", srcn:"도쿄 타워 공식", lat:35.6586, lng:139.7454, slot:{day:"thu", t:"21:00"}},
+   fee:1500, feeNote:"메인데크 어른부터", id:"ChIJCewJkL2LGGAR3Qmk0vCTGkg", q:"東京タワー", src:"https://www.tokyotower.co.jp/fee/", srcn:"도쿄 타워 공식", lat:35.6586, lng:139.7454, slot:{day:"thu", t:"21:00"}},
   // ── Claude 발견(2026-09-27): Henry가 저장하지 않은 곳 중 GO TOKYO·藝大アートプラザ·Tokyo Art Beat·dancyu·BRUTUS 같은 레퍼런스와 공식 사이트로 고른 곳.
   //    좌표는 넣지 않는다 — 구글 좌표는 30일만 보관할 수 있어서, 받은 구글 정보(tokyo-places)의 위치로 앱이 채운다(hydrateLoc). place ID는 계속 보관해도 된다.
   {n:"구 이와사키 저택 정원", ja:"旧岩崎邸庭園", kc:"photo", k:"건축, 정원", area:"유시마", when:"thu", found:"claude", dig:"Claude 발견",
@@ -467,7 +467,7 @@ const RECS = [
   {n:"SCAI 더 배스하우스", ja:"SCAI THE BATHHOUSE", kc:"art", k:"갤러리, 옛 목욕탕", area:"야나카", when:"thu", found:"claude", dig:"Claude 발견",
    why:"200년 된 목욕탕 '가시와유'를 고친 현대미술 갤러리. 12:00~18:00, 일·월·공휴일과 전시 교체 기간은 휴관.",
    tip:"기와지붕과 굴뚝이 남은 입구. 무엇이 걸렸는지는 공식 사이트에서 확인.",
-   id:"ChIJq1ynUyqMGGARJw9kwdVUyXE", q:"SCAI THE BATHHOUSE", src:"https://www.tokyoartbeat.com/venues/-/4353A332", srcn:"Tokyo Art Beat"},
+   fee:0, feeNote:"무료", id:"ChIJq1ynUyqMGGARJw9kwdVUyXE", q:"SCAI THE BATHHOUSE", src:"https://www.tokyoartbeat.com/venues/-/4353A332", srcn:"Tokyo Art Beat"},
   {n:"카키모리", ja:"カキモリ", kc:"book", k:"문구, 주문 노트", area:"구라마에", when:"thu", found:"claude", dig:"Claude 발견",
    why:"표지·종이·링을 골라 그 자리에서 노트를 묶어 주는 구라마에의 문구점. 11:00~18:00, 월요일 휴무. 주문 노트는 주말·공휴일만 예약제라 목요일엔 그냥 가도 돼요.",
    tip:"필름 기록용 노트를 하나 만들어 보세요.",
@@ -552,7 +552,7 @@ const RECS = [
   {n:"시부야 스카이", ja:"SHIBUYA SKY", kc:"view", k:"전망대, 노을", area:"시부야", when:"sat", found:"claude", dig:"Claude 발견",
    why:"시부야 스크램블 스퀘어 꼭대기의 옥상 전망대. 10:00~22:30(마지막 입장 21:20). 입장권은 입장일 2주 전 0시(일본 시간)부터 팔고, 해 질 녘 시간대가 가장 먼저 매진돼요.",
    tip:"11월 21일 해 지는 시각은 16:32쯤(계산값)이라 15:40쯤 들어가 옥상에서 기다려요. 비나 강풍이면 옥상을 닫아요.",
-   id:"ChIJ4Rr2JWiLGGARcyRSHuZ-9G8", q:"SHIBUYA SKY", src:"https://www.shibuya-scramble-square.com/sky/ticket/", srcn:"공식"},
+   fee:3400, feeNote:"웹 어른, 15시 이후 입장(14:59까지 2,700엔)", id:"ChIJ4Rr2JWiLGGARcyRSHuZ-9G8", q:"SHIBUYA SKY", src:"https://www.shibuya-scramble-square.com/sky/ticket/", srcn:"공식"},
   {n:"기라쿠", ja:"中華麺店 喜楽", kc:"food", k:"라멘, 저녁", area:"시부야 햐켄다나", when:"sat", found:"claude", dig:"Claude 발견",
    why:"1952년부터 도겐자카 햐켄다나에서 이어 온 중화면 가게. 간판 '중화면'은 담백한 간장 맛이에요. 11:30~20:30, 수요일 휴무.",
    tip:"시부야 스카이에서 걸어서 몇 분. 1층은 카운터, 2층은 테이블. 돌아올 땐 긴자선 渋谷 → 赤坂見附 한 번.",
@@ -782,12 +782,11 @@ const TRANSIT = [
   {t:"도쿄 서브웨이 티켓", body:[
     "24시간 1,000엔 · 48시간 1,500엔 · 72시간 2,000엔. 도쿄메트로 9개 노선과 도에이 4개 노선을 무제한으로 탑니다.",
     "JR과 사철은 포함되지 않습니다. 단기 체류 외국인만 살 수 있고, 자정이 아니라 처음 쓴 시각부터 시간을 셉니다.",
-    "이 일정으로 따지면 금요일(진보초·니혼바시)은 거의 메트로라 확실히 이득입니다. 목요일과 토요일은 JR·사철이 섞여요. 72시간권을 목요일 아침에 열면 목·금·토가 들어갑니다. 하루 세 번 이상 메트로를 타면 본전입니다."],
+    "72시간권을 목요일 아침에 열면 목·금·토가 들어갑니다. 하루 세 번 이상 메트로·도에이를 타면 본전이에요. 위 날짜별 전철 횟수로 가늠하세요(JR 구간은 빠져요)."],
    src:"https://www.tokyometro.jp/tst/en/index.html", srcn:"도쿄메트로 공식"},
 
   {t:"막차와 택시", body:[
-    "목요일(bar all)과 토요일(Bar Luther) 밤은 숙소에서 걸어서 2분 거리 바로 끝납니다. 막차를 신경 쓰지 않아도 돼요.",
-    "금요일 CAVE(시부야)만 멀리 있습니다. 긴자선 하나로 赤坂見附까지 돌아오니 그날 역에서 막차 시각을 확인하고, 놓치면 택시로 10분 남짓 거리예요.",
+    "밤이 숙소 옆 LP바(bar all·Bar Luther)에서 끝나는 날은 걸어서 들어와요. 위 '밤의 끝'에 멀리서 끝나는 날이 있으면 그날만 막차를 확인하세요.",
     "도쿄 지하철 막차는 바 영업보다 훨씬 이릅니다. 끝까지 있을 계획이면 택시 예산을 따로 잡아두세요."]}
 ];
 
