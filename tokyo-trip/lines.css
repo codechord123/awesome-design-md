@@ -64,7 +64,7 @@ a{color:inherit}
 /* ── 아래 탭 ── */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:30;background:color-mix(in srgb,var(--card) 94%,transparent);
   -webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-top:1px solid var(--rule);padding-bottom:env(safe-area-inset-bottom,0px)}
-nav.tabs .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;height:var(--nav)}
+nav.tabs .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;height:var(--nav)}
 .tab{appearance:none;border:0;background:transparent;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
   color:var(--mute);font-size:11.5px;font-weight:700;cursor:pointer;position:relative;min-height:48px}
 .tab .ki{width:23px;height:23px}
@@ -568,3 +568,30 @@ body.withside .toast{left:calc(50% - 190px)}
 .rainbox li small{color:var(--mute);font-size:12px}
 .rainbox .ra{display:flex;flex-wrap:wrap;gap:0 10px;width:100%}
 .rainbox .ra .lk{color:var(--ink);text-decoration:underline;text-underline-offset:3px;min-height:32px}
+/* 일정: 위 지도 + 아래 노선(2026-09-28) */
+.plan{position:relative}
+.pm{position:sticky;top:var(--dswh,62px);z-index:6;height:40vh;min-height:240px;max-height:440px;background:var(--soft);border-bottom:1px solid var(--rule);overflow:hidden}
+.pm .xmap{position:absolute;inset:0}
+.pm.min{height:52px;min-height:0}
+.pm.min .xmap,.pm.min .pmcard,.pm.min .xcount,.pm.min #pmfit{visibility:hidden}
+.pm.min .pmfab{bottom:auto;top:6px}
+.pm.min .pmchips{right:104px}
+.pmchips{position:absolute;left:0;right:0;top:0;z-index:500;display:flex;flex-wrap:nowrap;gap:6px;overflow-x:auto;padding:8px 10px;scrollbar-width:none;margin:0}
+.pmchips::-webkit-scrollbar{display:none}
+.pmchips .chip{flex:0 0 auto;background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.16)}
+.pmchips .chip[aria-pressed="true"]{background:var(--ink);color:var(--card)}
+.pmfab{position:absolute;right:10px;bottom:10px;z-index:600;display:flex;gap:8px;align-items:center}
+.pm .leaflet-bottom.leaflet-right{bottom:58px}
+.pmcard{position:absolute;left:0;right:0;bottom:62px;z-index:650;padding:0 10px}
+.pmcard:empty{display:none}
+.pmcard .xcards.one{position:static;display:block;padding:0;overflow:visible}
+.pmcard .xc{margin:0 auto;max-width:420px}
+#line li.st.sel .dot{box-shadow:0 0 0 6px color-mix(in srgb,var(--c) 30%,transparent)}
+#line li.st.sel .n{text-decoration:underline;text-decoration-color:var(--c);text-decoration-thickness:3px;text-underline-offset:4px}
+.plan.nomap .pm{display:none}
+@media (min-width:980px){
+  .plan{display:grid;grid-template-columns:minmax(0,1fr) minmax(420px,44%);align-items:start}
+  .pm{height:calc(100vh - var(--dswh,62px) - var(--nav));max-height:none;border-bottom:0;border-right:1px solid var(--rule)}
+  .pm .leaflet-bottom.leaflet-right{bottom:0}
+  .plan.nomap{display:block}
+}
