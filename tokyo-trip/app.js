@@ -7,7 +7,7 @@
 const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
 const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const LS={get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:v; }catch(e){ return d; } },
-          set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} },
+          set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} if(k==="tokyo-lines"||k==="tokyo-checks"||k==="tokyo-film") syncDirty(); },
           del(k){ try{ localStorage.removeItem(k); }catch(e){} }};
 const ico=(id,c="ki")=>`<svg class="${c}" aria-hidden="true"><use href="#${id}"/></svg>`;
 const HL="&hl=ko";
@@ -1038,6 +1038,103 @@ function applyAll(o){
   if(o.film && o.film.rolls) LS.set(FILM_KEY,JSON.stringify(o.film));
   if(o.gkey){ LS.set("tokyo-gkey",o.gkey); LS.del("tokyo-gkey-src"); }
 }
+/* 구글 계정 연동(2026-09-28) — Henry: "기기마다 바꾼 게 연동되게, 데이터 내려받는 과정 없이. 나만 쓰니까 구글 계정으로."
+   구글 로그인(Google Identity Services 토큰) → 그 계정 구글 드라이브의 앱 전용 숨김 폴더(appDataFolder)에 tokyo-lines.json 하나.
+   그 폴더는 로그인한 계정만 읽을 수 있어서 이메일을 코드에 적지 않는다. 노선·찜·예약 체크·필름 기록만 — 구글 장소 정보는 옮기지 않는다(30일 규칙).
+   두 기기에서 같이 고치면 나중에 고친 쪽이 남는다. 토큰은 1시간짜리라, 끝나면 화면을 처음 누를 때 구글 창을 잠깐 띄워 이어 간다(팝업은 누를 때만 열 수 있다).
+   tokyo-sync-local = 이 기기에서 마지막으로 고친 시각, tokyo-sync-seen = 드라이브와 마지막으로 맞춘 파일의 at. */
+var SYNC_APPLYING=false, SYNC_T=0, SYNC_BUSY=false, SYNC_ARMED=false, GTC=null, GTC_CB=null;
+const SYNC_FILE="tokyo-lines.json", SYNC_SCOPE="https://www.googleapis.com/auth/drive.appdata https://www.googleapis.com/auth/userinfo.email";
+function syncOn(){ return LS.get("tokyo-sync-on","")==="1" && !!LS.get("tokyo-gclient",""); }
+function gTok(){ try{ const t=JSON.parse(LS.get("tokyo-gtok","null")); return t && t.t && Date.now()<t.exp-60000 ? t.t : ""; }catch(e){ return ""; } }
+function syncDirty(){
+  if(SYNC_APPLYING) return;
+  try{ localStorage.setItem("tokyo-sync-local",String(Date.now())); }catch(e){}
+  if(!syncOn()) return;
+  clearTimeout(SYNC_T); SYNC_T=setTimeout(()=>{ if(gTok()) syncNow(); else syncArm(); },2000);
+}
+function gisLoad(){
+  if(window.google && google.accounts && google.accounts.oauth2) return Promise.resolve();
+  return new Promise((ok,no)=>{ const sc=document.createElement("script"); sc.src="https://accounts.google.com/gsi/client"; sc.async=true; sc.onload=ok; sc.onerror=()=>no(new Error("구글 로그인 스크립트를 못 불렀어요")); document.head.appendChild(sc); });
+}
+// 누르는 순간(사용자 동작)에 불러야 팝업이 막히지 않는다. gisLoad는 미리 해 둔다.
+function gLogin(consent){
+  return new Promise((ok,no)=>{
+    if(!(window.google && google.accounts && google.accounts.oauth2)){ no(new Error("구글 로그인 준비 중이에요. 잠시 뒤 다시 눌러 주세요")); return; }
+    if(!GTC) GTC=google.accounts.oauth2.initTokenClient({client_id:LS.get("tokyo-gclient",""), scope:SYNC_SCOPE, callback:r=>GTC_CB&&GTC_CB(r), error_callback:e=>GTC_CB&&GTC_CB({error:e&&e.type||"popup"})});
+    GTC_CB=r=>{ if(!r || r.error){ no(new Error(r&&r.error==="popup_closed"?"로그인 창을 닫았어요":"구글 로그인에 실패했어요")); return; }
+      LS.set("tokyo-gtok",JSON.stringify({t:r.access_token, exp:Date.now()+(+r.expires_in||3600)*1000})); ok(r.access_token); };
+    const o={prompt:consent?"consent":""}; const hint=LS.get("tokyo-gmail",""); if(hint) o.login_hint=hint;
+    GTC.requestAccessToken(o);
+  });
+}
+function syncArm(){
+  if(SYNC_ARMED || !syncOn()) return; SYNC_ARMED=true; gisLoad().catch(()=>{});
+  document.addEventListener("pointerup",function once(){ document.removeEventListener("pointerup",once,true); SYNC_ARMED=false;
+    if(gTok()) { syncNow(); return; }
+    gLogin(false).then(()=>syncNow()).catch(e=>{ LS.set("tokyo-sync-err",e.message); }); },true);
+}
+async function gdrive(path,opt){
+  const t=gTok(); if(!t) throw Object.assign(new Error("로그인이 끝났어요"),{auth:true});
+  const r=await fetch("https://www.googleapis.com/"+path,Object.assign({},opt,{headers:Object.assign({Authorization:"Bearer "+t},(opt&&opt.headers)||{})}));
+  if(r.status===401){ LS.del("tokyo-gtok"); throw Object.assign(new Error("로그인이 끝났어요"),{auth:true}); }
+  if(!r.ok) throw new Error("구글 드라이브 "+r.status);
+  return r;
+}
+function syncBody(at){ return JSON.stringify({v:1, at, lines:S, checks:CHECKED, film:filmGet()}); }
+async function syncPush(at){
+  let fid=LS.get("tokyo-sync-fid","");
+  if(fid){ try{ await gdrive("upload/drive/v3/files/"+fid+"?uploadType=media",{method:"PATCH",headers:{"Content-Type":"application/json"},body:syncBody(at)}); return; }catch(e){ if(e.auth) throw e; fid=""; LS.del("tokyo-sync-fid"); } }
+  const bd="tl"+Date.now(), meta=JSON.stringify({name:SYNC_FILE, parents:["appDataFolder"], mimeType:"application/json"});
+  const body=`--${bd}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${bd}\r\nContent-Type: application/json\r\n\r\n${syncBody(at)}\r\n--${bd}--`;
+  const r=await gdrive("upload/drive/v3/files?uploadType=multipart&fields=id",{method:"POST",headers:{"Content-Type":"multipart/related; boundary="+bd},body});
+  LS.set("tokyo-sync-fid",(await r.json()).id);
+}
+async function syncNow(first){
+  if(!syncOn() || SYNC_BUSY || navigator.onLine===false) return;
+  if(!gTok()){ syncArm(); return; }
+  SYNC_BUSY=true;
+  try{
+    let fid=LS.get("tokyo-sync-fid",""), remote=null;
+    if(!fid){ const l=await (await gdrive("drive/v3/files?spaces=appDataFolder&fields=files(id,modifiedTime)&orderBy=modifiedTime%20desc&q="+encodeURIComponent(`name='${SYNC_FILE}'`))).json();
+      fid=(l.files&&l.files[0]&&l.files[0].id)||""; if(fid) LS.set("tokyo-sync-fid",fid); }
+    if(fid){ try{ remote=await (await gdrive("drive/v3/files/"+fid+"?alt=media")).json(); }catch(e){ if(e.auth) throw e; LS.del("tokyo-sync-fid"); } }
+    const local=+LS.get("tokyo-sync-local","0"), seen=+LS.get("tokyo-sync-seen","0");
+    const rat=remote && remote.lines && remote.lines.days ? +remote.at||0 : 0;
+    // 처음 잇는 기기는 드라이브 쪽을 따른다(이 기기 것은 tokyo-sync-backup에 남긴다)
+    const takeRemote = rat && (first ? true : (rat>seen && (local<=seen || rat>local)));
+    if(takeRemote){
+      if(first) LS.set("tokyo-sync-backup",JSON.stringify({at:Date.now(), lines:S, checks:CHECKED, film:filmGet()}));
+      SYNC_APPLYING=true; try{ applyAll({lines:remote.lines, checks:remote.checks, film:remote.film}); save(); } finally{ SYNC_APPLYING=false; }
+      try{ localStorage.setItem("tokyo-sync-local",String(rat)); }catch(e){}
+      LS.set("tokyo-sync-seen",String(rat)); render(); if(!first) toast("다른 기기에서 고친 내용을 받아왔어요");
+    } else if(!rat || local>seen){
+      const at=local||Date.now(); await syncPush(at); LS.set("tokyo-sync-seen",String(at));
+      try{ localStorage.setItem("tokyo-sync-local",String(at)); }catch(e){}
+    }
+    LS.set("tokyo-sync-last",String(Date.now())); LS.del("tokyo-sync-err");
+  }catch(e){ if(e.auth) syncArm(); else LS.set("tokyo-sync-err",e.message||"연동 실패"); }
+  finally{ SYNC_BUSY=false; if(VIEW==="tools") renderTools(true); }
+}
+async function syncStart(){
+  try{
+    await gisLoad(); const t=await gLogin(true);
+    try{ const u=await (await fetch("https://www.googleapis.com/oauth2/v3/userinfo",{headers:{Authorization:"Bearer "+t}})).json(); if(u && u.email) LS.set("tokyo-gmail",u.email); }catch(e){}
+    LS.set("tokyo-sync-on","1"); LS.del("tokyo-sync-seen"); LS.del("tokyo-sync-fid");
+    await syncNow(true); toast("구글 계정으로 연동했어요");
+  }catch(e){ toast(e.message||"연동하지 못했어요"); }
+  renderTools(true);
+}
+function syncOff(){ ["tokyo-sync-on","tokyo-gtok","tokyo-sync-fid","tokyo-sync-seen","tokyo-sync-err","tokyo-gmail"].forEach(k=>LS.del(k)); GTC=null; renderTools(true); toast("연동을 껐어요. 드라이브의 내용은 그대로 있어요"); }
+function syncHTML(){
+  if(!LS.get("tokyo-gclient","")) return `<p>구글 계정으로 기기끼리 맞추려면 Vercel 환경 변수 <code>GOOGLE_CLIENT_ID</code>가 필요해요. 넣고 다시 배포하면 여기 버튼이 생겨요.</p>`;
+  if(!syncOn()) return `<p>구글 계정으로 <b>한 번만</b> 로그인하면 노선·찜·예약 체크·필름 기록이 이 계정의 구글 드라이브(앱 전용 숨김 폴더)에 저장되고, 같은 계정으로 로그인한 다른 기기와 저절로 맞춰져요. 두 기기에서 같이 고치면 나중에 고친 쪽이 남아요.</p>
+    <p>처음 잇는 기기는 드라이브에 있는 내용을 따라가요(이 기기 것은 따로 보관).</p><div class="acts"><button class="btn ink" id="sy-on">구글로 연동 시작</button></div>`;
+  const last=+LS.get("tokyo-sync-last","0"), err=LS.get("tokyo-sync-err","");
+  return `<p><b>${esc(LS.get("tokyo-gmail","구글 계정"))}</b>로 연동 중${last?` · 마지막으로 맞춘 시각 ${new Date(last).toLocaleTimeString("ko-KR",{hour:"2-digit",minute:"2-digit"})}`:""}</p>
+    ${!gTok()?`<p>로그인이 한 시간마다 끝나요. 화면을 한 번 누르면 구글 창이 잠깐 떴다 닫히며 이어서 맞춰요.</p>`:""}${err?`<p class="bad">${esc(err)}</p>`:""}
+    <div class="acts"><button class="btn ink" id="sy-now">지금 맞추기</button><button class="btn" id="sy-off">연동 끄기</button></div>`;
+}
 /* 키가 있으면 사진·영업시간을 알아서 받는다(30일 보관 규칙). 실패하면 이유를 남겨 화면에 보여 주고 6시간 뒤 다시.
    Henry: "API 등록까지 했는데 왜 사진 안 나와?" — 키가 그 기기에 없었는지, 주소 제한인지, 사진 주소가 만료됐는지 화면에서 바로 알 수 있게 했다. */
 let GBUSY=false, GPROG="";
@@ -1062,7 +1159,9 @@ async function serverKey(){
   if(navigator.onLine===false) return;
   try{
     const r=await fetch("/api/config",{cache:"no-store"}); if(!r.ok) return;
-    const k=String(((await r.json())||{}).gkey||"").trim(); if(!/^AIza[0-9A-Za-z_\-]{30,}$/.test(k)) return;
+    const cfg=(await r.json())||{};
+    if(cfg.gclient) LS.set("tokyo-gclient",String(cfg.gclient)); else LS.del("tokyo-gclient");
+    const k=String(cfg.gkey||"").trim(); if(!/^AIza[0-9A-Za-z_\-]{30,}$/.test(k)) return;
     const cur=LS.get("tokyo-gkey","");
     if(cur && LS.get("tokyo-gkey-src","")!=="server") return;
     if(cur!==k){ LS.set("tokyo-gkey",k); LS.set("tokyo-gkey-src","server"); LS.del("tokyo-gerr"); gTick(); }
@@ -1115,6 +1214,7 @@ function renderTools(keep){
   main.innerHTML=`<div class="wrap">
     <section class="hero"><p class="hero-date num">Tools</p><h1 class="hero-t">여행 도구</h1><p class="hero-s">예약 체크, 일본어, 긴급 연락처, 필름 기록, 구글 장소 정보, 노선 템플릿과 백업.</p></section>
     <div class="tools">
+      ${tl("sync","i-network","구글 계정으로 연동",syncOn()?"켜짐":"",syncHTML())}
       ${tl("move","i-network","다른 기기로 옮기기",MOVED?"가져옴":"",
         `<p>노선·찜·예약 체크·필름 기록·구글 키는 <b>이 기기에만</b> 저장돼요. 아이폰과 아이패드는 서로의 내용을 모르고, 같은 기기라도 사파리와 홈 화면 아이콘은 저장소가 따로예요.</p>
          <p><b>1. 보내는 기기</b>에서 복사하고 <b>2. 받는 기기</b>에서 붙여넣으세요. 같은 Apple ID로 로그인돼 있으면 아이폰에서 복사한 걸 아이패드에서 바로 붙여넣을 수 있어요.</p>
@@ -1165,6 +1265,10 @@ function renderTools(keep){
     LS.set("tokyo-gkey",k); LS.del("tokyo-gkey-src"); LS.del("tokyo-gerr"); autoPlaces(true); });
   const gc=$("#gclear"); if(gc) gc.addEventListener("click",()=>{ PSTORE={}; LS.del("tokyo-places"); renderTools(true); });
   const mstat=t=>{ const e=$("#mv-stat"); if(e) e.textContent=t; };
+  const syOn=$("#sy-on"); if(syOn) syOn.addEventListener("click",syncStart);
+  const syNow=$("#sy-now"); if(syNow) syNow.addEventListener("click",()=>{ if(gTok()) syncNow(); else gLogin(false).then(()=>syncNow()).catch(e=>toast(e.message)); });
+  const syOff=$("#sy-off"); if(syOff) syOff.addEventListener("click",syncOff);
+  if(LS.get("tokyo-gclient","") && !(window.google && google.accounts)) gisLoad().catch(()=>{});
   $("#mv-copy").addEventListener("click",async()=>{ const code=packAll();
     try{ await navigator.clipboard.writeText(code); mstat("복사했어요. 이제 받는 기기에서 붙여넣으세요."); toast("복사했어요"); }
     catch(e){ const ta=$("#mv-in"); ta.value=code; ta.focus(); ta.select(); mstat("자동 복사가 막혀서 아래 칸에 넣었어요. 길게 눌러 '복사'하세요."); } });
@@ -1209,7 +1313,8 @@ document.addEventListener("click",e=>{
   const b=e.target.closest("[data-big]"); if(b){ const p=place(b.dataset.big); if(p && p.ja) bigJa(p); return; }
   const o=e.target.closest("[data-open]"); if(o && !e.target.closest(".tl")){ openSheet(o.dataset.open); return; }
 });
-setTimeout(async()=>{ await serverKey(); autoPlaces(false); },1500);
+setTimeout(async()=>{ await serverKey(); autoPlaces(false); syncNow(); },1500);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") syncNow(); });
 document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.matches("[data-open][role=button]")){ e.preventDefault(); openSheet(e.target.dataset.open); } });
 function clock(){
   const n=tokyoNow(), N=tripNow(), el=$("#clock"); if(!el) return;

@@ -470,3 +470,4 @@ a.xa{text-decoration:none}
 .gcopy{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 .xf{font:800 11px/1 var(--num);letter-spacing:0;padding:3px 6px;border-radius:6px;background:var(--ink);color:var(--card)}
+.tl .in p.bad{color:var(--red);font-weight:700}
