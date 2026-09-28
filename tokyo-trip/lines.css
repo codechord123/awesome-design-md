@@ -388,7 +388,7 @@ body[data-view="pool"][data-poolmode="map"]{overflow:hidden}
 .xrow .chip .lsym.sm{width:20px;height:20px;font-size:9.5px;border-width:3px;margin-left:-4px}
 .xrow .chip.line[aria-pressed="true"]{background:var(--c);border-color:var(--c);color:#fff}
 .xrow .chip.line[aria-pressed="true"] .lsym{background:#fff;color:var(--ink)}
-.xfab{position:absolute;right:12px;bottom:calc(var(--xch) + 34px);z-index:600;display:flex;gap:8px;align-items:center}
+.xfab{position:absolute;right:12px;bottom:calc(var(--xch) + 58px);z-index:600;display:flex;gap:8px;align-items:center}
 .fab{width:44px;height:44px;border-radius:50%;border:0;background:var(--card);color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.22);display:grid;place-items:center;cursor:pointer}
 .fab .ki{width:20px;height:20px}
 .fab.on{background:#1a73e8;color:#fff}
@@ -465,7 +465,7 @@ body[data-view="board"][data-boardmap="1"]{overflow:hidden}
 .xh .ki{width:13px;height:13px}
 a.xa{text-decoration:none}
 .xa .ki{width:16px;height:16px}
-.gattr{display:flex;align-items:center;gap:6px;padding:2px 6px;margin:0 4px 2px 0;border-radius:6px;background:rgba(255,255,255,.85);font:500 10px/1.3 system-ui,sans-serif;color:#444;max-width:70vw}
+.gattr{display:flex;align-items:center;gap:6px;padding:2px 6px;margin:0 4px 2px 0;border-radius:6px;background:rgba(255,255,255,.85);font:500 10px/1.3 system-ui,sans-serif;color:#444;max-width:calc(100vw - 24px)}
 .glogo{font:600 11px/1 "Product Sans",system-ui,sans-serif;color:#5f6368;white-space:nowrap}
 .gcopy{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
@@ -642,7 +642,7 @@ body.withside .toast{left:calc(50% - 190px)}
 /* iOS 사파리: 지도(터치 가로챔) 위에 겹친 스크롤 칸은 손가락으로 안 내려간다(2026-09-28 Henry 폰) → 시트가 열리면 지도를 시트 위까지로 줄여 겹치지 않게 */
 .xp.sheet .xmap{bottom:56%}
 .xsheet{touch-action:pan-y}
-.xp.sheet .xfab{bottom:calc(56% + 12px)}
+.xp.sheet .xfab{bottom:calc(56% + 56px)}   /* 오른쪽 아래 구글·Leaflet 출처(두 줄) 위로. 출처가 버튼을 덮었다(2026-09-28 Henry 폰) */
 .xp.sheet .leaflet-bottom{bottom:4px}
 .rtools{display:flex;flex-wrap:wrap;align-items:center;gap:4px 14px;margin:-4px 0 8px}
 .dep2{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;color:var(--sub)}
