@@ -696,11 +696,11 @@ function dswHTML(){
   return `<nav class="dsw" aria-label="날짜 노선"><div class="wrap" role="tablist">${DAYKEYS.map(dk=>`<div class="dt" role="tab" tabindex="0" data-day="${dk}" style="--c:${LINE[dk].c}" aria-selected="${dk===CUR}" aria-label="${WDK[dk]}요일 ${LINE[dk].code} 노선">
       ${lsym(dk,"sm")}<span class="d">${WDK[dk]} ${DAY[dk].dt.split(".")[1]}</span>${EDIT.includes(dk)?`<ul class="drop" data-day="${dk}" aria-hidden="true"></ul>`:""}</div>`).join("")}</div></nav>`;
 }
-/* ── 일정: 위 지도 + 아래 노선 한 화면(2026-09-28) ──
-   Henry: "일정과 지도는 하나로 합칠 수 있을 것 같은데?" → 장소 탭까지 합쳐 탭 셋(오늘·일정·도구).
-   지도(#pm)는 한 번만 만들고 노선 목록(#plist)만 다시 그린다. 목록을 내리면 지도가 그 역으로, 핀을 누르면 목록이 그 역으로.
-   지도 위 칩(XCF)으로 아직 안 넣은 곳을 거르고(근처·찜·새로 발견·종류), 후보 핀을 누르면 아래에 카드와 "○에 넣기". */
-let XCF=LS.get("tokyo-lines-xcf","near"), PMMIN=LS.get("tokyo-lines-pmmin","0")==="1", PMLOCK=0, PMST=0;
+/* ── 일정 = 한 지도(2026-09-28 세 번째) ──
+   날짜 칩(목·금·토·일·전체)과 컨셉 칩 두 줄. 날을 고르면 그날 노선을 굵게·다른 날은 흐리게, 컨셉 칩(XCF)으로 안 넣은 곳을 후보 핀으로.
+   "전체"(MAPALL)면 예전 장소 지도처럼 네 날 노선과 모든 곳(XF.c로 거름). 아래 사진 카드와 패널(renderPanel)은 두 경우 모두. 수요일은 목록 화면. */
+let XCF="near";
+let MAPALL=LS.get("tokyo-lines-mapall","0")==="1", MC=LS.get("tokyo-lines-mc",""), MAPFIT=false;
 const XCFS=[["near","근처 후보","i-map"],["star","찜","i-star"],["found","새로 발견","i-compass"],["art","미술관·건축","i-art"],["book","서점","i-book"],["bar","LP바","i-record"],["food","먹고 마시기","i-food"],["walk","단풍·전망","i-leaf"]];
 function planCands(){
   if(!XCF || CUR==="wed") return [];
@@ -709,106 +709,28 @@ function planCands(){
   return [...CAT.values(),...Object.values(S.added)].filter(p=>p.lat && !p.gone && !placed.has(p.id)
     && (XCF==="star"?S.star[p.id]:XCF==="found"?p.found:(c&&c.kc||[]).includes(p.kc))).slice(0,80);
 }
-function planChips(){
-  return `${XCFS.map(([k,n,i])=>`<button class="chip" data-xcf="${k}" aria-pressed="${XCF===k}">${ico(i)}${n}</button>`).join("")}<button class="chip" data-go="pool">${ico("i-line")}전체 목록·검색</button>`;
+function setMapDay(k){
+  const c=$("#xcards"); XSEL=null; MAPFIT=true;
+  if(k==="all"){ MAPALL=true; } else { MAPALL=false; CUR=k; LS.set("tokyo-lines-day",k); }
+  LS.set("tokyo-lines-mapall",MAPALL?"1":"0"); render();
 }
-function ensurePlanMap(){
-  if(XMAP || !window.L || !$("#xmap")) return false;
-  $("#xmap").innerHTML="";
-  XMAP=L.map($("#xmap"),{zoomControl:false, attributionControl:true}); xBase(XMAP); XLAY=L.layerGroup().addTo(XMAP);
-  XMAP.on("click",()=>{ const c=$("#pmcard"); if(c) c.innerHTML=""; });
-  return true;
+function mapTop(){
+  const dk=CUR, day=!MAPALL;
+  const dates=`<div class="chips xrow">${EDIT.map(k=>`<button class="chip line" data-mday="${k}" aria-pressed="${day&&k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}<button class="chip" data-mday="all" aria-pressed="${MAPALL}">${ico("i-network")}전체</button><button class="chip" data-mday="wed">${lsym("wed","sm")}수 도착</button></div>`;
+  const cons=`<div class="chips xrow">${[["",day?"근처 후보":"모든 곳","i-map"],...XCFS.slice(1)].map(([k,n,i])=>`<button class="chip" data-mc="${k}" aria-pressed="${MC===k}">${ico(i)}${n}</button>`).join("")}${day?`<button class="chip" data-mc="none" aria-pressed="${MC==="none"}">후보 끄기</button>`:""}<button class="chip" data-go="pool">${ico("i-line")}목록·검색</button></div>`;
+  let sum="";
+  if(day){ const sc=schedule(dk), n=sc.rows.length, pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
+    const st = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
+    sum=`<div class="xsum"><b>${WDK[dk]} ${esc(REGION[dk].n)}</b><span>${n}역 · ${n?`${fmt(sc.depart)}–${fmt(sc.home)} · ${sc.dist.toFixed(1)}km · `:""}${st}</span><span class="xsl">${n?`<a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 동선</a>`:""}</span></div>`; }
+  return dates+cons+sum+gStatHTML();
 }
-function planDraw(fit){
-  XMODE="plan"; if(!XMAP) return;
-  XL=xInfo(xItems()); if(XSEL && !XL.some(x=>x.p.id===XSEL)) XSEL=null;
-  XLAY.clearLayers(); XMK=new Map();
-  const dk=CUR, pts=[[HOTEL.lat,HOTEL.lng],...S.days[dk].map(place).filter(q=>q&&q.lat).map(q=>[q.lat,q.lng]),[HOTEL.lat,HOTEL.lng]];
-  L.polyline(pts,{color:"#101010", weight:12, opacity:.16, interactive:false}).addTo(XLAY);
-  L.polyline(pts,{color:"#fff", weight:10, opacity:.95, interactive:false}).addTo(XLAY);
-  L.polyline(pts,{color:LINE[dk].hex, weight:6, opacity:1, interactive:false}).addTo(XLAY);
-  L.marker([HOTEL.lat,HOTEL.lng],{icon:L.divIcon({className:"xpw",html:`<span class="xhub" title="숙소"></span>`,iconSize:[24,24],iconAnchor:[12,12]}),keyboard:false}).addTo(XLAY);
-  XL.forEach(x=>{ const m=L.marker([x.p.lat,x.p.lng],{icon:xPin(x,XSEL===x.p.id), title:x.p.n, riseOnHover:true, zIndexOffset:x.cand?0:500}).addTo(XLAY);
-    m.on("click",()=>planPick(x.p.id,true)); XMK.set(x.p.id,{m,x}); });
-  const nc=XL.filter(x=>x.cand).length, n=$("#pmn"); if(n) n.textContent=`${XL.length-nc}역${nc?` · 후보 ${nc}`:""}`;
-  if(fit) requestAnimationFrame(()=>{ if(XMAP){ XMAP.invalidateSize(); xFit(); } });
-}
-function planPick(id,fromMap){
-  const x=XL.find(v=>v.p.id===id); if(!x) return;
-  xSelect(id,false,false);
-  const card=$("#pmcard"); if(!card) return;
-  if(x.cand){ card.innerHTML=`<ul class="xcards one">${xCard(x)}</ul>`;
-    $$("[data-xput]",card).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); card.innerHTML=""; mapPut(b.dataset.xput,b.dataset.day); })); }
-  else{ card.innerHTML="";
-    if(fromMap){ PMLOCK=Date.now(); const li=$(`#line li.st[data-id="${CSS.escape(id)}"]`); if(li) li.scrollIntoView({behavior:"smooth",block:wide()?"center":"end"}); } }
-}
-// 목록을 내리면 지도가 따라간다: 지도 아래 가장자리 바로 밑에 걸린 역을 고른다
-function planScrollSync(){
-  if(VIEW!=="board" || XMODE!=="plan" || !XMAP || Date.now()-PMLOCK<900) return;
-  const pm=$("#pm"), edge=wide()?110:((pm&&!PMMIN)?pm.getBoundingClientRect().bottom:60)+6;
-  const li=$$("#line li.st").find(l=>l.getBoundingClientRect().bottom>edge);
-  if(li && li.dataset.id!==XSEL && XMK.has(li.dataset.id)){ const c=$("#pmcard"); if(c) c.innerHTML=""; xSelect(li.dataset.id,false,false); }
-}
-window.addEventListener("scroll",()=>{ clearTimeout(PMST); PMST=setTimeout(planScrollSync,90); },{passive:true});
 function renderBoard(){
-  document.body.dataset.boardmap="0";
-  const wed=CUR==="wed", dayChanged=!$("#plan") || $("#plan").dataset.day!==CUR;
-  if(!$("#plan")){
-    main.innerHTML=`${dswHTML()}<div class="plan" id="plan">
-      <section class="pm${PMMIN?" min":""}" id="pm" aria-label="그날 노선 지도">
-        <div id="xmap" class="xmap" role="application" aria-label="그날 노선 지도"></div>
-        <div class="pmchips chips" id="pmchips"></div>
-        <div class="pmfab"><span class="xcount" id="pmn"></span><button class="fab" id="pmfit" aria-label="다 보이게">${ico("i-fit")}</button><button class="fab txt" id="pmmin">${PMMIN?"지도 펴기":"지도 접기"}</button></div>
-        <div id="pmcard" class="pmcard"></div>
-      </section>
-      <div class="pl" id="plist"></div></div>`;
-    $("#pmfit").addEventListener("click",()=>xFit());
-    $("#pmmin").addEventListener("click",()=>{ PMMIN=!PMMIN; LS.set("tokyo-lines-pmmin",PMMIN?"1":"0"); $("#pm").classList.toggle("min",PMMIN); $("#pmmin").textContent=PMMIN?"지도 펴기":"지도 접기"; if(!PMMIN && XMAP) setTimeout(()=>{ XMAP.invalidateSize(); xFit(); },60); });
-  }
-  $("#plan").dataset.day=CUR; $("#pm").hidden=wed; $("#plan").classList.toggle("nomap",wed);
-  const dn=$("#main > .dsw"); if(dn) dn.outerHTML=dswHTML();
-  const dswH=($("#main > .dsw")||{offsetHeight:62}).offsetHeight; document.documentElement.style.setProperty("--dswh",dswH+"px");
-  let body="";
-  if(CUR==="wed") body=wedHTML();
-  else{
-    const dk=CUR, sc=schedule(dk), now=nowNext(), R=REGION[dk], n=sc.rows.length;
-    const pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
-    const status = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
-    body=`<header class="dh" style="--c:${LINE[dk].c}">
-        <p class="k">${lsym(dk,"sm")}<span>${esc(R.n)} · ${esc(R.sub)}</span></p>
-        <h1>${WDK[dk]}요일 <span class="num">${DAY[dk].dt}</span></h1>
-        <p class="meta">${n?`<b>${n}</b>역 · <b>${fmt(sc.depart)}–${fmt(sc.home)}</b> · ${sc.dist.toFixed(1)}km · ${status}`:"아직 비어 있어요"}</p>
-        ${n?`<p class="links"><button class="lk" id="optbtn">${ico("i-route")}동선 최적화</button><a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a></p>`:""}
-      </header>
-      ${now.N.dk===dk?lcdHTML():""}
-      ${rainHTML(dk)}
-      <div class="lw" style="--c:${LINE[dk].c}">
-        ${termHTML("숙소 출발 <small>· 시각을 눌러 바꿔요</small>","",`<label class="dep"><b>${fmt(sc.depart)}</b><input type="time" id="depart" value="${hhmm(fmt(sc.depart))}" aria-label="숙소 출발 시각"></label>`)}
-        <ol class="line" id="line" data-day="${dk}">${sc.rows.map(r=>stationHTML(dk,r,now)).join("")}</ol>
-        ${n?`<p class="mv last"${legAttr(sc.rows[n-1].p,HOTEL,sc.back)}>${legText(sc.rows[n-1].p,HOTEL,sc.back,false)}</p>${termHTML("숙소 도착",fmt(sc.home))}`:""}
-      </div>
-      <button class="addst" id="addst">${ico("i-plus")}장소 추가</button>
-      <p class="hint">길게 눌러 끌면 순서가 바뀌어요. 위 날짜에 놓으면 그날로, 아래 '빼기'에 놓으면 보관함으로 가요.<br>시각은 거리로 잡은 추정이고, ${ico("i-lock","ki mi")} 표시는 예약·바처럼 고정한 시각이에요.</p>`;
-  }
-  $("#plist").innerHTML=`<div class="wrap">${newsHTML()}${optHTML()}${!wed?gStatHTML():""}${body}</div>`;
-  $$(".dt").forEach(b=>{ const f=()=>{ CUR=b.dataset.day; LS.set("tokyo-lines-day",CUR); XSEL=null; const c=$("#pmcard"); if(c) c.innerHTML=""; render(); window.scrollTo({top:0}); };
-    b.addEventListener("click",e=>{ if(e.target.closest(".drop li")) return; f(); });
-    b.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
-  const dep=$("#depart"); if(dep) dep.addEventListener("click",()=>{ try{ dep.showPicker(); }catch(e){} });
-  if(dep) dep.addEventListener("change",()=>{ const t=dep.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return; S.start[CUR]=t; commit(`숙소 출발 ${t}`); });
-  legFill(CUR);
-  $$("[data-rainswap]",main).forEach(b=>b.addEventListener("click",()=>rainSwap(b.dataset.rainswap,b.dataset.to)));
-  const ob=$("#optbtn"); if(ob) ob.addEventListener("click",()=>runOptimize(CUR));
-  const ad=$("#addst"); if(ad) ad.addEventListener("click",()=>openPicker());
-  if(wed) return;
-  wxFetch();
-  $("#pmchips").innerHTML=planChips();
-  $$("#pmchips [data-xcf]").forEach(b=>b.addEventListener("click",()=>{ XCF=XCF===b.dataset.xcf?"":b.dataset.xcf; LS.set("tokyo-lines-xcf",XCF); $("#pmcard").innerHTML="";
-    $$("#pmchips [data-xcf]").forEach(c=>c.setAttribute("aria-pressed",String(c.dataset.xcf===XCF))); planDraw(false); }));
-  const made=ensurePlanMap();
-  if(made && !XSEL){ const N=tripNow(); if(N.phase==="during" && N.dk===CUR){ const nn=nowNext(); const x=nn.cur||nn.next; if(x) XSEL=x.id; } }
-  planDraw(made || dayChanged);
-  $$("#line li.st").forEach(li=>li.classList.toggle("sel",li.dataset.id===XSEL));
+  if(CUR==="wed"){ document.body.dataset.boardmap="0"; main.innerHTML=`${dswHTML()}<div class="wrap">${newsHTML()}${wedHTML()}</div>`;
+    $$(".dt").forEach(b=>b.addEventListener("click",e=>{ if(e.target.closest(".drop li")) return; CUR=b.dataset.day; LS.set("tokyo-lines-day",CUR); MAPALL=false; LS.set("tokyo-lines-mapall","0"); MAPFIT=true; render(); window.scrollTo({top:0}); }));
+    return; }
+  XCF = MC==="none" ? "" : (MC||"near");
+  if(MAPALL) XF={c:(MC&&MC!=="none")?MC:"all", a:"all"};
+  renderMapView(MAPALL?"explore":"route");
 }
 
 /* ── 장소 추가: 휴대폰은 시트, 넓은 화면은 오른쪽 패널(끌어서 넣기) ── */
@@ -838,33 +760,88 @@ function pickerBody(){
     <ul class="pool" id="pool">${items.map(pkHTML).join("")||`<li class="src" style="padding:16px 0">여기엔 남은 곳이 없어요. '전체'를 눌러 보세요.</li>`}</ul>`;
 }
 function renderSide(){
-  const side=$("#side");
-  const route=false, on=false;   // 2026-09-28 일정 탭이 지도+노선 한 화면이 되며 오른쪽 패널은 쓰지 않는다(장소 추가는 시트, 후보는 지도에서)
-  const was=document.body.classList.contains("withside");
-  side.hidden=!on; document.body.classList.toggle("withside",on);
-  if(was!==on && XMAP) requestAnimationFrame(()=>{ if(XMAP) XMAP.invalidateSize(); });
-  if(!on) return;
-  if(route){ side.innerHTML=routeSideHTML(); wireRouteSide(side); return; }
-  side.innerHTML=`<div class="side-h"><b>보관함</b><span>${WDK[CUR]}요일 노선으로 끌어 넣기</span></div>${pickerBody()}`;
-  $$("[data-df]",side).forEach(b=>b.addEventListener("click",()=>{ DF=b.dataset.df; LS.set("tokyo-lines-df",DF); renderSide(); wireDnD(); }));
+  if(VIEW==="board" && CUR!=="wed" && $("#xp")) return;   // 일정 지도는 xUpdate → renderPanel이 그린다
+  const side=$("#side"); side.hidden=true; document.body.classList.remove("withside");
 }
-// 넓은 화면의 운행표 지도: 오른쪽에 그날 역(끌어서 순서, × 빼기)과 근처 후보(넣기, 자리는 자동)
+/* ── 일정 지도의 패널(2026-09-28 세 번째) ──
+   Henry: "일정에서 목록과 지도를 함께 보며 조정하는 것과, 지도에서 전체 목록·일정을 함께 보는 기능을 합치라는 거였어."
+   넓은 화면은 오른쪽 패널(#side), 폰은 "목록"을 누르면 반 화면 시트(#xsheet). 날을 고르면 그날 노선(⠿ 끌어 순서·× 빼기·구간 교통·출발 시각·최적화)과
+   후보(⠿ 노선으로 끌기·넣기), "전체"면 닷새 노선 넷(날 사이로 끌어 옮기기)과 보관함(날짜로 끌기·가장 좋은 날에 넣기). */
+let PSORTS=[], XSHEET=false;
+const rowWarn=r=>r.warn.length?`<small class="${r.warn.some(w=>w.lv==="bad")?"bad":"warn"}">${esc(r.warn.map(w=>w.t).join(" · "))}</small>`:"";
 function routeSideHTML(){
-  const dk=CUR, sc=schedule(dk);
-  const rows=sc.rows.map(r=>`<li class="rs${XSEL===r.id?" on":""}" data-id="${esc(r.id)}"><span class="h" aria-hidden="true">⠿</span>${sta(dk,r.i,"sm")}
-    <button class="rb" data-xsel="${esc(r.id)}"><b>${esc(r.p.n)}</b><small>${fmt(r.start)}–${fmt(r.end)}${r.warn.length?` · <span class="${r.warn.some(w=>w.lv==="bad")?"bad":"warn"}">${esc(r.warn[0].t)}</span>`:""}</small></button>
+  const dk=CUR, sc=schedule(dk), n=sc.rows.length, N=tripNow();
+  const rows=sc.rows.map(r=>`<li class="rs${XSEL===r.id?" on":""}" data-id="${esc(r.id)}"><span class="h" aria-label="끌어서 순서 바꾸기">⠿</span>${sta(dk,r.i,"sm")}
+    <button class="rb" data-xsel="${esc(r.id)}"><b>${esc(r.p.n)}</b><small>${fmt(r.start)}–${fmt(r.end)} · ${r.dur}분${r.pin?` · 고정 ${esc(r.pin)}`:""}</small>
+      <span class="mv2"${legAttr(r.from||HOTEL,r.p,r.tr)}>${legText(r.from||HOTEL,r.p,r.tr,r.i===0)}</span>${rowWarn(r)}</button>
     <button class="rx" data-xout="${esc(r.id)}" aria-label="${esc(r.p.n)} 빼기">${ico("i-x")}</button></li>`).join("");
-  const cands=xCands(dk).map(p=>({p, f:Object.assign({dk}, fit(p,dk))})).sort((a,b)=>(a.f.off-b.f.off)||(a.f.cost-b.f.cost)).slice(0,20)
-    .map(({p,f})=>`<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="pi">${ico((KIND[p.kc]||KIND.view).i)}</span>
+  const C=planCands().map(p=>({p, f:Object.assign({dk}, fit(p,dk))})).sort((a,b)=>(a.f.off-b.f.off)||(a.f.cost-b.f.cost)).slice(0,25);
+  const cands=C.map(({p,f})=>`<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="노선으로 끌기">⠿</span><span class="pi">${ico((KIND[p.kc]||KIND.view).i)}</span>
       <button class="rb" data-xsel="${esc(p.id)}"><b>${S.star[p.id]?"★ ":""}${esc(p.n)}</b><small>${esc(p.k||(KIND[p.kc]||KIND.view).n)}${addTxt(f)?` · ${esc(addTxt(f))}`:""}</small></button>
       ${f.off?`<span class="rs-off">휴무</span>`:`<button class="add" data-xput="${esc(p.id)}" data-day="${dk}">넣기</button>`}</li>`).join("");
-  return `<div class="side-h"><b>${WDK[dk]}요일 노선</b><span>끌어서 순서 · × 빼기</span></div><ol class="rsl" id="rsl">${rows||`<li class="src" style="padding:12px 0">비어 있어요. 아래 후보에서 넣어 보세요.</li>`}</ol>
-    <div class="side-h sub"><b>근처 후보</b><span>넣으면 가장 덜 돌아가는 자리에</span></div><ul class="rsl">${cands||`<li class="src" style="padding:12px 0">노선 근처에 남은 곳이 없어요.</li>`}</ul>`;
+  const last=n?sc.rows[n-1]:null, cn=(XCFS.find(x=>x[0]===XCF)||["","후보"])[1];
+  return `${N.phase==="during"&&N.dk===dk?lcdHTML():""}${optHTML()}
+    <div class="side-h"><b>${WDK[dk]}요일 노선</b><span>⠿ 끌어서 순서 · × 빼기</span></div>
+    <div class="rtools"><label class="dep2">숙소 출발 <input type="time" id="depart2" value="${hhmm(fmt(sc.depart))}"></label>${n?`<button class="lk" id="optbtn2">${ico("i-route")}동선 최적화</button>`:""}<button class="lk" id="addst2">${ico("i-plus")}장소 추가</button></div>
+    ${rainHTML(dk)}
+    <ol class="rsl" id="rsl">${rows||`<li class="src empty">비어 있어요. 아래 후보를 끌어 오거나 넣어 보세요.</li>`}</ol>
+    ${last?`<p class="rsend"><span class="mv2"${legAttr(last.p,HOTEL,sc.back)}>${legText(last.p,HOTEL,sc.back,false)}</span><b>${fmt(sc.home)} 숙소 도착</b></p>`:""}
+    ${XCF?`<div class="side-h sub"><b>${esc(cn)}</b><span>⠿ 노선으로 끌거나 넣기</span></div><ul class="rsl" id="rcand">${cands||`<li class="src empty">남은 곳이 없어요.</li>`}</ul>`:""}`;
 }
-function wireRouteSide(side){
-  $$("[data-xsel]",side).forEach(b=>b.addEventListener("click",()=>{ const id=b.dataset.xsel; if(!XMK.has(id) && !S.days[CUR].includes(id) && !XCAND){ XCAND=true; LS.set("tokyo-lines-xcand","1"); xUpdate(false); } xSelect(id,true); }));
-  $$("[data-xout]",side).forEach(b=>b.addEventListener("click",()=>mapOut(b.dataset.xout)));
-  $$("[data-xput]",side).forEach(b=>b.addEventListener("click",()=>mapPut(b.dataset.xput,b.dataset.day)));
+function overviewHTML(){
+  const days=EDIT.map(dk=>{ const sc=schedule(dk);
+    return `<div class="ovd"><p class="ovh">${lsym(dk,"sm")}<b>${WDK[dk]} ${DAY[dk].dt}</b><span>${sc.rows.length}역${sc.rows.length?` · ${fmt(sc.depart)}–${fmt(sc.home)}`:""}${sc.bad?` · <em class="bad">확인 ${sc.bad}</em>`:""}</span><button class="lk" data-mday="${dk}">이날 지도</button></p>
+      <ol class="rsl ovday" data-day="${dk}">${sc.rows.map(r=>`<li class="rs${XSEL===r.id?" on":""}" data-id="${esc(r.id)}"><span class="h" aria-label="끌어서 옮기기">⠿</span>${sta(dk,r.i,"sm")}
+        <button class="rb" data-xsel="${esc(r.id)}"><b>${esc(r.p.n)}</b><small>${fmt(r.start)}</small>${rowWarn(r)}</button><button class="rx" data-xout="${esc(r.id)}" aria-label="${esc(r.p.n)} 빼기">${ico("i-x")}</button></li>`).join("")}</ol></div>`; }).join("");
+  const placed=new Set(EDIT.flatMap(k=>S.days[k])), c=XC.find(x=>x.k===XF.c)||XC[0];
+  const pool=[...CAT.values(),...Object.values(S.added)].filter(p=>p.lat && !p.gone && !placed.has(p.id) && (c.k==="all"||(c.k==="star"?S.star[p.id]:c.k==="found"?p.found:c.kc.includes(p.kc))))
+    .sort((a,b)=>(!!S.star[b.id]-!!S.star[a.id])||a.n.localeCompare(b.n,"ko")).slice(0,60);
+  const prow=p=>{ const sp=spots(p)[0]; return `<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="날짜로 끌기">⠿</span><span class="pi">${ico((KIND[p.kc]||KIND.view).i)}</span>
+      <button class="rb" data-xsel="${esc(p.id)}"><b>${S.star[p.id]?"★ ":""}${esc(p.n)}</b><small>${esc(AREANAME[areaOf(p)]||"")}${sp&&!sp.off&&addTxt(sp)?` · ${WDK[sp.dk]} ${esc(addTxt(sp))}`:""}</small></button>
+      ${sp&&!sp.off?`<button class="add" data-xput="${esc(p.id)}" data-day="${sp.dk}">${WDK[sp.dk]}에 넣기</button>`:""}</li>`; };
+  return `<div class="side-h"><b>닷새 노선</b><span>⠿ 끌어서 날짜·순서 바꾸기</span></div>${days}
+    <div class="side-h sub"><b>보관함${c.k==="all"?"":` · ${esc(c.n)}`}</b><span>⠿ 날짜로 끌거나 넣기</span></div><ul class="rsl" id="ovpool">${pool.map(prow).join("")||`<li class="src empty">남은 곳이 없어요.</li>`}</ul>`;
+}
+function renderPanel(){
+  PSORTS.forEach(x=>{ try{ x.destroy(); }catch(e){} }); PSORTS=[];
+  const side=$("#side"), sh=$("#xsheet"), xp=$("#xp"), on=VIEW==="board" && CUR!=="wed" && !!xp, w=wide();
+  const was=document.body.classList.contains("withside");
+  side.hidden=!(on&&w); document.body.classList.toggle("withside",!!(on&&w));
+  if(sh){ sh.hidden=!(on&&!w&&XSHEET); xp.classList.toggle("sheet",!!(on&&!w&&XSHEET)); }
+  const lb=$("#xlist"); if(lb) lb.textContent=XSHEET?"지도만":"목록";
+  if(XMAP && was!==(on&&w)) requestAnimationFrame(()=>{ if(XMAP) XMAP.invalidateSize(); });
+  const host=on?(w?side:(XSHEET?sh:null)):null; if(!host) return;
+  const top=host.scrollTop; host.innerHTML=(w?"":`<p class="sh-grab" aria-hidden="true"></p>`)+(MAPALL?overviewHTML():routeSideHTML()); host.scrollTop=top;
+  wirePanel(host); legFill(MAPALL?null:CUR);
+}
+function wirePanel(host){
+  $$("[data-xsel]",host).forEach(b=>b.addEventListener("click",()=>xSelect(b.dataset.xsel,true)));
+  $$("[data-xout]",host).forEach(b=>b.addEventListener("click",()=>mapOut(b.dataset.xout)));
+  $$("[data-xput]",host).forEach(b=>b.addEventListener("click",()=>mapPut(b.dataset.xput,b.dataset.day)));
+  $$("[data-mday]",host).forEach(b=>b.addEventListener("click",()=>setMapDay(b.dataset.mday)));
+  $$("[data-rainswap]",host).forEach(b=>b.addEventListener("click",()=>rainSwap(b.dataset.rainswap,b.dataset.to)));
+  const dep=$("#depart2",host); if(dep) dep.addEventListener("change",()=>{ const t=dep.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return; S.start[CUR]=t; commit(`숙소 출발 ${t}`); });
+  const ob=$("#optbtn2",host); if(ob) ob.addEventListener("click",()=>runOptimize(CUR));
+  const ad=$("#addst2",host); if(ad) ad.addEventListener("click",()=>openPicker());
+  if(!window.Sortable) return;
+  const common={handle:".h", draggable:"li[data-id]", animation:160, ghostClass:"ghost", chosenClass:"chosen", fallbackOnBody:true, forceFallback:true, fallbackTolerance:3, scroll:true, scrollSensitivity:90, scrollSpeed:22, bubbleScroll:true};
+  const undo=snap=>()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); };
+  if(!MAPALL){
+    const snap=daySnap();
+    const dayDrop=e=>{ if(!e.to || e.to.id!=="rsl") return; if(e.from===e.to && e.oldIndex===e.newIndex) return;
+      const ids=$$(":scope > li[data-id]",e.to).map(x=>x.dataset.id); ids.forEach(id=>{ if(!S.days[CUR].includes(id)) removeEverywhere(id); }); S.days[CUR]=ids;
+      setTimeout(()=>{ commit(); toastUndo("노선을 바꿨어요",undo(snap)); },0); };
+    const rsl=$("#rsl",host), rc=$("#rcand",host);
+    if(rsl) PSORTS.push(Sortable.create(rsl,Object.assign({},common,{group:{name:"rt",pull:false,put:true}, onEnd:dayDrop})));
+    if(rc) PSORTS.push(Sortable.create(rc,Object.assign({},common,{group:{name:"rt",pull:true,put:false}, sort:false, onEnd:dayDrop})));
+  } else {
+    const snap=daySnap();
+    const ovDrop=e=>{ if(!e.to || e.to.id==="ovpool") return; if(e.from===e.to && e.oldIndex===e.newIndex) return;
+      EDIT.forEach(dk=>{ const ol=$(`.ovday[data-day="${dk}"]`,host); if(ol) S.days[dk]=$$(":scope > li[data-id]",ol).map(x=>x.dataset.id); });
+      setTimeout(()=>{ commit(); toastUndo("노선을 바꿨어요",undo(snap)); },0); };
+    $$(".ovday",host).forEach(ol=>PSORTS.push(Sortable.create(ol,Object.assign({},common,{group:{name:"ov",pull:true,put:true}, onEnd:ovDrop}))));
+    const pl=$("#ovpool",host); if(pl) PSORTS.push(Sortable.create(pl,Object.assign({},common,{group:{name:"ov",pull:true,put:false}, sort:false, onEnd:ovDrop})));
+  }
 }
 const picker=$("#picker");
 function openPicker(){
@@ -881,10 +858,7 @@ picker.addEventListener("click",e=>{ if(e.target===picker || e.target.closest("[
 function wireDnD(){
   SORTS.forEach(s=>{ try{ s.destroy(); }catch(e){} }); SORTS=[];
   if(!window.Sortable || VIEW!=="board" || CUR==="wed") return;
-  const rsl=$("#side #rsl");
-  if(rsl && rsl.querySelector("li[data-id]")) SORTS.push(Sortable.create(rsl,{draggable:"li[data-id]", handle:".h", animation:160, ghostClass:"ghost", chosenClass:"chosen",
-    onEnd(e){ if(e.oldIndex===e.newIndex) return; const snap=daySnap(); S.days[CUR]=$$("#side #rsl > li[data-id]").map(x=>x.dataset.id); commit();
-      toastUndo("순서를 바꿨어요",()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); }); }}));
+
   const line=$("#line"), pool=wide()?$("#side #pool"):null, trash=$("#trash ul");
   const clearHot=()=>{ $$(".dt.hot").forEach(x=>x.classList.remove("hot")); $("#trash").classList.remove("hot"); };
   const common={group:{name:"trip",pull:true,put:true}, draggable:"li[data-id]", animation:160, delay:170, delayOnTouchOnly:true, touchStartThreshold:6,
@@ -956,7 +930,7 @@ function killXMap(){ if(XMAP){ try{ XMAP.remove(); }catch(e){} XMAP=null; XLAY=n
 const kfmt=n=>n>=1000?(n/1000).toFixed(1).replace(/\.0$/,"")+"천":String(n||0);
 function xItems(){
   if(XMODE==="plan") return S.days[CUR].map(place).filter(p=>p&&p.lat).concat(planCands());
-  if(XMODE==="route") return S.days[CUR].map(place).filter(p=>p&&p.lat).concat(XCAND?xCands(CUR):[]);
+  if(XMODE==="route") return S.days[CUR].map(place).filter(p=>p&&p.lat).concat(planCands());
   const placed=new Set(EDIT.flatMap(dk=>S.days[dk])), c=XC.find(x=>x.k===XF.c)||XC[0], a=XF.a;
   return [...CAT.values(), ...Object.values(S.added)].filter(p=>p.lat && (!p.gone||placed.has(p.id))
     && (c.k==="all" || (c.k==="star" ? S.star[p.id] : c.k==="found" ? p.found : c.kc.includes(p.kc)))
@@ -1002,35 +976,23 @@ function xCard(x){
       <span class="xt"><span class="xk">${where}</span><b class="xn">${esc(p.n)}</b><span class="xm">${meta}</span>${XMODE==="route"&&r?`<span class="xh">${hopText(r,r.i===0)}${r.wait>=10?` · ${r.wait}분 여유`:""}</span>`:""}${warn}</span>
     </button>${act}</li>`;
 }
-function xChips(){
-  const n=k=>{ const s=XF.c; XF.c=k; const v=xItems().length; XF.c=s; return v; };
-  const na=a=>{ const s=XF.a; XF.a=a; const v=xItems().length; XF.a=s; return v; };
-  return `<div class="chips xrow">${XC.map(c=>`<button class="chip" data-xc="${c.k}" aria-pressed="${XF.c===c.k}">${c.i?ico(c.i):""}${esc(c.n)} <b>${n(c.k)}</b></button>`).join("")}</div>
-    <div class="chips xrow">${XA.map(a=>`<button class="chip${EDIT.includes(a)?" line":""}" data-xa="${a}" aria-pressed="${XF.a===a}"${EDIT.includes(a)?` style="--c:${LINE[a].c}"`:""}>${EDIT.includes(a)?lsym(a,"sm")+WDK[a]+" ":""}${a==="all"?"모든 지역":esc(AREANAME[a])} <b>${na(a)}</b></button>`).join("")}</div>`;
-}
 let XMODE="explore";   // "explore"(지도 탭) | "route"(운행표를 지도로)
-let XCAND=LS.get("tokyo-lines-xcand","1")==="1";   // 운행표 지도에 근처 후보 핀을 같이
-let BOARDMAP=LS.get("tokyo-lines-bm","0")==="1";
-function setBM(on){ BOARDMAP=on; LS.set("tokyo-lines-bm",on?"1":"0"); render(); window.scrollTo({top:0}); }
-// 일정 탭의 목록 ↔ 지도 전환(2026-09-28, Henry: 운행표·노선도·지도가 겹친다 → 한 탭에서 전환)
-const segBM=()=>`<span class="seg" role="group" aria-label="보기"><button type="button" data-bm="0" aria-pressed="${!BOARDMAP}">${ico("i-line")}목록</button><button type="button" data-bm="1" aria-pressed="${BOARDMAP}">${ico("i-map")}지도</button></span>`;
 function renderExplore(){ renderMapView("explore"); }
 function renderMapView(mode){
-  XMODE=mode; document.body.dataset.boardmap = mode==="route" ? "1" : "0";
-  const fresh=!$("#xp") || $("#xp").dataset.mode!==mode;
+  XMODE=mode; document.body.dataset.boardmap="1";
+  const fresh=!$("#xp");
   if(fresh){
     killXMap();
-    const fab = mode==="route"
-      ? `<span class="xcount" id="xcount"></span><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button>`
-      : `<span class="xcount" id="xcount"></span><button class="fab" id="xme" aria-label="내 위치에서 가까운 순">${ico("i-locate")}</button><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button><button class="fab txt" data-pm="list">목록</button>`;
-    main.innerHTML=`<section class="xp${mode==="route"?" route":""}" id="xp" data-mode="${mode}">
+    const fab=`<span class="xcount" id="xcount"></span><button class="fab" id="xme" aria-label="내 위치에서 가까운 순">${ico("i-locate")}</button><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button><button class="fab txt" id="xlist">목록</button>`;
+    main.innerHTML=`<section class="xp" id="xp" data-mode="map">
       <div class="xtop" id="xtop"></div>
       <div id="xmap" class="xmap" role="application" aria-label="${mode==="route"?"그날 노선 지도":"장소 지도"}"></div>
       <div class="xfab">${fab}</div>
       <ul class="xcards" id="xcards"></ul>
-      <button class="xnav prev" id="xprev" aria-label="이전 장소">‹</button><button class="xnav next" id="xnext" aria-label="다음 장소">›</button></section>`;
+      <button class="xnav prev" id="xprev" aria-label="이전 장소">‹</button><button class="xnav next" id="xnext" aria-label="다음 장소">›</button>
+      <div class="xsheet" id="xsheet" hidden></div></section>`;
+    $("#xlist").addEventListener("click",()=>{ XSHEET=!XSHEET; renderPanel(); if(XMAP) setTimeout(()=>{ XMAP.invalidateSize(); if(XSEL) xSelect(XSEL,false,false); },60); });
     $$("button[data-pm]",main).forEach(b=>b.addEventListener("click",()=>setPM(b.dataset.pm)));
-    $$("button[data-bm]",main).forEach(b=>b.addEventListener("click",()=>setBM(b.dataset.bm==="1")));
     $("#xfit").addEventListener("click",()=>xFit());
     const me=$("#xme"); if(me) me.addEventListener("click",xLocate);
     const cards=$("#xcards"); let t=0;
@@ -1056,9 +1018,9 @@ function renderMapView(mode){
       XLAY=L.layerGroup().addTo(XMAP);
       requestAnimationFrame(()=>{ if(XMAP){ XMAP.invalidateSize(); xFit(); } });
     } else $("#xmap").innerHTML=`<p class="src" style="padding:20px">지도를 불러오지 못했어요. 아래 카드는 그대로 쓸 수 있어요.</p>`;
-    if(mode==="route"){ const N=tripNow(); if(N.phase==="during" && N.dk===CUR){ const nn=nowNext(); const x=nn.cur||nn.next; if(x) XSEL=x.id; } }
+    if(mode==="route"){ const N=tripNow(); if(N.phase==="during" && N.dk===CUR && !XSEL){ const nn=nowNext(); const x=nn.cur||nn.next; if(x) XSEL=x.id; } }
   }
-  xUpdate(fresh);
+  xUpdate(fresh || MAPFIT); MAPFIT=false;
 }
 /* 지도 바탕: 키가 있고 Map Tiles API가 켜져 있으면 구글 지도(한국어 지명), 아니면 국토지리원 담색지도(없으면 OSM).
    구글 타일은 정책상 캐시·오프라인 금지라 서비스 워커가 손대지 않고, 구글 로고 글자와 뷰포트 저작권 문구를 오른쪽 아래에 둔다. */
@@ -1104,11 +1066,9 @@ function xBase(map){
 }
 let XL=[];
 function xUpdate(fit){
-  if(XMODE==="route"){ xRouteTop(); } else {
-  $("#xtop").innerHTML=xChips()+gStatHTML();
-  $$("[data-xc]").forEach(b=>b.addEventListener("click",()=>{ XF.c=(XF.c===b.dataset.xc&&b.dataset.xc!=="all")?"all":b.dataset.xc; LS.set("tokyo-lines-xf",JSON.stringify(XF)); XSEL=null; xUpdate(true); }));
-  $$("[data-xa]").forEach(b=>b.addEventListener("click",()=>{ XF.a=(XF.a===b.dataset.xa&&b.dataset.xa!=="all")?"all":b.dataset.xa; LS.set("tokyo-lines-xf",JSON.stringify(XF)); XSEL=null; xUpdate(true); }));
-  }
+  $("#xtop").innerHTML=mapTop();
+  $$("#xtop [data-mday]").forEach(b=>b.addEventListener("click",()=>setMapDay(b.dataset.mday)));
+  $$("#xtop [data-mc]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.mc; MC=(MC===k&&k!=="")?"":k; LS.set("tokyo-lines-mc",MC); XSEL=null; render(); }));
   $$("#xtop .chip[aria-pressed=true]").forEach(c=>{ const row=c.parentElement; row.scrollLeft=Math.max(0,c.offsetLeft-row.clientWidth/2+c.offsetWidth/2); });
   const items=xItems(); XL=xInfo(items);
   if(XSEL && !XL.some(x=>x.p.id===XSEL)) XSEL=null;
@@ -1119,11 +1079,12 @@ function xUpdate(fit){
   $("#xp").style.setProperty("--xch",(cards.offsetHeight+10)+"px");
   $$("[data-xput]",cards).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); mapPut(b.dataset.xput,b.dataset.day); }));
   $$("[data-xout]",cards).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); mapOut(b.dataset.xout); }));
-  $$("[data-xboard]",cards).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); go("board",b.dataset.xboard); }));
+  $$("[data-xboard]",cards).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); setMapDay(b.dataset.xboard); }));
   if(!XMAP) return;
   XLAY.clearLayers(); XMK=new Map();
-  const one=XMODE==="route"?CUR:(EDIT.includes(XF.a)?XF.a:null), days=one?[one]:EDIT;
+  const one=XMODE==="route"?CUR:(EDIT.includes(XF.a)?XF.a:null), days=XMODE==="route"?[...EDIT.filter(k=>k!==CUR),CUR]:(one?[one]:EDIT);
   days.forEach(dk=>{ const pts=[[HOTEL.lat,HOTEL.lng],...S.days[dk].map(place).filter(q=>q&&q.lat).map(q=>[q.lat,q.lng]),[HOTEL.lat,HOTEL.lng]];
+    if(one && dk!==one){ L.polyline(pts,{color:LINE[dk].hex, weight:3, opacity:.35, dashArray:"6 6", interactive:false}).addTo(XLAY); return; }   // 다른 날은 흐린 점선
     const soft=!one && XF.c!=="all";   // 컨셉만 고른 때는 노선을 옅게 깔아 핀이 먼저 보이게
     L.polyline(pts,{color:"#101010", weight:one?12:9, opacity:soft?.06:.16, interactive:false}).addTo(XLAY);
     L.polyline(pts,{color:"#fff", weight:one?10:7, opacity:soft?.5:.95, interactive:false}).addTo(XLAY);
@@ -1134,16 +1095,7 @@ function xUpdate(fit){
   if(XME) xMeMarker();
   if(fit) xFit();
   if(XSEL) xSelect(XSEL,true,true);
-}
-function xRouteTop(){
-  const dk=CUR, sc=schedule(dk), n=sc.rows.length, pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
-  const st = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
-  $("#xtop").innerHTML=`<div class="chips xrow">${EDIT.map(k=>`<button class="chip line" data-rday="${k}" aria-pressed="${k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}</div>
-    <div class="xsum">${segBM()}<b>${WDK[dk]} ${esc(REGION[dk].n)}</b><span>${n}역 · ${n?`${fmt(sc.depart)}–${fmt(sc.home)} · ${sc.dist.toFixed(1)}km · `:""}${st}</span>
-      <span class="xsl">${n?`<a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 동선</a>`:""}<button class="lk" data-xcand aria-pressed="${XCAND}">${ico("i-map")}후보 ${XCAND?"숨기기":"보기"}</button></span></div>${gStatHTML()}`;
-  $$("#xtop button[data-bm]").forEach(b=>b.addEventListener("click",()=>setBM(b.dataset.bm==="1")));
-  $$("[data-rday]").forEach(b=>b.addEventListener("click",()=>{ CUR=b.dataset.rday; LS.set("tokyo-lines-day",CUR); XSEL=null; xUpdate(true); renderSide(); wireDnD(); }));
-  const cb=$("[data-xcand]"); if(cb) cb.addEventListener("click",()=>{ XCAND=!XCAND; LS.set("tokyo-lines-xcand",XCAND?"1":"0"); if(!XCAND && XSEL && !S.days[CUR].includes(XSEL)) XSEL=null; xUpdate(false); });
+  renderPanel();
 }
 function xFit(){
   if(!XMAP) return;
@@ -1154,12 +1106,12 @@ function xFit(){
   XMAP.fitBounds(pts,{paddingTopLeft:[28,top+24], paddingBottomRight:[28,bot+24], maxZoom:15});
 }
 function xPad(){ const h=s=>($(s)||{offsetHeight:0}).offsetHeight;
-  return XMODE==="plan" ? {top:h("#pmchips")+8, bot:h("#pmcard")+(wide()?0:44)} : {top:h("#xtop"), bot:h("#xcards")}; }
+  return {top:h("#xtop"), bot:$("#xp.sheet")?h("#xsheet"):h("#xcards")}; }
 function xSelect(id,fromMap,quiet){
   const prev=XSEL; XSEL=id;
   [prev,id].forEach(k=>{ const o=k&&XMK.get(k); if(o){ o.m.setIcon(xPin(o.x,k===id)); o.m.setZIndexOffset(k===id?1000:0); } });
   $$("#xcards .xc").forEach(li=>li.classList.toggle("on",li.dataset.x===id));
-  $$("#side .rs").forEach(li=>li.classList.toggle("on",li.dataset.id===id));
+  $$("#side .rs, #xsheet .rs").forEach(li=>{ const on=li.dataset.id===id; li.classList.toggle("on",on); if(on && fromMap) li.scrollIntoView({block:"nearest",behavior:"smooth"}); });
   const o=XMK.get(id);
   $$("#line li.st").forEach(li=>li.classList.toggle("sel",li.dataset.id===id));
   if(o && XMAP && !quiet){ const {top,bot}=xPad(), pt=XMAP.latLngToContainerPoint(o.m.getLatLng()), sz=XMAP.getSize();
