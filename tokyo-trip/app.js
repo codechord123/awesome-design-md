@@ -1785,5 +1785,12 @@ if(tripNow().phase==="during" && LS.get("tokyo-lines-view",null)===null) VIEW="h
 render();
 
 if("serviceWorker" in navigator && location.protocol!=="file:"){
-  navigator.serviceWorker.register("sw.js").catch(()=>{});
+  // 새 버전은 받자마자 한 번 새로고침(2026-09-28 Henry: 자동으로 바로). 저장은 localStorage라 잃는 게 없고, 입력 중이면 끝날 때까지 기다린다.
+  const had=!!navigator.serviceWorker.controller; let reloading=false;
+  const typing=()=>{ const a=document.activeElement; return a && (a.matches("input,textarea,select,[contenteditable]")); };
+  const reload=()=>{ if(reloading) return; if(typing()){ document.addEventListener("focusout",()=>setTimeout(reload,300),{once:true}); return; } reloading=true; location.reload(); };
+  navigator.serviceWorker.addEventListener("controllerchange",()=>{ if(had) reload(); });
+  navigator.serviceWorker.register("sw.js").then(reg=>{
+    document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") reg.update().catch(()=>{}); });
+  }).catch(()=>{});
 }
