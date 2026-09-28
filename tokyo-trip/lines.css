@@ -595,3 +595,40 @@ body.withside .toast{left:calc(50% - 190px)}
   .pm .leaflet-bottom.leaflet-right{bottom:0}
   .plan.nomap{display:block}
 }
+/* 지출 */
+.chkw{border-bottom:1px solid var(--rule);padding-bottom:8px}
+.chkw .chk{border-bottom:0}
+.pay{display:flex;align-items:center;gap:8px;margin:0 0 0 38px;font-size:13px;font-weight:700;color:var(--sub)}
+.pay label{display:flex;align-items:center;gap:6px}
+.pay input[type=number]{width:96px;min-height:36px;border:1.5px solid var(--rule);border-radius:10px;padding:0 8px;background:var(--hi);font:600 14px var(--num)}
+.pay input[type=checkbox]{width:18px;height:18px;accent-color:var(--ink)}
+.spf{margin:0 0 14px}
+.bd li b .x{border:0;background:none;color:var(--mute);font-size:16px;cursor:pointer;padding:0 0 0 6px}
+/* 오늘 = 그날 브리핑 */
+.bh0 .hero-t{font-size:30px}
+.bchips{margin:4px 0 6px}
+.bcard{background:var(--card);border-radius:var(--r);box-shadow:var(--lift);padding:14px 16px;margin:14px 0 0}
+.bcard h2{display:flex;align-items:center;gap:8px;margin:0 0 10px;font-size:17px;font-weight:850;letter-spacing:-.03em}
+.bcard h2 .ki{width:20px;height:20px}
+.bcard p{margin:0 0 8px;font-size:14.5px;color:var(--sub);word-break:keep-all}
+.bm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 10px}
+.bm>div{background:var(--hi);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.bm span{font-size:12.5px;font-weight:700;color:var(--mute)}
+.bm b{font:800 20px/1.2 var(--num);color:var(--ink)}
+.bm b i{font-style:normal;font-size:14px;color:var(--sub)}
+.bm small{font-size:12px;color:var(--mute)}
+.bl{list-style:none;margin:0 0 6px;padding:0}
+.bl li{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;border-bottom:1px solid var(--rule);font-size:14px;color:var(--ink)}
+.bl li:last-child{border-bottom:0}
+.bl li b{font:700 14px var(--num);white-space:nowrap}
+.bl li em{display:block;font-style:normal;font-size:12px;color:var(--mute);font-weight:600}
+.bl li em.w{color:var(--amber)}
+.bl li.bad em.w{color:var(--red)}
+.bl li.mu{color:var(--mute)}
+.warnline{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--ink)!important}
+.warnline .ki{width:16px;height:16px}
+.bf b{color:var(--ink)}
+.bleg{list-style:none;margin:0 0 8px;padding:0;display:grid;gap:8px}
+.bleg li{padding:8px 10px;border-radius:12px;background:var(--hi)}
+.bleg .bh2{margin:0 0 2px;font-size:14px;color:var(--ink)}
+.bleg .mv{padding:0;min-height:0}
