@@ -8,7 +8,7 @@
   --bg:#EFEEE9;--card:#FFFFFF;--ink:#101010;--sub:#55544F;--mute:#7C7B75;--rule:#DCDBD4;--soft:#E6E5DF;--hi:#F7F6F2;
   --red:#D7263D;--amber:#A76100;--ok:#1B7F4B;
   /* 도쿄메트로 공식 노선색 */
-  --L-wed:#1B3D8F;--L-thu:#F39700;--L-fri:#009BBF;--L-sat:#9CAEB7;--L-sun:#E60012;
+  --L-wed:#1B3D8F;--L-thu:#F39700;--L-fri:#009BBF;--L-sat:#8F76D6;--L-sun:#E60012;
   --ko:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Hiragino Sans","Noto Sans KR","Noto Sans JP",system-ui,sans-serif;
   --num:"Barlow Condensed","Pretendard Variable",Pretendard,"Arial Narrow",system-ui,sans-serif;
   --lat:"Barlow","Pretendard Variable",Pretendard,system-ui,sans-serif;
@@ -18,10 +18,10 @@
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0D0E10;--card:#17181B;--ink:#F1F0EB;--sub:#BDBCB6;--mute:#8D8C86;--rule:#2A2B2F;--soft:#222327;--hi:#1C1D21;
-  --red:#FF5A6E;--amber:#F0A640;--ok:#4CC486;--L-wed:#5B7FE0;--L-sat:#AFC0C8;
+  --red:#FF5A6E;--amber:#F0A640;--ok:#4CC486;--L-wed:#5B7FE0;--L-sat:#A48FE3;
   --lift:0 1px 0 rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.7)}}
 :root[data-theme="dark"]{--bg:#0D0E10;--card:#17181B;--ink:#F1F0EB;--sub:#BDBCB6;--mute:#8D8C86;--rule:#2A2B2F;--soft:#222327;--hi:#1C1D21;
-  --red:#FF5A6E;--amber:#F0A640;--ok:#4CC486;--L-wed:#5B7FE0;--L-sat:#AFC0C8;--lift:0 1px 0 rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.7)}
+  --red:#FF5A6E;--amber:#F0A640;--ok:#4CC486;--L-wed:#5B7FE0;--L-sat:#A48FE3;--lift:0 1px 0 rgba(0,0,0,.4),0 10px 28px -12px rgba(0,0,0,.7)}
 *,*::before,*::after{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:500 16px/1.55 var(--ko);letter-spacing:-.01em;
@@ -531,3 +531,31 @@ body.withside .toast{left:calc(50% - 190px)}
 .wxc.wet{border-color:var(--L-fri,#0aa)}
 .wxc b{font-size:12.5px;color:var(--ink)}.wxc .wc{font-size:12.5px;font-weight:700;color:var(--ink)}
 .wxc .wt{font:700 13px var(--num)}.wxc .wr,.wxc .ws{font-size:11px;color:var(--mute);font-weight:600}
+/* 목록 ↔ 지도 전환 */
+.seg{display:inline-flex;background:var(--soft);border-radius:999px;padding:3px;gap:2px;margin-right:6px;vertical-align:middle}
+.seg button{display:inline-flex;align-items:center;gap:5px;border:0;background:none;border-radius:999px;min-height:34px;padding:0 12px;font-weight:800;font-size:13px;color:var(--sub);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--card)}
+.seg .ki{width:15px;height:15px}
+.xsum .seg{margin-right:4px}
+/* 구간 교통(구글 경로) */
+.mv .lg{display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap}
+.mv .lg.rt{color:var(--sub)}
+.rl{display:inline-block;padding:1px 6px;border-radius:5px;background:var(--lc,#555);color:var(--lt,#fff);font:800 11.5px/1.5 inherit;font-family:inherit;margin-right:3px}
+.lcdleg{margin-top:12px;border-top:1px solid #2A2A2D;padding-top:10px}
+.lgb{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.lgb li{display:flex;align-items:flex-start;gap:8px;font-size:14.5px;color:#F4F4F0}
+.lgb li span{display:flex;flex-direction:column;gap:2px}
+.lgb li small{color:#9A9A95;font-size:12.5px}
+.lgb li.w{color:#B9B9B3;font-size:13px}
+.lgb .ki{width:15px;height:15px}
+.lgt{margin:8px 0 0;font:600 13.5px var(--num);color:#FFB23E}
+/* 오늘 */
+.tleft{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.tleft .rb{display:flex;align-items:center;gap:10px;width:100%;border:0;background:var(--card);border-radius:12px;padding:10px 12px;box-shadow:var(--lift);cursor:pointer;text-align:left;font-size:15px;font-weight:700;color:var(--ink)}
+.tleft .rb b{font:700 15px var(--num);color:var(--sub)}
+.lrow.today{outline:2.5px solid var(--c);outline-offset:-2.5px}
+.netmap.sm{max-width:420px;margin-left:auto;margin-right:auto}
+.lcdleg .nx{margin:0 0 8px;display:flex;align-items:center;gap:6px;font-size:14px;color:#F4F4F0}
+.lcdleg .nx .sta{background:#fff}
+.dh .links{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.seg button,.lk{white-space:nowrap}

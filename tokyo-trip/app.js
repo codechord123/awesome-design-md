@@ -29,7 +29,7 @@ const LINE={
   wed:{code:"KS", c:"var(--L-wed)", hex:"#1B3D8F", name:"도착"},
   thu:{code:"G",  c:"var(--L-thu)", hex:"#F39700", name:"북동선"},
   fri:{code:"T",  c:"var(--L-fri)", hex:"#009BBF", name:"도심선"},
-  sat:{code:"H",  c:"var(--L-sat)", hex:"#9CAEB7", name:"남서선"},
+  sat:{code:"Z",  c:"var(--L-sat)", hex:"#8F76D6", name:"남서선"},   // 한조몬선 보라. 히비야선 은색은 회색 지도와 섞여서 바꿨다(2026-09-28)
   sun:{code:"M",  c:"var(--L-sun)", hex:"#E60012", name:"긴자선"}
 };
 const REGION={
@@ -190,6 +190,69 @@ function hopText(r,first){
   if(r.tr.mode==="noloc") return `${ico("i-walk")}${pre}이동 시간 모름 · 구글 장소 정보를 받으면 계산돼요`;
   const dist=r.tr.d<1?Math.round(r.tr.d*1000)+"m":r.tr.d.toFixed(1)+"km";
   return r.tr.mode==="walk" ? `${ico("i-walk")}${pre}도보 ${r.tr.min}분 · ${dist}` : `${ico("i-train")}${pre}전철 약 ${r.tr.min}분 · ${dist}`;
+}
+
+/* ─────────────── 구간 교통: 구글 Routes API(2026-09-28) ───────────────
+   Henry: "다음 이정표로 교통안내가 잘 나왔으면." 전철 구간(1.2km 넘는 곳)마다 computeRoutes(TRANSIT)로 탈 노선·탈 역·내릴 역·정거장 수를 받는다.
+   키의 API 제한에 Routes API가 있어야 한다. 경로는 저장하지 않고 이 세션(sessionStorage)에만 둔다(구글 정책 — 좌표·place ID 말고는 캐시 조심).
+   실패하면 2분 쉬고, 그동안은 앱의 추정(hopText)을 보여 준다. 화면 전체를 다시 그리지 않고 [data-leg] 자리만 바꾼다(끄는 중 흔들리지 않게). */
+let RT=(()=>{ try{ return new Map(JSON.parse(sessionStorage.getItem("tokyo-rt")||"[]")); }catch(e){ return new Map(); } })();
+const LEGINFO=new Map(), RTWAIT=new Set();
+const legKey=(a,b)=>`${(+a.lat).toFixed(4)},${(+a.lng).toFixed(4)}>${(+b.lat).toFixed(4)},${(+b.lng).toFixed(4)}`;
+function legAttr(a,b,tr,big,dep){
+  if(!tr || tr.mode!=="train" || !a || !b || !a.lat || !b.lat) return "";
+  const k=legKey(a,b), I=LEGINFO.get(k)||{a,b,tr}; if(dep) I.dep=dep; LEGINFO.set(k,I);
+  return ` data-leg="${k}"${big?' data-bigleg="1"':""}`;
+}
+function rlChip(t){ return `<span class="rl" style="--lc:${esc(t.color)};--lt:${esc(t.text)}">${esc(t.name||t.line||"전철")}</span>`; }
+function legText(a,b,tr,first){
+  const R=a&&b&&a.lat&&b.lat?RT.get(legKey(a,b)):null, pre=first?"숙소에서 ":"";
+  if(!R || !R.steps) return `<span class="lg">${hopText({tr},first)}</span>`;
+  const T=R.steps.filter(x=>!x.w);
+  if(!T.length) return `<span class="lg">${ico("i-walk")}${pre}걸어서 약 ${R.min}분</span>`;
+  return `<span class="lg rt">${ico("i-train")}${pre}${T.map(t=>`${rlChip(t)}${esc(t.from)}→${esc(t.to)}`).join(" · ")} · 약 ${R.min}분</span>`;
+}
+function legBig(a,b,tr){
+  const R=a&&b&&a.lat&&b.lat?RT.get(legKey(a,b)):null;
+  if(!R || !R.steps) return `<p class="lgt">${tr&&tr.mode==="train"?`전철 약 ${tr.min}분(추정) · 길찾기로 경로를 보세요`:tr&&tr.mode==="walk"?`걸어서 약 ${tr.min}분`:tr&&tr.mode==="noloc"?"위치를 받기 전이에요 · 길찾기로 경로를 보세요":"바로 옆이에요"}</p>`;
+  return `<ol class="lgb">${R.steps.map(t=>t.w?`<li class="w">${ico("i-walk")}걸어서 ${t.w}분</li>`
+      :`<li>${rlChip(t)}<span><b>${esc(t.from)}</b> → <b>${esc(t.to)}</b><small>${[t.head?esc(t.head)+" 방면":"", t.n?t.n+"정거장":"", t.min?t.min+"분":""].filter(Boolean).join(" · ")}</small></span></li>`).join("")}</ol>
+    <p class="lgt">약 ${R.min}분 · 구글 경로</p>`;
+}
+function rtOff(){ return !!LS.get("tokyo-rt-err","") && Date.now()-(+LS.get("tokyo-rt-try","0"))<2*60e3; }
+async function rtFetch(k){
+  const I=LEGINFO.get(k), key=LS.get("tokyo-gkey",""); if(!I || !key) return;
+  const body={origin:{location:{latLng:{latitude:+I.a.lat,longitude:+I.a.lng}}}, destination:{location:{latLng:{latitude:+I.b.lat,longitude:+I.b.lng}}}, travelMode:"TRANSIT", languageCode:"ja", regionCode:"JP"};
+  if(I.dep && I.dep>Date.now()+60e3) body.departureTime=new Date(I.dep).toISOString();
+  const call=b=>fetch("https://routes.googleapis.com/directions/v2:computeRoutes",{method:"POST",headers:{"Content-Type":"application/json","X-Goog-Api-Key":key,
+    "X-Goog-FieldMask":"routes.duration,routes.legs.steps.travelMode,routes.legs.steps.staticDuration,routes.legs.steps.transitDetails"},body:JSON.stringify(b)});
+  let r=await call(body);
+  if(r.status===400 && body.departureTime){ delete body.departureTime; r=await call(body); }
+  if(!r.ok){ const t=await r.text().catch(()=>"");
+    if(r.status===401||r.status===403){ LS.set("tokyo-rt-err",/SERVICE_BLOCKED|has not been used|is disabled|not enabled/i.test(t)?"Routes API가 꺼져 있거나 키의 API 제한에 없어요.":/referer|referrer/i.test(t)?"키의 웹사이트 제한에 지금 주소가 없어요.":"Routes API 오류 "+r.status); LS.set("tokyo-rt-try",String(Date.now())); throw new Error("off"); }
+    return; }
+  const j=await r.json(), R=j.routes&&j.routes[0]; if(!R){ RT.set(k,{steps:[],min:0,none:true}); return; }
+  const out=[]; let walk=0;
+  (R.legs||[]).forEach(L=>(L.steps||[]).forEach(st=>{ const sec=parseInt(st.staticDuration)||0;
+    if(st.travelMode==="TRANSIT" && st.transitDetails){ if(walk>=60){ out.push({w:Math.round(walk/60)}); } walk=0;
+      const T=st.transitDetails, Ln=T.transitLine||{}, SD=T.stopDetails||{};
+      out.push({line:Ln.nameShort||"", name:Ln.name||Ln.nameShort||"", color:Ln.color||"#555555", text:Ln.textColor||"#ffffff", from:(SD.departureStop||{}).name||"", to:(SD.arrivalStop||{}).name||"", n:T.stopCount||0, head:T.headsign||"", min:Math.round(sec/60)});
+    } else walk+=sec; }));
+  if(walk>=60) out.push({w:Math.round(walk/60)});
+  RT.set(k,{steps:out, min:Math.round((parseInt(R.duration)||0)/60)}); LS.del("tokyo-rt-err");
+  try{ sessionStorage.setItem("tokyo-rt",JSON.stringify([...RT])); }catch(e){}
+}
+// 화면에 있는 전철 구간 중 아직 없는 것만 받아서 그 자리만 바꾼다. dk를 주면 그날 출발 시각도 넘긴다
+async function legFill(dk){
+  if(!LS.get("tokyo-gkey","") || navigator.onLine===false || rtOff()) return;
+  if(dk && DAY[dk] && EDIT.includes(dk)){ const sc=schedule(dk), base=new Date(DAY[dk].date+"T00:00:00+09:00").getTime();
+    sc.rows.forEach(r=>{ const a=r.from||HOTEL; if(r.tr.mode==="train" && a.lat && r.p.lat){ const I=LEGINFO.get(legKey(a,r.p)); if(I) I.dep=base+(r.arr-r.tr.min)*60000; } }); }
+  const ks=[...new Set($$("[data-leg]").map(e=>e.dataset.leg))].filter(k=>!RT.has(k) && !RTWAIT.has(k)).slice(0,12);
+  for(const k of ks){ RTWAIT.add(k);
+    try{ await rtFetch(k); }catch(e){ RTWAIT.delete(k); break; }
+    RTWAIT.delete(k);
+    $$(`[data-leg="${CSS.escape(k)}"]`).forEach(el=>{ const I=LEGINFO.get(k); if(!I) return;
+      if(el.dataset.bigleg) el.innerHTML=legBig(I.a,I.b,I.tr); else { const lg=el.querySelector(".lg"); if(lg) lg.outerHTML=legText(I.a,I.b,I.tr,I.a===HOTEL); } }); }
 }
 
 /* ─────────────── 도쿄 시각, 지금·다음 ─────────────── */
@@ -515,34 +578,45 @@ function lcdHTML(){
     <p class="k">${cur?"Now":"Next"} <em>${cur?"지금":"次は · 다음"}</em> <span class="sta sm" style="--c:${LINE[N.dk].c};margin-left:auto"><i>${c.l}</i><b>${c.n}</b></span></p>
     <p class="n">${esc(r.p.n)}</p>${r.p.ja?`<p class="j">${esc(r.p.ja)}</p>`:""}
     <p class="w">${cur?`${fmt(r.end)}까지 · ${r.end-N.min}분 남음`:`${fmt(r.start)} 도착 예정 · ${left}분 뒤`}</p>
-    <div class="acts"><a class="btn go" href="${DIR(r.from||HOTEL,r.p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a><button class="btn" data-big="${esc(r.id)}">${ico("i-zoom")}크게 보기</button>${VIEW==="board"?"":`<button class="btn" data-go="board" data-day="${N.dk}">운행표</button>`}</div>
+    ${(()=>{ const nx=cur?next:r; if(!nx) return ""; const a=nx.from||HOTEL;   // 다음 이정표: 지금 있는 곳에서 다음 역까지 가는 법
+      return `<div class="lcdleg">${cur?`<p class="nx">다음 ${sta(N.dk,nx.i,"sm")} <b>${esc(nx.p.n)}</b> · ${fmt(nx.start)}</p>`:""}<div${legAttr(a,nx.p,nx.tr,true)}>${legBig(a,nx.p,nx.tr)}</div></div>`; })()}
+    <div class="acts"><a class="btn go" href="${DIR(r.from||HOTEL,r.p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a><button class="btn" data-big="${esc(r.id)}">${ico("i-zoom")}크게 보기</button>${VIEW==="board"?"":`<button class="btn" data-go="board" data-day="${N.dk}">일정</button>`}</div>
   </section>`;
 }
+/* ── 오늘(홈) ──
+   2026-09-28 Henry: "운행표·노선도·지도가 겹친다, 선택과 집중." → 탭을 오늘·일정·장소·도구로. 오늘은
+   여행 중엔 지금/다음 역과 다음 구간 교통, 남은 역. 여행 전엔 D-day, 닷새 요약, 할 일(예약), 날씨, 노선도 그림(작게). */
 function renderHome(){
-  const dd=dday(), N=tripNow();
+  const dd=dday(), N=tripNow(), now=nowNext();
   const rows=EDIT.map(dk=>{ const sc=schedule(dk), n=sc.rows.length;
     const st = sc.bad ? flag("bad",`확인 ${sc.bad}`) : sc.warns ? flag("warn",`주의 ${sc.warns}`) : n ? flag("good","문제 없음") : flag("pin","비어 있음");
-    return `<button class="lrow" style="--c:${LINE[dk].c}" data-go="board" data-day="${dk}">
-      ${lsym(dk)}<span><span class="t">${WDK[dk]} ${DAY[dk].dt} · ${esc(REGION[dk].n)}</span><span class="s">${esc(REGION[dk].sub)}</span><span style="display:inline-flex;margin-top:6px">${st}</span></span>
+    const w=wxDays().find(x=>x.k===dk), wf=w&&w.f?` · ${esc(WMO(w.f.c))} ${Math.round(w.f.hi)}°${w.f.rain>=50?` · 비 ${w.f.rain}%`:""}`:"";
+    return `<button class="lrow${N.dk===dk?" today":""}" style="--c:${LINE[dk].c}" data-go="board" data-day="${dk}">
+      ${lsym(dk)}<span><span class="t">${WDK[dk]} ${DAY[dk].dt} · ${esc(REGION[dk].n)}${N.dk===dk?" · 오늘":""}</span><span class="s">${esc(REGION[dk].sub)}${wf}</span><span style="display:inline-flex;margin-top:6px">${st}</span></span>
       <span class="m"><b>${n}역</b>${n?`${fmt(sc.depart)}–${fmt(sc.home)}`:""}</span></button>`; }).join("");
-  const CK=checksNow(), done=CK.filter(c=>CHECKED[c.id]).length;
+  const CK=checksNow(), left=CK.filter(c=>!CHECKED[c.id]);
+  const todayLeft = now.sc ? now.sc.rows.filter(r=>r.end>now.N.min) : [];
   main.innerHTML=`<div class="wrap">${newsHTML()}
     <section class="hero">
-      <p class="hero-date num">11.18<span>—</span>22</p>
-      <h1 class="hero-t">늦가을 도쿄 노선도</h1>
-      <p class="hero-s">${N.phase==="before"?`출발까지 ${dd}일. `:N.phase==="during"?`${DAYKEYS.indexOf(N.dk)+1}일차. `:""}아카사카미쓰케 숙소에서 날마다 한 노선이 나갑니다. 노선을 누르면 그날 운행표로, 블록은 끌어서 옮겨요.</p>
+      <p class="hero-date num">${N.phase==="during"?`${WDK[N.dk]} ${DAY[N.dk].dt}`:`11.18<span>—</span>22`}</p>
+      <h1 class="hero-t">${N.phase==="before"?`출발까지 ${dd}일`:N.phase==="during"?`${DAYKEYS.indexOf(N.dk)+1}일차`:"늦가을 도쿄"}</h1>
+      <p class="hero-s">아카사카미쓰케 숙소에서 날마다 한 노선이 나가요. 날짜를 누르면 그날 일정으로.</p>
     </section>
     ${lcdHTML()}
-    <figure class="netmap" style="margin-top:18px">${netmapSVG()}<figcaption class="cap">Schematic · 숙소에서 뻗는 네 노선</figcaption></figure>
-    <section class="sec"><div class="sec-h"><h2>노선 안내</h2><span class="en">Lines</span></div>
+    ${todayLeft.length?`<section class="sec"><div class="sec-h"><h2>오늘 남은 역</h2><span class="en">Today</span></div>
+      <ol class="tleft">${todayLeft.map(r=>`<li><button class="rb" data-go="board" data-day="${N.dk}">${sta(N.dk,r.i,"sm")}<b>${fmt(r.start)}</b><span>${esc(r.p.n)}</span></button></li>`).join("")}</ol></section>`:""}
+    <section class="sec"><div class="sec-h"><h2>닷새</h2><span class="en">Lines</span></div>
       <button class="lrow" style="--c:${LINE.wed.c}" data-go="board" data-day="wed">${lsym("wed")}<span><span class="t">수 ${DAY.wed.dt} · 도착</span><span class="s">나리타 20:00 → 숙소 22:30</span></span><span class="m"><b>—</b></span></button>
       <div class="lines" style="margin-top:10px">${rows}</div></section>
-    <section class="sec"><div class="sec-h"><h2>예약</h2><span class="en">Reservations</span></div>
+    <section class="sec"><div class="sec-h"><h2>할 일</h2><span class="en">To do</span></div>
       <button class="lrow" style="--c:var(--ink)" data-go="tools" data-open="resv"><span class="picto" style="width:34px;height:34px;border-radius:10px">${ico("i-check")}</span>
-        <span><span class="t">${done}/${CK.length} 완료</span><span class="s">${esc(CK.filter(c=>!CHECKED[c.id]).slice(0,3).map(c=>c.t).join(" · ")||"모두 끝났어요")}</span></span><span class="m"></span></button></section>
-    <p class="src" style="margin:28px 0 20px">예산·교통·공항·날씨는 도구 탭에 있어요. 이전 화면은 <a href="classic.html">여기</a>.</p>
+        <span><span class="t">예약 ${CK.length-left.length}/${CK.length}</span><span class="s">${esc(left.slice(0,3).map(c=>c.t).join(" · ")||"모두 끝났어요")}</span></span><span class="m"></span></button></section>
+    <figure class="netmap sm" style="margin-top:22px">${netmapSVG()}<figcaption class="cap">Schematic · 숙소에서 뻗는 네 노선 · 누르면 그날 일정</figcaption></figure>
+    <p class="src" style="margin:22px 0 20px">예산·교통·공항·날씨는 도구에 있어요. 이전 화면은 <a href="classic.html">여기</a>.</p>
   </div>`;
   $$(".netmap .ln").forEach(g=>{ const f=()=>go("board",g.dataset.day); g.addEventListener("click",f); g.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
+  if(now.N && now.N.dk) legFill(now.N.dk);
+  wxFetch();
 }
 
 /* ── 운행표: 선 하나에 역 ──
@@ -554,7 +628,7 @@ function stationHTML(dk,r,now){
   if(r.pin) meta.push(`${ico("i-lock","ki mi")}${esc(r.pin)}`);
   if(p.need||p.needId) meta.push(p.needId && CHECKED[p.needId] ? `<span class="ok">예약 완료</span>` : `<span class="nd">${esc(p.need||p.ask||"예약 확인")}</span>`);
   return `<li class="st${bad?" bad":warn?" warn":""}${cur?" now":""}${past?" past":""}" data-id="${esc(r.id)}">
-    <p class="mv">${hopText(r,r.i===0)}${r.wait>=10?` · <span class="wait">${r.wait}분 여유</span>`:""}</p>
+    <p class="mv"${legAttr(r.from||HOTEL,r.p,r.tr)}>${legText(r.from||HOTEL,r.p,r.tr,r.i===0)}${r.wait>=10?` · <span class="wait">${r.wait}분 여유</span>`:""}</p>
     <div class="row" role="button" tabindex="0" data-open="${esc(r.id)}" aria-label="${c.l}${c.n} ${esc(p.n)} ${fmt(r.start)}">
       <span class="t"><b>${fmt(r.start)}</b><i>${c.l}${c.n}</i></span>
       <span class="dot" aria-hidden="true"></span>
@@ -591,13 +665,13 @@ function renderBoard(){
         <p class="k">${lsym(dk,"sm")}<span>${esc(R.n)} · ${esc(R.sub)}</span></p>
         <h1>${WDK[dk]}요일 <span class="num">${DAY[dk].dt}</span></h1>
         <p class="meta">${n?`<b>${n}</b>역 · <b>${fmt(sc.depart)}–${fmt(sc.home)}</b> · ${sc.dist.toFixed(1)}km · ${status}`:"아직 비어 있어요"}</p>
-        ${n?`<p class="links"><button class="lk" id="mapbtn">${ico("i-map")}지도로 보기</button><button class="lk" id="optbtn">${ico("i-route")}동선 최적화</button><a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a></p>`:""}
+        ${n?`<p class="links">${segBM()}<button class="lk" id="optbtn">${ico("i-route")}동선 최적화</button><a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a></p>`:""}
       </header>
       ${now.N.dk===dk?lcdHTML():""}
       <div class="lw" style="--c:${LINE[dk].c}">
         ${termHTML("숙소 출발 <small>· 시각을 눌러 바꿔요</small>","",`<label class="dep"><b>${fmt(sc.depart)}</b><input type="time" id="depart" value="${hhmm(fmt(sc.depart))}" aria-label="숙소 출발 시각"></label>`)}
         <ol class="line" id="line" data-day="${dk}">${sc.rows.map(r=>stationHTML(dk,r,now)).join("")}</ol>
-        ${n?`<p class="mv last">${hopText({tr:sc.back},false)}</p>${termHTML("숙소 도착",fmt(sc.home))}`:""}
+        ${n?`<p class="mv last"${legAttr(sc.rows[n-1].p,HOTEL,sc.back)}>${legText(sc.rows[n-1].p,HOTEL,sc.back,false)}</p>${termHTML("숙소 도착",fmt(sc.home))}`:""}
       </div>
       <button class="addst" id="addst">${ico("i-plus")}장소 추가</button>
       <p class="hint">길게 눌러 끌면 순서가 바뀌어요. 위 날짜에 놓으면 그날로, 아래 '빼기'에 놓으면 보관함으로 가요.<br>시각은 거리로 잡은 추정이고, ${ico("i-lock","ki mi")} 표시는 예약·바처럼 고정한 시각이에요.</p>`;
@@ -608,7 +682,8 @@ function renderBoard(){
     b.addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); f(); } }); });
   const dep=$("#depart"); if(dep) dep.addEventListener("click",()=>{ try{ dep.showPicker(); }catch(e){} });
   if(dep) dep.addEventListener("change",()=>{ const t=dep.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return; S.start[CUR]=t; commit(`숙소 출발 ${t}`); });
-  const mb=$("#mapbtn"); if(mb) mb.addEventListener("click",()=>setBM(true));
+  $$("button[data-bm]",main).forEach(b=>b.addEventListener("click",()=>setBM(b.dataset.bm==="1")));
+  legFill(CUR);
   const ob=$("#optbtn"); if(ob) ob.addEventListener("click",()=>runOptimize(CUR));
   const ad=$("#addst"); if(ad) ad.addEventListener("click",()=>openPicker());
 }
@@ -797,7 +872,7 @@ function xCard(x){
   const put = sp && !sp.off ? `<button class="xa" data-xput="${esc(p.id)}" data-day="${sp.dk}">${lsym(sp.dk,"sm")}${WDK[sp.dk]}에 넣기${sp.add!=null||sp.tight?` <small>${esc(addTxt(sp))}</small>`:""}</button>`
                             : `<span class="xa off">${sp?WDK[sp.dk]+"요일 휴무":""}</span>`;
   const act = XMODE==="route" ? (x.cand ? put : `<span class="xas"><a class="xa soft" href="${DIR(r&&r.from||HOTEL,p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a>${out}</span>`)
-            : dk ? `<span class="xas"><button class="xa soft" data-xboard="${dk}">운행표</button>${out}</span>` : put;
+            : dk ? `<span class="xas"><button class="xa soft" data-xboard="${dk}">일정</button>${out}</span>` : put;
   return `<li class="xc${XSEL===p.id?" on":""}" data-x="${esc(p.id)}" style="--t:${tint}">
     <button class="xb" data-open="${esc(p.id)}" aria-label="${esc(p.n)} 자세히">
       <span class="xph">${P&&P.photo?`<img src="${esc(P.photo)}" data-pid="${esc(p.id)}" alt="" loading="lazy">`:`<span class="big">${ico(kind.i)}</span>`}${S.star[p.id]?`<span class="xst">${ico("i-star")}</span>`:""}</span>
@@ -814,6 +889,8 @@ let XMODE="explore";   // "explore"(지도 탭) | "route"(운행표를 지도로
 let XCAND=LS.get("tokyo-lines-xcand","1")==="1";   // 운행표 지도에 근처 후보 핀을 같이
 let BOARDMAP=LS.get("tokyo-lines-bm","0")==="1";
 function setBM(on){ BOARDMAP=on; LS.set("tokyo-lines-bm",on?"1":"0"); render(); window.scrollTo({top:0}); }
+// 일정 탭의 목록 ↔ 지도 전환(2026-09-28, Henry: 운행표·노선도·지도가 겹친다 → 한 탭에서 전환)
+const segBM=()=>`<span class="seg" role="group" aria-label="보기"><button type="button" data-bm="0" aria-pressed="${!BOARDMAP}">${ico("i-line")}목록</button><button type="button" data-bm="1" aria-pressed="${BOARDMAP}">${ico("i-map")}지도</button></span>`;
 function renderExplore(){ renderMapView("explore"); }
 function renderMapView(mode){
   XMODE=mode; document.body.dataset.boardmap = mode==="route" ? "1" : "0";
@@ -821,7 +898,7 @@ function renderMapView(mode){
   if(fresh){
     killXMap();
     const fab = mode==="route"
-      ? `<span class="xcount" id="xcount"></span><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button><button class="fab txt" data-bm="0">목록</button>`
+      ? `<span class="xcount" id="xcount"></span><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button>`
       : `<span class="xcount" id="xcount"></span><button class="fab" id="xme" aria-label="내 위치에서 가까운 순">${ico("i-locate")}</button><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button><button class="fab txt" data-pm="list">목록</button>`;
     main.innerHTML=`<section class="xp${mode==="route"?" route":""}" id="xp" data-mode="${mode}">
       <div class="xtop" id="xtop"></div>
@@ -939,8 +1016,9 @@ function xRouteTop(){
   const dk=CUR, sc=schedule(dk), n=sc.rows.length, pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
   const st = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
   $("#xtop").innerHTML=`<div class="chips xrow">${EDIT.map(k=>`<button class="chip line" data-rday="${k}" aria-pressed="${k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}</div>
-    <div class="xsum"><b>${WDK[dk]} ${esc(REGION[dk].n)}</b><span>${n}역 · ${n?`${fmt(sc.depart)}–${fmt(sc.home)} · ${sc.dist.toFixed(1)}km · `:""}${st}</span>
+    <div class="xsum">${segBM()}<b>${WDK[dk]} ${esc(REGION[dk].n)}</b><span>${n}역 · ${n?`${fmt(sc.depart)}–${fmt(sc.home)} · ${sc.dist.toFixed(1)}km · `:""}${st}</span>
       <span class="xsl">${n?`<a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 동선</a>`:""}<button class="lk" data-xcand aria-pressed="${XCAND}">${ico("i-map")}후보 ${XCAND?"숨기기":"보기"}</button></span></div>${gStatHTML()}`;
+  $$("#xtop button[data-bm]").forEach(b=>b.addEventListener("click",()=>setBM(b.dataset.bm==="1")));
   $$("[data-rday]").forEach(b=>b.addEventListener("click",()=>{ CUR=b.dataset.rday; LS.set("tokyo-lines-day",CUR); XSEL=null; xUpdate(true); renderSide(); wireDnD(); }));
   const cb=$("[data-xcand]"); if(cb) cb.addEventListener("click",()=>{ XCAND=!XCAND; LS.set("tokyo-lines-xcand",XCAND?"1":"0"); if(!XCAND && XSEL && !S.days[CUR].includes(XSEL)) XSEL=null; xUpdate(false); });
 }
@@ -1329,7 +1407,10 @@ function infoTransit(){
   const nights=T.filter(t=>t.sc.rows.length).map(t=>{ const l=t.sc.rows[t.sc.rows.length-1]; const far=l.p.lat?km(l.p,HOTEL):null;
     return `<li>${lsym(t.dk,"sm")}<span><b>${WDK[t.dk]} ${esc(l.p.n)}</b> ${fmt(t.sc.home)} 숙소 · ${far==null?"거리 모름":far<=0.6?"걸어서 숙소":`숙소까지 ${far.toFixed(1)}km — 막차 확인`}</span></li>`; }).join("");
   const card=x=>`<div class="tc"><p class="th">${esc(x.t)}</p>${x.body.map(b=>`<p>${esc(b)}</p>`).join("")}${x.src?`<p class="src"><a href="${esc(x.src)}" target="_blank" rel="noopener">${esc(x.srcn||"출처")}</a></p>`:""}</div>`;
-  return `${T.map(t=>`<div class="bd"><p class="bh">${lsym(t.dk,"sm")}<b>${WDK[t.dk]}요일 전철 ${t.n}번</b><span>걸어서 ${t.walk.toFixed(1)}km${t.unknown?` · 모름 ${t.unknown}`:""}</span></p>
+  const rte=LS.get("tokyo-rt-err","");
+  return `<p>${rte?`<span class="bad">구간 교통: ${esc(rte)}</span> 구글 콘솔에서 <a href="https://console.cloud.google.com/apis/library/routes.googleapis.com" target="_blank" rel="noopener">Routes API</a>를 켜고 키의 API 제한에 더하면, 일정의 전철 구간마다 탈 노선·역이 나와요.`
+      :LS.get("tokyo-gkey","")?"일정의 전철 구간마다 구글 경로(탈 노선·탈 역·내릴 역)가 붙어요. 여행 중엔 오늘 탭의 다음 역 판에도.":"구글 키가 있으면 일정의 전철 구간마다 탈 노선·역이 붙어요."}</p>
+    ${T.map(t=>`<div class="bd"><p class="bh">${lsym(t.dk,"sm")}<b>${WDK[t.dk]}요일 전철 ${t.n}번</b><span>걸어서 ${t.walk.toFixed(1)}km${t.unknown?` · 모름 ${t.unknown}`:""}</span></p>
       ${t.legs.length?`<ul>${t.legs.map(l=>`<li><span>${esc(l.from)} → ${esc(l.to)}</span><b>약 ${l.min}분</b></li>`).join("")}</ul>`:""}</div>`).join("")}
     <p class="src" style="margin:-4px 0 12px">1.6km 안쪽은 걸어서(분속 72m)로 셌어요. 전철 분은 앱의 추정(역까지 걷기·기다림 10분 + km당 2.6분)이라 실제 노선은 운행표의 길찾기로.</p>
     <div class="bd"><p class="bh"><b>밤의 끝</b></p><ul class="nt">${nights}</ul></div>
@@ -1426,7 +1507,7 @@ function renderTools(keep){
       ${tl("tpl","i-line","노선 템플릿",PLANS.find(p=>p.k===S.tpl)?.n||"",
         `<p>정리해 둔 일정 중 하나로 노선을 다시 짭니다. 찜과 직접 담은 곳은 남아요.</p><div class="tpl">${PLANS.filter(p=>p.k!=="mine").map(p=>`<button data-tpl="${p.k}"><b>${esc(p.n)}${p.k===S.tpl?" · 지금":""}</b><span>${esc(p.intro)}</span></button>`).join("")}</div>`)}
       ${tl("google","i-pin","구글 장소 정보",n?`${n}곳`:"키 없음",
-        `<p>키를 넣고 받으면 모든 블록에 사진·평점·요일별 영업시간이 붙고, 영업시간 밖이면 운행표에 경고가 떠요. 30일 동안 보관해요.</p>
+        `<p>키를 넣고 받으면 모든 블록에 사진·평점·요일별 영업시간이 붙고, 영업시간 밖이면 일정에 경고가 떠요. 30일 동안 보관해요.</p>
          <label class="fld">Places API 키<input type="password" id="gkey" value="${esc(key)}" autocomplete="off" placeholder="AIza…"></label>
          <div class="acts"><button class="btn ink" id="gfetch">장소 정보 받기</button>${n?`<button class="btn" id="gclear">지우기</button>`:""}</div><p id="gstat" style="margin-top:10px">${GBUSY?`받는 중 ${GPROG}`:n?`${n}곳 저장됨 · 사진 ${gPhotos()}곳 · ${Math.floor((Date.now()-PSTORE.at)/864e5)}일 전`:"아직 받지 않았어요."}</p>${LS.get("tokyo-gerr","")?`<p class="gerr">${esc(LS.get("tokyo-gerr",""))}</p>`:""}
          <p>키 만들기: console.cloud.google.com → Places API (New) 사용 → 사용자 인증 정보에서 API 키 → 웹사이트 제한에 이 주소 추가.</p>`)}
