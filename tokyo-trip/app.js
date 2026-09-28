@@ -834,7 +834,7 @@ async function gSession(key){
 function xBase(map){
   const key=LS.get("tokyo-gkey","");
   const gsi=gsiBase(map);
-  const skip=!key || navigator.onLine===false || (LS.get("tokyo-gtile-err","") && Date.now()-(+LS.get("tokyo-gtile-try","0"))<6*3600e3);
+  const skip=!key || navigator.onLine===false || (LS.get("tokyo-gtile-err","") && Date.now()-(+LS.get("tokyo-gtile-try","0"))<2*60e3);   // 실패하면 2분만 쉰다(Henry: 콘솔에서 켜면 바로 보이게)
   if(skip) return;
   gSession(key).then(sess=>{
     if(XMAP!==map) return;
@@ -1192,7 +1192,7 @@ async function serverKey(){
     const k=String(cfg.gkey||"").trim(); if(!/^AIza[0-9A-Za-z_\-]{30,}$/.test(k)) return;
     const cur=LS.get("tokyo-gkey","");
     if(cur && LS.get("tokyo-gkey-src","")!=="server") return;
-    if(cur!==k){ LS.set("tokyo-gkey",k); LS.set("tokyo-gkey-src","server"); LS.del("tokyo-gerr"); gTick(); }
+    if(cur!==k){ LS.set("tokyo-gkey",k); LS.set("tokyo-gkey-src","server"); LS.del("tokyo-gerr"); LS.del("tokyo-gtile-err"); gTick(); }
   }catch(e){}
 }
 function askKey(){
