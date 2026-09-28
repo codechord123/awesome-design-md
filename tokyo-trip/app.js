@@ -699,6 +699,10 @@ function dswHTML(){
 /* ── 일정 = 한 지도(2026-09-28 세 번째) ──
    날짜 칩(목·금·토·일·전체)과 컨셉 칩 두 줄. 날을 고르면 그날 노선을 굵게·다른 날은 흐리게, 컨셉 칩(XCF)으로 안 넣은 곳을 후보 핀으로.
    "전체"(MAPALL)면 예전 장소 지도처럼 네 날 노선과 모든 곳(XF.c로 거름). 아래 사진 카드와 패널(renderPanel)은 두 경우 모두. 수요일은 목록 화면. */
+// 안 넣은 곳 핀 색 = 컨셉 색(노선 색 주황·하늘·보라·빨강·남색은 피한다). 넣으면 그날 노선 색 원+번호로 바뀐다(2026-09-28 Henry)
+const KCOL={art:"#D9468F",photo:"#D9468F",book:"#8B5A2B",bar:"#222222",food:"#2E9D57",market:"#2E9D57",leaf:"#0F7B6C",view:"#0F7B6C"};
+const XCOL={art:"#D9468F",book:"#8B5A2B",bar:"#222222",food:"#2E9D57",walk:"#0F7B6C"};
+const kcol=p=>KCOL[p.kc]||"#5E6B78";
 let XCF="near";
 let MAPALL=LS.get("tokyo-lines-mapall","0")==="1", MC=LS.get("tokyo-lines-mc",""), MAPFIT=false;
 const XCFS=[["near","근처 후보","i-map"],["star","찜","i-star"],["found","새로 발견","i-compass"],["art","미술관·건축","i-art"],["book","서점","i-book"],["bar","LP바","i-record"],["food","먹고 마시기","i-food"],["walk","단풍·전망","i-leaf"]];
@@ -717,7 +721,9 @@ function setMapDay(k){
 function mapTop(){
   const dk=CUR, day=!MAPALL;
   const dates=`<div class="chips xrow">${EDIT.map(k=>`<button class="chip line" data-mday="${k}" aria-pressed="${day&&k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}<button class="chip" data-mday="all" aria-pressed="${MAPALL}">${ico("i-network")}전체</button><button class="chip" data-mday="wed">${lsym("wed","sm")}수 도착</button></div>`;
-  const cons=`<div class="chips xrow">${[["",day?"근처 후보":"모든 곳","i-map"],...XCFS.slice(1)].map(([k,n,i])=>`<button class="chip" data-mc="${k}" aria-pressed="${MC===k}">${ico(i)}${n}</button>`).join("")}${day?`<button class="chip" data-mc="none" aria-pressed="${MC==="none"}">후보 끄기</button>`:""}<button class="chip" data-go="pool">${ico("i-line")}목록·검색</button></div>`;
+  const cnt=k=>{ if(day){ const s0=XCF; XCF=k===""?"near":k; const v=planCands().length; XCF=s0; return v; }
+    const s0=XF.c; XF.c=k===""?"all":k; const v=xItems().length; XF.c=s0; return v; };
+  const cons=`<div class="chips xrow">${[["",day?"근처 후보":"모든 곳","i-map"],...XCFS.slice(1)].map(([k,n,i])=>`<button class="chip" data-mc="${k}" aria-pressed="${MC===k}"${XCOL[k]?` style="--k:${XCOL[k]}"`:""}>${ico(i)}${n} <b>${cnt(k)}</b></button>`).join("")}${day?`<button class="chip" data-mc="none" aria-pressed="${MC==="none"}">후보 끄기</button>`:""}<button class="chip" data-go="pool">${ico("i-line")}목록·검색</button></div>`;
   let sum="";
   if(day){ const sc=schedule(dk), n=sc.rows.length, pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
     const st = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
@@ -776,7 +782,7 @@ function routeSideHTML(){
       <span class="mv2"${legAttr(r.from||HOTEL,r.p,r.tr)}>${legText(r.from||HOTEL,r.p,r.tr,r.i===0)}</span>${rowWarn(r)}</button>
     <button class="rx" data-xout="${esc(r.id)}" aria-label="${esc(r.p.n)} 빼기">${ico("i-x")}</button></li>`).join("");
   const C=planCands().map(p=>({p, f:Object.assign({dk}, fit(p,dk))})).sort((a,b)=>(a.f.off-b.f.off)||(a.f.cost-b.f.cost)).slice(0,25);
-  const cands=C.map(({p,f})=>`<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="노선으로 끌기">⠿</span><span class="pi">${ico((KIND[p.kc]||KIND.view).i)}</span>
+  const cands=C.map(({p,f})=>`<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="노선으로 끌기">⠿</span><span class="pi" style="--k:${kcol(p)}">${ico((KIND[p.kc]||KIND.view).i)}</span>
       <button class="rb" data-xsel="${esc(p.id)}"><b>${S.star[p.id]?"★ ":""}${esc(p.n)}</b><small>${esc(p.k||(KIND[p.kc]||KIND.view).n)}${addTxt(f)?` · ${esc(addTxt(f))}`:""}</small></button>
       ${f.off?`<span class="rs-off">휴무</span>`:`<button class="add" data-xput="${esc(p.id)}" data-day="${dk}">넣기</button>`}</li>`).join("");
   const last=n?sc.rows[n-1]:null, cn=(XCFS.find(x=>x[0]===XCF)||["","후보"])[1];
@@ -796,7 +802,7 @@ function overviewHTML(){
   const placed=new Set(EDIT.flatMap(k=>S.days[k])), c=XC.find(x=>x.k===XF.c)||XC[0];
   const pool=[...CAT.values(),...Object.values(S.added)].filter(p=>p.lat && !p.gone && !placed.has(p.id) && (c.k==="all"||(c.k==="star"?S.star[p.id]:c.k==="found"?p.found:c.kc.includes(p.kc))))
     .sort((a,b)=>(!!S.star[b.id]-!!S.star[a.id])||a.n.localeCompare(b.n,"ko")).slice(0,60);
-  const prow=p=>{ const sp=spots(p)[0]; return `<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="날짜로 끌기">⠿</span><span class="pi">${ico((KIND[p.kc]||KIND.view).i)}</span>
+  const prow=p=>{ const sp=spots(p)[0]; return `<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="날짜로 끌기">⠿</span><span class="pi" style="--k:${kcol(p)}">${ico((KIND[p.kc]||KIND.view).i)}</span>
       <button class="rb" data-xsel="${esc(p.id)}"><b>${S.star[p.id]?"★ ":""}${esc(p.n)}</b><small>${esc(AREANAME[areaOf(p)]||"")}${sp&&!sp.off&&addTxt(sp)?` · ${WDK[sp.dk]} ${esc(addTxt(sp))}`:""}</small></button>
       ${sp&&!sp.off?`<button class="add" data-xput="${esc(p.id)}" data-day="${sp.dk}">${WDK[sp.dk]}에 넣기</button>`:""}</li>`; };
   return `<div class="side-h"><b>닷새 노선</b><span>⠿ 끌어서 날짜·순서 바꾸기</span></div>${days}
@@ -954,7 +960,7 @@ function xInfo(items){   // 카드 순서와 붙일 말: 역이면 시각, 아�
 function xPin(x,sel){
   const {p,dk,r}=x, star=S.star[p.id];
   const html = dk ? `<span class="xpin on${sel?" sel":""}" style="--c:${LINE[dk].hex}">${r?r.i+1:""}</span>`
-                  : `<span class="xpin${x.cand?" cand":""}${star?" star":""}${sel?" sel":""}">${ico((KIND[p.kc]||KIND.view).i)}</span>`;
+                  : `<span class="xpin free${x.cand?" cand":""}${star?" star":""}${sel?" sel":""}" style="--k:${kcol(p)}">${ico((KIND[p.kc]||KIND.view).i)}</span>`;
   const z=dk?30:x.cand?24:26; return L.divIcon({className:"xpw", html, iconSize:[z,z], iconAnchor:[z/2,z/2]});
 }
 function xCard(x){
@@ -1085,10 +1091,10 @@ function xUpdate(fit){
   const one=XMODE==="route"?CUR:(EDIT.includes(XF.a)?XF.a:null), days=XMODE==="route"?[...EDIT.filter(k=>k!==CUR),CUR]:(one?[one]:EDIT);
   days.forEach(dk=>{ const pts=[[HOTEL.lat,HOTEL.lng],...S.days[dk].map(place).filter(q=>q&&q.lat).map(q=>[q.lat,q.lng]),[HOTEL.lat,HOTEL.lng]];
     if(one && dk!==one){ L.polyline(pts,{color:LINE[dk].hex, weight:3, opacity:.35, dashArray:"6 6", interactive:false}).addTo(XLAY); return; }   // 다른 날은 흐린 점선
-    const soft=!one && XF.c!=="all";   // 컨셉만 고른 때는 노선을 옅게 깔아 핀이 먼저 보이게
-    L.polyline(pts,{color:"#101010", weight:one?12:9, opacity:soft?.06:.16, interactive:false}).addTo(XLAY);
-    L.polyline(pts,{color:"#fff", weight:one?10:7, opacity:soft?.5:.95, interactive:false}).addTo(XLAY);
-    L.polyline(pts,{color:LINE[dk].hex, weight:one?6:soft?3:4, opacity:one?1:soft?.45:.75, interactive:false}).addTo(XLAY); });
+    // 전체에선 네 노선을 다 진하게(2026-09-28 Henry: 흐리면 날끼리 비교가 어렵다)
+    L.polyline(pts,{color:"#101010", weight:one?12:10, opacity:.16, interactive:false}).addTo(XLAY);
+    L.polyline(pts,{color:"#fff", weight:one?10:8, opacity:.95, interactive:false}).addTo(XLAY);
+    L.polyline(pts,{color:LINE[dk].hex, weight:one?6:5, opacity:1, interactive:false}).addTo(XLAY); });
   L.marker([HOTEL.lat,HOTEL.lng],{icon:L.divIcon({className:"xpw",html:`<span class="xhub" title="숙소"></span>`,iconSize:[24,24],iconAnchor:[12,12]}),keyboard:false}).addTo(XLAY);
   XL.forEach(x=>{ const m=L.marker([x.p.lat,x.p.lng],{icon:xPin(x,XSEL===x.p.id), title:x.p.n, riseOnHover:true}).addTo(XLAY);
     m.on("click",()=>xSelect(x.p.id,true)); XMK.set(x.p.id,{m,x}); });

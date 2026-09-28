@@ -425,7 +425,7 @@ body[data-view="pool"][data-poolmode="map"]{overflow:hidden}
 .xa.off{background:none;color:var(--red);font-size:12.5px;padding:0 4px}
 /* 핀 */
 .xpw{background:none;border:0}
-.xpin{--free:#5E6B78;display:grid;place-items:center;width:100%;height:100%;box-sizing:border-box;border-radius:50%;background:var(--free);color:#fff;border:2px solid #fff;
+.xpin{display:grid;place-items:center;width:100%;height:100%;box-sizing:border-box;border-radius:50%;background:#5E6B78;color:#fff;border:2px solid #fff;
   box-shadow:0 2px 6px rgba(0,0,0,.3);font:800 13px/1 var(--num);transition:transform .15s}
 .xpin .ki{width:14px;height:14px}
 .xpin.on{background:var(--c);border:3px solid #fff;color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.3)}
@@ -661,6 +661,14 @@ body.withside .toast{left:calc(50% - 190px)}
 .sortable-fallback.rs{background:var(--card);box-shadow:0 8px 20px rgba(0,0,0,.25)}
 .sortable-fallback.rs .mv2,.sortable-fallback.rs small{display:none}
 body.withside #xlist{display:none}
-/* 안 넣은 곳 = 한 가지 색(슬레이트 #5E6B78) + 종류 기호. 노선·지역 색과 섞이지 않게(2026-09-28 Henry) */
-.rs.cand .pi{width:24px;height:24px;border-radius:50%;background:#5E6B78;color:#fff}
+/* 안 넣은 곳 = 컨셉 색 둥근 네모 + 흰 기호, 넣은 곳 = 노선 색 동그라미 + 번호(2026-09-28 Henry) */
+.xpin.free{background:var(--k,#5E6B78);border-radius:8px;border:2px solid #fff;box-shadow:0 0 0 1px rgba(0,0,0,.25),0 2px 6px rgba(0,0,0,.35)}
+.xpin.free.star{box-shadow:0 0 0 3px var(--amber),0 2px 6px rgba(0,0,0,.35)}
+.xpin.free.sel{box-shadow:0 0 0 4px color-mix(in srgb,var(--ink) 30%,transparent),0 8px 16px rgba(0,0,0,.35)}
+.xpin.free.cand{opacity:1;border-style:dashed}
+.rs.cand .pi{width:24px;height:24px;border-radius:7px;background:var(--k,#5E6B78);color:#fff}
 .rs.cand .pi .ki{width:14px;height:14px}
+.xrow .chip[style*="--k"] .ki{color:var(--k)}
+.xrow .chip[aria-pressed="true"][style*="--k"]{background:var(--k);color:#fff}
+.xrow .chip[aria-pressed="true"][style*="--k"] .ki{color:#fff}
+.xrow .chip b{font:700 12px var(--num);opacity:.7}
