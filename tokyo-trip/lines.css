@@ -559,3 +559,12 @@ body.withside .toast{left:calc(50% - 190px)}
 .lcdleg .nx .sta{background:#fff}
 .dh .links{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
 .seg button,.lk{white-space:nowrap}
+/* 비 오는 날 */
+.rainbox{margin:14px 0 4px;padding:12px 14px;border-radius:14px;background:color-mix(in srgb,var(--L-fri) 10%,var(--card));border:1.5px solid color-mix(in srgb,var(--L-fri) 40%,transparent)}
+.rainbox .rh{display:flex;align-items:center;gap:6px;margin:0 0 6px;color:var(--ink)}.rainbox .rh span{margin-left:auto;font:600 13px var(--num);color:var(--mute)}
+.rainbox .rh .ki{width:18px;height:18px}
+.rainbox ul{list-style:none;margin:0;padding:0}
+.rainbox li{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;padding:6px 0;border-top:1px solid var(--rule);font-size:14px}
+.rainbox li small{color:var(--mute);font-size:12px}
+.rainbox .ra{display:flex;flex-wrap:wrap;gap:0 10px;width:100%}
+.rainbox .ra .lk{color:var(--ink);text-decoration:underline;text-underline-offset:3px;min-height:32px}

@@ -1,12 +1,12 @@
 /* 늦가을 도쿄 — 오프라인 캐시
    shell: 설치할 때 한 번에 저장 / tiles·fonts: 본 것만 저장 */
-const VER    = "v42";
+const VER    = "v43";
 const SHELL  = "tokyo-shell-" + VER;
 const TILES  = "tokyo-tiles-v1";
 const FONTS  = "tokyo-fonts-v1";
 const PHOTOS = "tokyo-photos-v1";   // 구글 장소 사진 — 본 것만
 const KEEP   = [SHELL, TILES, FONTS, PHOTOS];
-const MAXTILES = 900;
+const MAXTILES = 2500;   // 오프라인 준비로 노선 주변을 미리 받는다
 
 const ASSETS = [
   "./",

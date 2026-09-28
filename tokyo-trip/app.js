@@ -668,6 +668,7 @@ function renderBoard(){
         ${n?`<p class="links">${segBM()}<button class="lk" id="optbtn">${ico("i-route")}동선 최적화</button><a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 지도 동선</a></p>`:""}
       </header>
       ${now.N.dk===dk?lcdHTML():""}
+      ${rainHTML(dk)}
       <div class="lw" style="--c:${LINE[dk].c}">
         ${termHTML("숙소 출발 <small>· 시각을 눌러 바꿔요</small>","",`<label class="dep"><b>${fmt(sc.depart)}</b><input type="time" id="depart" value="${hhmm(fmt(sc.depart))}" aria-label="숙소 출발 시각"></label>`)}
         <ol class="line" id="line" data-day="${dk}">${sc.rows.map(r=>stationHTML(dk,r,now)).join("")}</ol>
@@ -684,6 +685,8 @@ function renderBoard(){
   if(dep) dep.addEventListener("change",()=>{ const t=dep.value.replace(/^0(\d)/,"$1"); if(isNaN(toMin(t))) return; S.start[CUR]=t; commit(`숙소 출발 ${t}`); });
   $$("button[data-bm]",main).forEach(b=>b.addEventListener("click",()=>setBM(b.dataset.bm==="1")));
   legFill(CUR);
+  $$("[data-rainswap]",main).forEach(b=>b.addEventListener("click",()=>rainSwap(b.dataset.rainswap,b.dataset.to)));
+  if(CUR!=="wed") wxFetch();
   const ob=$("#optbtn"); if(ob) ob.addEventListener("click",()=>runOptimize(CUR));
   const ad=$("#addst"); if(ad) ad.addEventListener("click",()=>openPicker());
 }
@@ -941,7 +944,7 @@ function renderMapView(mode){
    구글 타일은 정책상 캐시·오프라인 금지라 서비스 워커가 손대지 않고, 구글 로고 글자와 뷰포트 저작권 문구를 오른쪽 아래에 둔다. */
 function gsiBase(map){
   map._bases=map._bases||[];
-  const gsi=L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",{minZoom:5, maxNativeZoom:18, maxZoom:20, className:"xtiles",
+  const gsi=L.tileLayer("https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png",{minZoom:5, maxNativeZoom:18, maxZoom:20, className:"xtiles", crossOrigin:LS.get("tokyo-gsi-cors","")==="1"?"":undefined,
     attribution:'<a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">地理院タイル</a>'}).addTo(map);
   map._bases.push(gsi);
   let bad=0, ok=0; gsi.on("tileload",()=>ok++); gsi.on("tileerror",()=>{ if(++bad>=6 && !ok && XMAP===map && map.hasLayer(gsi)){ map.removeLayer(gsi);
@@ -1461,6 +1464,65 @@ function infoWx(){
     <p>11월 평년값은 낮 <b>${NORMALS.hi}°C</b>, 밤 <b>${NORMALS.lo}°C</b>예요. 하순은 달 평균보다 조금 더 쌀쌀해요. 낮엔 니트나 가벼운 겉옷, 전망대 노을(16시 반쯤)과 밤 LP바엔 한 겹 더.</p>
     <p class="src">예보 <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>${w?` · ${new Date(w.at).toLocaleString("ko-KR",{month:"numeric",day:"numeric",hour:"2-digit",minute:"2-digit"})} 받음`:""} · 평년값 <a href="${esc(NORMALS.src)}" target="_blank" rel="noopener">${esc(NORMALS.srcn)}</a> · 해 지는 시각은 NOAA 식으로 계산한 값(±1분)</p>`;
 }
+/* 오프라인 준비(2026-09-28): 노선이 지나는 곳의 국토지리원 타일(13~16단계)과 장소 사진을 미리 받아 서비스 워커에 둔다.
+   구글 지도 타일은 캐시 금지라 받지 않는다(오프라인에선 국토지리원 지도로 떨어진다). OSM은 대량 받기 금지라 쓰지 않는다. */
+function preTiles(){
+  const set=new Set(), t2=(lat,lng,z)=>{ const n=2**z, x=Math.floor((lng+180)/360*n), r=lat*Math.PI/180, y=Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); return [x,y]; };
+  EDIT.forEach(dk=>{ const pts=[HOTEL,...S.days[dk].map(place).filter(p=>p&&p.lat)]; if(pts.length<2) return;
+    const la=pts.map(p=>+p.lat), ln=pts.map(p=>+p.lng), pad=0.006, S0=Math.min(...la)-pad, N0=Math.max(...la)+pad, W0=Math.min(...ln)-pad, E0=Math.max(...ln)+pad;
+    for(let z=13;z<=16;z++){ const [x0,y0]=t2(N0,W0,z), [x1,y1]=t2(S0,E0,z); for(let x=x0;x<=x1;x++) for(let y=y0;y<=y1;y++) set.add(`${z}/${x}/${y}`); } });
+  return [...set].slice(0,2200);
+}
+function infoOffline(){
+  const n=preTiles().length, ph=EDIT.flatMap(dk=>S.days[dk]).map(place).filter(p=>p && placeOf(p) && placeOf(p).photo).length;
+  return `<p>와이파이에서 한 번 눌러 두면, 도쿄에서 데이터가 약해도 일정·지도·사진이 열려요. 지금 노선이 지나는 곳의 지도 ${n}장과 사진 ${ph}장이에요. 노선을 크게 바꿨으면 다시 눌러 주세요.</p>
+    <div class="acts"><button class="btn ink" id="prefetch"${PREBUSY?" disabled":""}>${PREBUSY?`받는 중 ${PREBUSY}`:"지도·사진 미리 받기"}</button></div>
+    <p class="src">구글 지도는 정책상 저장할 수 없어서, 인터넷이 없을 땐 국토지리원 지도로 보여요. 구간 교통(구글 경로)도 인터넷이 있어야 나와요.</p>`;
+}
+let PREBUSY="";
+async function prefetchAll(){
+  if(PREBUSY) return; if(navigator.onLine===false){ toast("인터넷이 연결된 곳에서 눌러 주세요"); return; }
+  const tiles=preTiles(), photos=[...new Set(EDIT.flatMap(dk=>S.days[dk]).map(place).map(p=>p&&placeOf(p)&&placeOf(p).photo).filter(Boolean))];
+  let done=0, ok=0; const all=tiles.length+photos.length, tick=()=>{ PREBUSY=`${done}/${all}`; const b=$("#prefetch"); if(b) b.textContent=`받는 중 ${PREBUSY}`; };
+  PREBUSY="0/"+all; renderTools(true);
+  const job=async u=>{ try{ const r=await fetch(u,{mode:"cors"}); if(r.ok) ok++; }catch(e){} done++; if(done%20===0) tick(); };
+  const q=tiles.map(t=>`https://cyberjapandata.gsi.go.jp/xyz/pale/${t}.png`);
+  for(let i=0;i<q.length;i+=6) await Promise.all(q.slice(i,i+6).map(job));
+  if(ok>tiles.length*0.5) LS.set("tokyo-gsi-cors","1");
+  for(const u of photos){ try{ await fetch(u,{mode:"no-cors"}); }catch(e){} done++; }
+  PREBUSY=""; LS.set("tokyo-pre-at",String(Date.now())); renderTools(true);
+  toast(ok?`지도 ${ok}장, 사진 ${photos.length}장을 받아 뒀어요`:"지도를 미리 받지 못했어요. 지도 탭을 날짜별로 한 번씩 열어 두세요");
+}
+// 예약 알림 캘린더: 판매 시작이 확인된 곳(open)은 그 시각, 나머지는 한 번에 모아 10/20 20:00(지났으면 내일 20:00)
+function resvIcs(){
+  const enc=new TextEncoder(), fold=line=>{ const out=[]; let cur="",n=0; for(const ch of line){ const b=enc.encode(ch).length; if(n+b>(out.length?74:75)){ out.push(cur); cur=""; n=0; } cur+=ch; n+=b; } out.push(cur); return out.join("\r\n "); };
+  const tx=v=>String(v??"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,").replace(/\r?\n/g,"\\n");
+  const z=ms=>new Date(ms).toISOString().replace(/[-:]/g,"").replace(/\.\d{3}/,"");
+  const left=checksNow().filter(c=>!CHECKED[c.id]), L=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//tokyo-lines//KO","CALSCALE:GREGORIAN","X-WR-CALNAME:도쿄 예약 알림"];
+  const ev=(uid,ms,sum,desc,url,alarms)=>{ L.push("BEGIN:VEVENT",`UID:${uid}@tokyo-lines`,"DTSTAMP:20260928T000000Z",`DTSTART:${z(ms)}`,`DTEND:${z(ms+30*60000)}`,fold(`SUMMARY:${tx(sum)}`),fold(`DESCRIPTION:${tx(desc)}`),...(url?[fold(`URL:${url}`)]:[]));
+    alarms.forEach(m=>L.push("BEGIN:VALARM","ACTION:DISPLAY",`TRIGGER:-PT${m}M`,fold(`DESCRIPTION:${tx(sum)}`),"END:VALARM")); L.push("END:VEVENT"); };
+  left.filter(c=>c.open).forEach(c=>ev(`open-${c.id}`, new Date(c.open).getTime(), `${c.t} 예약 오픈`, c.d, c.url, [30,0]));
+  const rest=left.filter(c=>!c.open);
+  if(rest.length){ let t=new Date("2026-10-20T20:00:00+09:00").getTime(); if(t<Date.now()){ const d=new Date(Date.now()+864e5); t=new Date(d.toISOString().slice(0,10)+"T20:00:00+09:00").getTime(); }
+    ev("todo-all", t, `도쿄 예약 챙기기 ${rest.length}곳`, rest.map(c=>`${c.t}: ${c.d}`).join("\n"), "", [0]); }
+  L.push("END:VCALENDAR"); return L.join("\r\n")+"\r\n";
+}
+/* 비 오는 날 대안(2026-09-28): 그날 비 확률 50% 이상이면 밖에서 보는 곳마다 가까운 실내 후보(미술관·서점, 2km 안, 그날 여는 곳)를 "바꾸기"로 */
+function rainHTML(dk){
+  const w=wxDays().find(x=>x.k===dk); if(!w || !w.f || w.f.rain<50) return "";
+  const placed=new Set(EDIT.flatMap(k=>S.days[k]));
+  const outs=S.days[dk].map(place).filter(p=>p && (p.outside || ["leaf","view","market"].includes(p.kc)));
+  if(!outs.length) return "";
+  const alts=p=>!p.lat?[]:[...CAT.values()].filter(q=>q.lat && !q.gone && !q.outside && ["art","book"].includes(q.kc) && !placed.has(q.id) && !offOn(q,dk) && km(p,q)<=2)
+    .sort((a,b)=>km(p,a)-km(p,b)).slice(0,2);
+  return `<section class="rainbox"><p class="rh">${ico("i-rain")}<b>${WDK[dk]}요일 비 ${w.f.rain}% 예보</b><span>${esc(WMO(w.f.c))} ${Math.round(w.f.hi)}°</span></p>
+    <ul>${outs.map(p=>{ const A=alts(p); return `<li><b>${esc(p.n)}</b>${p.rain?`<small>${esc(p.rain)}</small>`:""}${A.length?`<span class="ra">대신 ${A.map(q=>`<button class="lk" data-rainswap="${esc(p.id)}" data-to="${esc(q.id)}">${esc(q.n)} <small>${km(p,q).toFixed(1)}km</small></button>`).join("")}</span>`:`<small>근처 실내 후보가 없어요</small>`}</li>`; }).join("")}</ul></section>`;
+}
+function rainSwap(from,to){
+  const dk=EDIT.find(k=>S.days[k].includes(from)); if(!dk) return; const a=place(from), b=place(to); if(!a||!b) return;
+  const snap=daySnap(); const i=S.days[dk].indexOf(from); S.days[dk][i]=to; delete S.pins[from]; commit();
+  toastUndo(`${a.n} → ${b.n}`,()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); });
+}
 function wireInfo(){
   const on=(id,fn)=>{ const el=$(id); if(el) el.addEventListener("change",fn); };
   on("#ai-in",e=>{ LS.set("tokyo-air-in",e.target.value); if(LS.get("tokyo-air-manual","")!=="1") LS.set("tokyo-air",e.target.value); renderTools(true); });
@@ -1488,7 +1550,9 @@ function renderTools(keep){
          <div class="acts"><button class="btn" id="mv-paste">클립보드에서 붙여넣기</button><button class="btn ink" id="mv-go">가져오기</button></div>
          <p id="mv-stat" style="margin-top:10px"></p>`)}
       ${tl("resv","i-check","예약 체크",`${checksNow().filter(c=>CHECKED[c.id]).length}/${checksNow().length}`,
-        checksNow().map(c=>`<label class="chk"><input type="checkbox" data-chk="${c.id}"${CHECKED[c.id]?" checked":""}><span><b>${esc(c.t)}</b>${esc(c.d)}</span></label>`).join(""))}
+        checksNow().map(c=>`<label class="chk"><input type="checkbox" data-chk="${c.id}"${CHECKED[c.id]?" checked":""}><span><b>${esc(c.t)}</b>${esc(c.d)}${c.url?` <a href="${esc(c.url)}" target="_blank" rel="noopener">예약 페이지</a>`:""}</span></label>`).join("")
+        +`<div class="acts" style="margin-top:12px"><button class="btn" id="resvics">${ico("i-cal")}예약 알림 캘린더</button></div><p class="src">판매 시작 시각이 확인된 곳(시부야 스카이 11/7 0시)은 그 시각과 30분 전에, 나머지는 10월 20일 저녁 8시에 한 번 "예약 챙기기" 알림이 와요(이 날짜는 앱이 정한 것).</p>`)}
+      ${tl("offline","i-box","오프라인 준비",LS.get("tokyo-pre-at","")?`${new Date(+LS.get("tokyo-pre-at")).toLocaleDateString("ko-KR",{month:"numeric",day:"numeric"})} 받음`:"",infoOffline())}
       ${tl("budget","i-tool","예산",BUDGET_V(),infoBudget())}
       ${tl("transit","i-train","교통",`전철 ${EDIT.reduce((a,dk)=>a+dayTrains(dk).n,0)}번`,infoTransit())}
       ${tl("air","i-move","공항",`${AIRPORTS[LS.get("tokyo-air-in","nrt")]?.n||"나리타"} · 일 ${fmt(sunLeaveMin())} 출발`,infoAir())}
@@ -1535,6 +1599,8 @@ function renderTools(keep){
   const gc=$("#gclear"); if(gc) gc.addEventListener("click",()=>{ PSTORE={}; LS.del("tokyo-places"); renderTools(true); });
   const mstat=t=>{ const e=$("#mv-stat"); if(e) e.textContent=t; };
   wireInfo();
+  const rv=$("#resvics"); if(rv) rv.addEventListener("click",()=>download("tokyo-reservations.ics",resvIcs(),"text/calendar;charset=utf-8"));
+  const pf=$("#prefetch"); if(pf) pf.addEventListener("click",()=>prefetchAll());
   const syOn=$("#sy-on"); if(syOn) syOn.addEventListener("click",syncStart);
   const syNow=$("#sy-now"); if(syNow) syNow.addEventListener("click",()=>{ if(gTok()) syncNow(); else gLogin(false).then(()=>syncNow()).catch(e=>toast(e.message)); });
   const syOff=$("#sy-off"); if(syOff) syOff.addEventListener("click",syncOff);
