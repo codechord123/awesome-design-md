@@ -778,7 +778,8 @@ function renderMapView(mode){
       <div class="xtop" id="xtop"></div>
       <div id="xmap" class="xmap" role="application" aria-label="${mode==="route"?"그날 노선 지도":"장소 지도"}"></div>
       <div class="xfab">${fab}</div>
-      <ul class="xcards" id="xcards"></ul></section>`;
+      <ul class="xcards" id="xcards"></ul>
+      <button class="xnav prev" id="xprev" aria-label="이전 장소">‹</button><button class="xnav next" id="xnext" aria-label="다음 장소">›</button></section>`;
     $$("button[data-pm]",main).forEach(b=>b.addEventListener("click",()=>setPM(b.dataset.pm)));
     $$("button[data-bm]",main).forEach(b=>b.addEventListener("click",()=>setBM(b.dataset.bm==="1")));
     $("#xfit").addEventListener("click",()=>xFit());
@@ -787,6 +788,19 @@ function renderMapView(mode){
     cards.addEventListener("scroll",()=>{ clearTimeout(t); t=setTimeout(()=>{ const r=cards.getBoundingClientRect(), mid=r.left+r.width/2;
       let best=null,bd=1e9; $$(".xc",cards).forEach(li=>{ const b=li.getBoundingClientRect(), d=Math.abs(b.left+b.width/2-mid); if(d<bd){bd=d;best=li;} });
       if(best && best.dataset.x && best.dataset.x!==XSEL) xSelect(best.dataset.x,false); },120); },{passive:true});
+    // PC(마우스)에서도 넘기게: 끌기·휠·‹ › 버튼·← →. 손가락 스와이프는 그대로. 6px 넘게 끌면 카드 누름으로 치지 않는다
+    let drag=null;
+    cards.addEventListener("pointerdown",e=>{ if(e.pointerType!=="mouse" || e.button!==0 || e.target.closest(".xa")) return; drag={id:e.pointerId, x:e.clientX, s:cards.scrollLeft, moved:false}; });
+    cards.addEventListener("pointermove",e=>{ if(!drag || e.pointerId!==drag.id) return; const d=e.clientX-drag.x;
+      if(!drag.moved && Math.abs(d)>6){ drag.moved=true; cards.classList.add("drag"); try{ cards.setPointerCapture(e.pointerId); }catch(er){} }
+      if(drag.moved) cards.scrollLeft=drag.s-d; });
+    const dragEnd=()=>{ if(!drag) return; if(drag.moved){ cards.classList.remove("drag"); cards.dataset.dragged="1"; setTimeout(()=>{ delete cards.dataset.dragged; },0); } drag=null; };
+    cards.addEventListener("pointerup",dragEnd); cards.addEventListener("pointercancel",dragEnd);
+    cards.addEventListener("click",e=>{ if(cards.dataset.dragged){ e.stopPropagation(); e.preventDefault(); } },true);
+    let wheelAt=0;
+    cards.addEventListener("wheel",e=>{ const d=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY; if(Math.abs(d)<4) return; e.preventDefault();
+      const now=Date.now(); if(now-wheelAt<320) return; wheelAt=now; xStep(d>0?1:-1); },{passive:false});
+    $("#xprev").addEventListener("click",()=>xStep(-1)); $("#xnext").addEventListener("click",()=>xStep(1));
     if(window.L){
       XMAP=L.map($("#xmap"),{zoomControl:false, attributionControl:true});
       xBase(XMAP);
@@ -897,6 +911,16 @@ function xSelect(id,fromMap,quiet){
       XMAP.panTo([cur.lat+(ll.lat-c.lat), cur.lng+(ll.lng-c.lng)],{animate:true}); } }
   if(fromMap){ const li=$(`#xcards .xc[data-x="${CSS.escape(id)}"]`); if(li) li.scrollIntoView({behavior:quiet?"auto":"smooth",inline:"center",block:"nearest"}); }
 }
+// 이전/다음 장소로(버튼·휠·← →). 고른 게 없으면 가운데 카드부터
+function xStep(dir){
+  if(!XL || !XL.length) return;
+  let i=XL.findIndex(x=>x.p.id===XSEL);
+  if(i<0){ const cards=$("#xcards"), r=cards.getBoundingClientRect(), mid=r.left+r.width/2; let bd=1e9;
+    $$(".xc[data-x]",cards).forEach((li,k)=>{ const b=li.getBoundingClientRect(), d=Math.abs(b.left+b.width/2-mid); if(d<bd){ bd=d; i=k; } }); if(i<0) i=0; else i-=dir; }
+  const j=Math.max(0,Math.min(XL.length-1,i+dir)); xSelect(XL[j].p.id,true);
+}
+document.addEventListener("keydown",e=>{ if((e.key!=="ArrowLeft" && e.key!=="ArrowRight") || !$("#xcards") || e.target.closest("input,textarea,select,[contenteditable],.leaflet-container") || e.altKey || e.ctrlKey || e.metaKey) return;
+  e.preventDefault(); xStep(e.key==="ArrowRight"?1:-1); });
 function xMeMarker(){ if(!XMAP||!XME) return; if(XMEMK) XMEMK.remove(); XMEMK=L.marker([XME.lat,XME.lng],{icon:L.divIcon({className:"xpw",html:`<span class="xme"></span>`,iconSize:[22,22],iconAnchor:[11,11]}),interactive:false,keyboard:false}).addTo(XMAP); }
 function xLocate(){
   if(XME){ XME=null; if(XMEMK){ XMEMK.remove(); XMEMK=null; } $("#xme").classList.remove("on"); xUpdate(false); return; }
@@ -1063,6 +1087,7 @@ function gLogin(consent){
     if(!(window.google && google.accounts && google.accounts.oauth2)){ no(new Error("구글 로그인 준비 중이에요. 잠시 뒤 다시 눌러 주세요")); return; }
     if(!GTC) GTC=google.accounts.oauth2.initTokenClient({client_id:LS.get("tokyo-gclient",""), scope:SYNC_SCOPE, callback:r=>GTC_CB&&GTC_CB(r), error_callback:e=>GTC_CB&&GTC_CB({error:e&&e.type||"popup"})});
     GTC_CB=r=>{ if(!r || r.error){ no(new Error(r&&r.error==="popup_closed"?"로그인 창을 닫았어요":"구글 로그인에 실패했어요")); return; }
+      if(google.accounts.oauth2.hasGrantedAllScopes && !google.accounts.oauth2.hasGrantedAllScopes(r,"https://www.googleapis.com/auth/drive.appdata")){ no(new Error("드라이브 권한 체크 칸이 꺼져 있었어요. 다시 누르고 '앱 데이터 보기·관리' 칸을 켜 주세요")); return; }
       LS.set("tokyo-gtok",JSON.stringify({t:r.access_token, exp:Date.now()+(+r.expires_in||3600)*1000})); ok(r.access_token); };
     const o={prompt:consent?"consent":""}; const hint=LS.get("tokyo-gmail",""); if(hint) o.login_hint=hint;
     GTC.requestAccessToken(o);
@@ -1078,7 +1103,10 @@ async function gdrive(path,opt){
   const t=gTok(); if(!t) throw Object.assign(new Error("로그인이 끝났어요"),{auth:true});
   const r=await fetch("https://www.googleapis.com/"+path,Object.assign({},opt,{headers:Object.assign({Authorization:"Bearer "+t},(opt&&opt.headers)||{})}));
   if(r.status===401){ LS.del("tokyo-gtok"); throw Object.assign(new Error("로그인이 끝났어요"),{auth:true}); }
-  if(!r.ok) throw new Error("구글 드라이브 "+r.status);
+  if(!r.ok){ let why=""; try{ const j=await r.json(), er=j.error||{}; why=((er.errors||[])[0]||{}).reason||er.status||""; why+=" "+(er.message||""); }catch(e){}
+    if(/accessNotConfigured|SERVICE_DISABLED|has not been used|is disabled/i.test(why)) throw new Error("구글 콘솔에서 Google Drive API가 꺼져 있어요. 켠 뒤 몇 분 기다렸다가 '지금 맞추기'를 눌러 주세요.");
+    if(/insufficient|SCOPE|PERMISSION_DENIED/i.test(why)) throw new Error("로그인할 때 드라이브 권한이 체크되지 않았어요. '연동 끄기' 뒤 다시 연동하면서 권한 체크 칸을 켜 주세요.");
+    throw new Error("구글 드라이브 "+r.status+(why.trim()?" · "+why.trim().slice(0,120):"")); }
   return r;
 }
 function syncBody(at){ return JSON.stringify({v:1, at, lines:S, checks:CHECKED, film:filmGet()}); }
