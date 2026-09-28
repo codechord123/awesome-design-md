@@ -1036,7 +1036,7 @@ function applyAll(o){
   useLines(o.lines);
   if(o.checks){ CHECKED=o.checks; LS.set("tokyo-checks",JSON.stringify(CHECKED)); }
   if(o.film && o.film.rolls) LS.set(FILM_KEY,JSON.stringify(o.film));
-  if(o.gkey) LS.set("tokyo-gkey",o.gkey);
+  if(o.gkey){ LS.set("tokyo-gkey",o.gkey); LS.del("tokyo-gkey-src"); }
 }
 /* 키가 있으면 사진·영업시간을 알아서 받는다(30일 보관 규칙). 실패하면 이유를 남겨 화면에 보여 주고 6시간 뒤 다시.
    Henry: "API 등록까지 했는데 왜 사진 안 나와?" — 키가 그 기기에 없었는지, 주소 제한인지, 사진 주소가 만료됐는지 화면에서 바로 알 수 있게 했다. */
@@ -1056,10 +1056,22 @@ function gStatHTML(){
   return `<div class="gst ${g.k}" role="status"><span class="gt">${esc(g.t)}</span>${act}</div>`;
 }
 function gTick(){ $$(".gst .gt").forEach(el=>{ el.textContent=gState().t; }); }
+// 서버(Vercel 환경 변수 GMAPS_KEY)에 키가 있으면 받아 쓴다. 이 기기에 직접 넣은 키가 있으면 그게 먼저다.
+// 서버에서 받은 키는 tokyo-gkey-src="server"로 표시해 두고, 서버 키가 바뀌면 따라 바꾼다.
+async function serverKey(){
+  if(navigator.onLine===false) return;
+  try{
+    const r=await fetch("/api/config",{cache:"no-store"}); if(!r.ok) return;
+    const k=String(((await r.json())||{}).gkey||"").trim(); if(!/^AIza[0-9A-Za-z_\-]{30,}$/.test(k)) return;
+    const cur=LS.get("tokyo-gkey","");
+    if(cur && LS.get("tokyo-gkey-src","")!=="server") return;
+    if(cur!==k){ LS.set("tokyo-gkey",k); LS.set("tokyo-gkey-src","server"); LS.del("tokyo-gerr"); gTick(); }
+  }catch(e){}
+}
 function askKey(){
   const v=(prompt("구글 Places API 키를 붙여넣으세요 (AIza로 시작해요)")||"").trim(); if(!v) return;
   if(!/^AIza[0-9A-Za-z_\-]{30,}$/.test(v)){ toast("키 모양이 아니에요. AIza로 시작하는 전체를 붙여넣으세요"); return; }
-  LS.set("tokyo-gkey",v); LS.del("tokyo-gerr"); autoPlaces(true);
+  LS.set("tokyo-gkey",v); LS.del("tokyo-gkey-src"); LS.del("tokyo-gerr"); autoPlaces(true);
 }
 async function autoPlaces(force){
   const key=LS.get("tokyo-gkey",""); if(!key || GBUSY || (navigator.onLine===false)) return;
@@ -1148,9 +1160,9 @@ function renderTools(keep){
   const hb=$("[data-hotel]"); if(hb) hb.addEventListener("click",()=>bigJa({n:HOTEL.n, ja:HOTEL.ja, addr:HOTEL.addr}));
   $$("[data-tpl]").forEach(b=>b.addEventListener("click",()=>{ const P=PLANS.find(p=>p.k===b.dataset.tpl); if(!confirm(`'${P.n}'로 노선을 다시 짤까요? 지금 순서와 고정 시각은 사라져요. 먼저 파일로 저장해 두면 되돌릴 수 있어요.`)) return;
     S=fromTemplate(P.k,{star:S.star, added:S.added}); commit(`'${P.n}' 노선으로 다시 짰어요`); }));
-  const gk=$("#gkey"); if(gk) gk.addEventListener("change",()=>{ LS.set("tokyo-gkey",gk.value.trim()); LS.del("tokyo-gerr"); if(gk.value.trim()) autoPlaces(true); });
+  const gk=$("#gkey"); if(gk) gk.addEventListener("change",()=>{ LS.set("tokyo-gkey",gk.value.trim()); LS.del("tokyo-gkey-src"); LS.del("tokyo-gerr"); if(gk.value.trim()) autoPlaces(true); });
   const gf=$("#gfetch"); if(gf) gf.addEventListener("click",()=>{ const k=gk.value.trim(); if(!k){ $("#gstat").textContent="먼저 키를 넣어 주세요."; gk.focus(); return; }
-    LS.set("tokyo-gkey",k); LS.del("tokyo-gerr"); autoPlaces(true); });
+    LS.set("tokyo-gkey",k); LS.del("tokyo-gkey-src"); LS.del("tokyo-gerr"); autoPlaces(true); });
   const gc=$("#gclear"); if(gc) gc.addEventListener("click",()=>{ PSTORE={}; LS.del("tokyo-places"); renderTools(true); });
   const mstat=t=>{ const e=$("#mv-stat"); if(e) e.textContent=t; };
   $("#mv-copy").addEventListener("click",async()=>{ const code=packAll();
@@ -1197,7 +1209,7 @@ document.addEventListener("click",e=>{
   const b=e.target.closest("[data-big]"); if(b){ const p=place(b.dataset.big); if(p && p.ja) bigJa(p); return; }
   const o=e.target.closest("[data-open]"); if(o && !e.target.closest(".tl")){ openSheet(o.dataset.open); return; }
 });
-setTimeout(()=>autoPlaces(false),1500);
+setTimeout(async()=>{ await serverKey(); autoPlaces(false); },1500);
 document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ") && e.target.matches("[data-open][role=button]")){ e.preventDefault(); openSheet(e.target.dataset.open); } });
 function clock(){
   const n=tokyoNow(), N=tripNow(), el=$("#clock"); if(!el) return;

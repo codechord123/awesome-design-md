@@ -6,8 +6,8 @@
       "destination": "/tokyo-trip/index.html"
     },
     {
-      "source": "/:path*",
-      "destination": "/tokyo-trip/:path*"
+      "source": "/:path((?!api/).*)",
+      "destination": "/tokyo-trip/:path"
     }
   ],
   "headers": [

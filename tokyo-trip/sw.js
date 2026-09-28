@@ -1,6 +1,6 @@
 /* 늦가을 도쿄 — 오프라인 캐시
    shell: 설치할 때 한 번에 저장 / tiles·fonts: 본 것만 저장 */
-const VER    = "v33";
+const VER    = "v34";
 const SHELL  = "tokyo-shell-" + VER;
 const TILES  = "tokyo-tiles-v1";
 const FONTS  = "tokyo-fonts-v1";
@@ -99,6 +99,7 @@ self.addEventListener("fetch", e=>{
   let url;
   try{ url = new URL(req.url); }catch(err){ return; }
 
+  if(url.origin === location.origin && url.pathname.startsWith("/api/")) return;   // 서버 설정(키)은 캐시하지 않는다
   if(req.mode === "navigate"){ e.respondWith(networkFirst(req)); return; }
   if(url.hostname.endsWith("tile.openstreetmap.org") || url.hostname === "cyberjapandata.gsi.go.jp"){ e.respondWith(tile(req)); return; }
   if(url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com"){
