@@ -1112,7 +1112,7 @@ function xFit(){
   XMAP.fitBounds(pts,{paddingTopLeft:[28,top+24], paddingBottomRight:[28,bot+24], maxZoom:15});
 }
 function xPad(){ const h=s=>($(s)||{offsetHeight:0}).offsetHeight;
-  return {top:h("#xtop"), bot:$("#xp.sheet")?h("#xsheet"):h("#xcards")}; }
+  return {top:h("#xtop"), bot:$("#xp.sheet")?0:h("#xcards")}; }   // 시트가 열리면 지도가 시트 위에서 끝난다
 function xSelect(id,fromMap,quiet){
   const prev=XSEL; XSEL=id;
   [prev,id].forEach(k=>{ const o=k&&XMK.get(k); if(o){ o.m.setIcon(xPin(o.x,k===id)); o.m.setZIndexOffset(k===id?1000:0); } });
