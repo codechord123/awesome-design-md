@@ -832,11 +832,15 @@ function wirePanel(host){
   if(!window.Sortable) return;
   const common={handle:".h", draggable:"li[data-id]", animation:160, ghostClass:"ghost", chosenClass:"chosen", fallbackOnBody:true, forceFallback:true, fallbackTolerance:3, scroll:true, scrollSensitivity:90, scrollSpeed:22, bubbleScroll:true};
   const undo=snap=>()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); };
+  // 놓을 때마다 그날 동선 최적화(2026-10-14 Henry가 골랐다): 고정·예약·여는 시각을 지키며 이동이 줄면 순서를 바꾼다. 되돌리기는 놓기 전으로.
+  const reflow=(dks,snap)=>{ let b=0,a=0,ch=false;
+    dks.forEach(dk=>{ const r=optimizeDay(dk); if(r && r.changed && r.after.score<r.before.score-0.5){ S.days[dk]=r.order; ch=true; b+=r.before.mv; a+=r.after.mv; } });
+    OPTRES=null; commit(); toastUndo(ch?`동선을 다시 짰어요 · 이동 ${b}분 → ${a}분`:"노선을 바꿨어요",undo(snap)); };
   if(!MAPALL){
     const snap=daySnap();
     const dayDrop=e=>{ if(!e.to || e.to.id!=="rsl") return; if(e.from===e.to && e.oldIndex===e.newIndex) return;
       const ids=$$(":scope > li[data-id]",e.to).map(x=>x.dataset.id); ids.forEach(id=>{ if(!S.days[CUR].includes(id)) removeEverywhere(id); }); S.days[CUR]=ids;
-      setTimeout(()=>{ commit(); toastUndo("노선을 바꿨어요",undo(snap)); },0); };
+      setTimeout(()=>reflow([CUR],snap),0); };
     const rsl=$("#rsl",host), rc=$("#rcand",host);
     if(rsl) PSORTS.push(Sortable.create(rsl,Object.assign({},common,{group:{name:"rt",pull:false,put:true}, onEnd:dayDrop})));
     if(rc) PSORTS.push(Sortable.create(rc,Object.assign({},common,{group:{name:"rt",pull:true,put:false}, sort:false, onEnd:dayDrop})));
@@ -844,7 +848,8 @@ function wirePanel(host){
     const snap=daySnap();
     const ovDrop=e=>{ if(!e.to || e.to.id==="ovpool") return; if(e.from===e.to && e.oldIndex===e.newIndex) return;
       EDIT.forEach(dk=>{ const ol=$(`.ovday[data-day="${dk}"]`,host); if(ol) S.days[dk]=$$(":scope > li[data-id]",ol).map(x=>x.dataset.id); });
-      setTimeout(()=>{ commit(); toastUndo("노선을 바꿨어요",undo(snap)); },0); };
+      const dks=[...new Set([e.from,e.to].map(x=>x && x.dataset && x.dataset.day).filter(k=>EDIT.includes(k)))];
+      setTimeout(()=>reflow(dks,snap),0); };
     $$(".ovday",host).forEach(ol=>PSORTS.push(Sortable.create(ol,Object.assign({},common,{group:{name:"ov",pull:true,put:true}, onEnd:ovDrop}))));
     const pl=$("#ovpool",host); if(pl) PSORTS.push(Sortable.create(pl,Object.assign({},common,{group:{name:"ov",pull:true,put:false}, sort:false, onEnd:ovDrop})));
   }
