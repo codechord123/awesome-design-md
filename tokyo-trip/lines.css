@@ -675,3 +675,5 @@ body.withside #xlist{display:none}
 .xrow .chip[aria-pressed="true"][style*="--k"]{background:var(--k);color:#fff}
 .xrow .chip[aria-pressed="true"][style*="--k"] .ki{color:#fff}
 .xrow .chip b{font:700 12px var(--num);opacity:.7}
+.tsteps{margin:8px 0 6px;padding-left:20px;display:grid;gap:6px;font-size:14px;line-height:1.5}
+.tsteps li::marker{font-weight:800}

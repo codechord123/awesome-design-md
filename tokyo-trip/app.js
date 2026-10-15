@@ -1512,7 +1512,7 @@ function infoAir(){
   const opt=(v,cur)=>Object.entries(AIRPORTS).map(([k,x])=>`<option value="${k}"${k===cur?" selected":""}>${x.n}</option>`).join("");
   return `<p class="th">수요일 도착 · 공항에서 숙소까지</p>
     <label class="fld">도착 공항<select id="ai-in">${opt(0,ai)}</select></label>
-    ${A.routes.map(r=>`<div class="tc${r.best?" best":""}"><p class="th">${esc(r.n)}${r.best?" · 추천":""}</p><p><b>${esc(r.d||"")}</b>${r.fare?` · ${esc(r.fare)}`:""}</p><p>${esc(r.note)}</p></div>`).join("")}
+    ${A.routes.map(r=>`<div class="tc${r.best?" best":""}"><p class="th">${esc(r.n)}${r.best?" · 추천":""}</p><p><b>${esc(r.d||"")}</b>${r.fare?` · ${esc(r.fare)}`:""}</p><p>${esc(r.note)}</p>${r.steps?`<ol class="tsteps">${r.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:""}${r.url?`<p><a class="lk" href="${esc(r.url)}" target="_blank" rel="noopener">${ico("i-train")}${esc(r.urln||"공식 사이트")}</a></p>`:""}${r.src?`<p class="src" style="margin:4px 0 0">${esc(r.src)}</p>`:""}</div>`).join("")}
     <p>${esc(A.last)}</p>
     <div class="acts"><a class="btn" href="https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(A.q)}&destination=${encodeURIComponent(HOTEL.q||HOTEL.addr)}&travelmode=transit" target="_blank" rel="noopener">${ico("i-route")}${esc(A.n)} → 숙소 길찾기</a></div>
     <p class="th" style="margin-top:18px">일요일 출국 · 언제 숙소를 나설까</p>
