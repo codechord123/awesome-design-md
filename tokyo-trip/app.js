@@ -65,7 +65,7 @@ DAYS.forEach(d=>{
   (d.spare||[]).forEach(s=>catAdd(asStop(s,d.key)));
 });
 RECS.forEach(r=>catAdd({q:r.q, n:r.n, ja:r.ja, kc:r.kc, k:r.k, note:r.why, tip:r.tip, src:r.src, srcn:r.srcn, lat:r.lat, lng:r.lng, dig:r.dig, gid:r.id, found:r.found, shot:r.shot, fee:r.fee, feeNote:r.feeNote,
-  outside:r.outside, fee:r.fee, feeNote:r.feeNote, slot:r.slot, gone:r.gone, goneSrc:r.goneSrc, rec:true}));
+  outside:r.outside, fee:r.fee, feeNote:r.feeNote, slot:r.slot, gone:r.gone, goneSrc:r.goneSrc, arch:r.arch, rec:true}));
 SIGHTS.forEach(g=>catAdd({q:g.q, n:g.n, ja:g.ja, kc:"photo", k:"건축", arch:{by:g.by, year:g.year}, note:g.why, src:g.src, srcn:g.srcn, gid:g.id,
   lat:g.lat, lng:g.lng, dig:g.dig, outside:true, sday:g.day}));
 // 블록 id는 q. 원래 id 필드(구글 place_id)는 gid로 옮겼다
@@ -77,7 +77,7 @@ let S=null;
 function place(id){ return CAT.get(id) || (S && S.added && S.added[id]) || null; }
 function blank(){ return {v:1, pv:PLANVER, tpl:DEFPLAN, days:{thu:[],fri:[],sat:[],sun:[]}, start:{}, pins:{}, dur:{}, star:{}, added:{}}; }
 // 노선 판(pv)이 바뀌면 한 번 새 추천 노선으로 바꾸고, 이전 노선은 tokyo-lines-prev에 남겨 되돌릴 수 있게 한다
-const PLANVER=4;
+const PLANVER=5;   // 5: 건축 리스트(2026-10-18)
 const DEFPLAN="henry";
 function tplStops(P,dk){
   const d=DAY[dk], pd=P.days && P.days[dk];
@@ -313,9 +313,9 @@ async function gPhoto(key,j){   // 사진 주소(photoUri)는 금방 만료된�
   try{ const pr=await fetch("https://places.googleapis.com/v1/"+pn+"/media?maxHeightPx=900&maxWidthPx=1200&skipHttpRedirect=true&key="+encodeURIComponent(key)); if(pr.ok){ const pj=await pr.json(); return pj.photoUri||""; } }catch(e){}
   return "";
 }
-async function fetchPlaces(key,report){
+async function fetchPlaces(key,report,only){
   const seen=new Set(), jobs=[];
-  [...CAT.values(), ...Object.values(S.added)].forEach(p=>{ const k=pkey(p); if((p.lat||p.gid) && !seen.has(k)){ seen.add(k); jobs.push(p); } });
+  [...CAT.values(), ...Object.values(S.added)].forEach(p=>{ const k=pkey(p); if((p.lat||p.gid) && !seen.has(k) && (!only || only.has(k))){ seen.add(k); jobs.push(p); } });
   const out={}; let fail=0, first="", done=0, stop=false, next=0;
   async function one(p){
     try{
@@ -1422,16 +1422,21 @@ function askKey(){
 }
 async function autoPlaces(force){
   const key=LS.get("tokyo-gkey",""); if(!key || GBUSY || (navigator.onLine===false)) return;
+  let only=null;
   if(!force){
     const fresh=PSTORE.at && Date.now()-PSTORE.at < PMAXAGE-2*864e5;
-    if(fresh && gPhotos()) return;
+    // 새로 넣은 곳(place ID만 있고 아직 받은 적 없는 곳)은 저장본이 새것이어도 그곳만 받는다(2026-10-18 건축 리스트)
+    const miss=[...CAT.values()].filter(p=>p.gid && !p.lat && !(PSTORE.byId||{})[pkey(p)]).map(pkey);
+    if(fresh && gPhotos() && !miss.length) return;
     if(LS.get("tokyo-gerr","") && Date.now()-(+LS.get("tokyo-gtry","0")) < 6*3600e3) return;
+    if(fresh && gPhotos()) only=new Set(miss);
   }
   LS.set("tokyo-gtry",String(Date.now())); GBUSY=true; GPROG=""; if(!sheet.open) render();
   try{
-    const res=await fetchPlaces(key,(i,t)=>{ GPROG=`${i}/${t}`; gTick(); });
+    const res=await fetchPlaces(key,(i,t)=>{ GPROG=`${i}/${t}`; gTick(); }, only);
     const got=Object.keys(res.out).length;
-    if(got){ PSTORE={at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} hydrateLoc(); }
+    // 일부만 받았으면 받은 시각(30일 기준)은 그대로 둔다
+    if(got){ PSTORE={at:only?PSTORE.at:Date.now(), v:1, byId:Object.assign({}, PSTORE.byId||{}, res.out)}; try{ localStorage.setItem("tokyo-places",JSON.stringify(PSTORE)); }catch(e){} hydrateLoc(); }
     if(got && res.fail<=res.total/2){ LS.del("tokyo-gerr"); toast(`${got}곳 사진·영업시간을 받았어요`); }
     else { LS.set("tokyo-gerr",res.first||"구글 장소 정보를 받지 못했어요."); toast(res.first||"구글 장소 정보를 받지 못했어요"); }
   }catch(e){ LS.set("tokyo-gerr","네트워크에 닿지 못했어요. 인터넷이 될 때 '다시 받기'를 눌러 주세요."); }
