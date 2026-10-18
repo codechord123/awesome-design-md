@@ -395,9 +395,10 @@ const KWIN={art:[600,1080], book:[660,1200], bar:[1080,1740], market:[360,840], 
         + 그 종류로는 이상한 시각(1000, 밤 11시 미술관 같은) + 늘어난 이동 분. 고정 시각이 10분 넘게 밀리거나 새 경고가 생기면 "밀림".
    이동만 보던 첫 판은 꽉 찬 날이면 무엇이든 밤 LP바 뒤로 보냈다. 렌더마다 FITC를 비운다. */
 // 이 곳을 둘 만한 때: 종류에 아침·점심·저녁이 적혀 있으면 식사 시간, 출처 있는 여는 시각이 있으면 그걸 따르고(여기선 안 봄), 아니면 종류별 보통 시각
-function kwin(p){ if(p.outside) return null; const k=p.k||"";
+// 2026-10-18: 출처 있는 여는 시각을 먼저 본다. 예전엔 종류 글자("소바, 점심")를 먼저 봐서 저녁에 가는 간다 마쓰야·아침에 가는 카야바를 벌점 주고, 최적화가 하루를 엉뚱하게 뒤섞었다
+function kwin(p){ if(p.outside) return null; if(hoursOf(p).o) return null; const k=p.k||"";
   if(/아침/.test(k)) return [360,630]; if(/점심/.test(k)) return [660,870]; if(/저녁/.test(k)) return [1020,1290];
-  if(hoursOf(p).o) return null; return KWIN[p.kc]||null; }
+  return KWIN[p.kc]||null; }
 let FITC=new Map();
 const hardBad=r=>r.warn.filter(w=>w.lv==="bad" && !/늦어요/.test(w.t)).length;
 function fit(p,dk){
@@ -430,8 +431,10 @@ function placeInto(id,dk,quiet){
 }
 const placeMsg=(p,dk,f)=>`${p.n} → ${WDK[dk]} ${LINE[dk].code}${String(f.idx+1).padStart(2,"0")}${f.add!=null?` · 이동 +${f.add}분`:""}${f.tight?(f.worst&&f.worst.m?` · ${f.worst.n} ${f.worst.m}분 밀려요`:" · 시간이 빠듯해요"):""}`;
 /* 지도에서 바로 넣고 빼기(2026-09-28) — Henry: "지도 메뉴에서도 목록에서 넣고 빼고, 지도 보면서 바로." 넣는 자리는 자동(fit), 둘 다 되돌리기 토스트 */
-function toastUndo(msg,fn){ const el=$("#toast"); el.innerHTML=`<span>${esc(msg)}</span><button type="button" class="tu">되돌리기</button>`; el.classList.add("on","act"); clearTimeout(el._t);
-  el.querySelector(".tu").onclick=()=>{ clearTimeout(el._t); el.classList.remove("on","act"); fn(); }; el._t=setTimeout(()=>el.classList.remove("on","act"),5000); }
+function toastUndo(msg,fn,act){ const el=$("#toast"); el.innerHTML=`<span>${esc(msg)}</span><button type="button" class="tu">되돌리기</button>${act?`<button type="button" class="tu tu2">${esc(act.label)}</button>`:""}`; el.classList.add("on","act"); clearTimeout(el._t);
+  const close=()=>{ clearTimeout(el._t); el.classList.remove("on","act"); };
+  el.querySelector(".tu").onclick=()=>{ close(); fn(); }; if(act) el.querySelector(".tu2").onclick=()=>{ close(); act.fn(); };
+  el._t=setTimeout(()=>el.classList.remove("on","act"),act?8000:5000); }
 function daySnap(){ return {days:JSON.parse(JSON.stringify(S.days)), pins:Object.assign({},S.pins)}; }
 function mapPut(id,dk){ const p=place(id); if(!p) return; const snap=daySnap(); XSEL=id; const f=placeInto(id,dk,true); commit();
   toastUndo(placeMsg(p,dk,f),()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); }); }
@@ -830,26 +833,28 @@ function wirePanel(host){
   const ob=$("#optbtn2",host); if(ob) ob.addEventListener("click",()=>runOptimize(CUR));
   const ad=$("#addst2",host); if(ad) ad.addEventListener("click",()=>openPicker());
   if(!window.Sortable) return;
-  const common={handle:".h", draggable:"li[data-id]", animation:160, ghostClass:"ghost", chosenClass:"chosen", fallbackOnBody:true, forceFallback:true, fallbackTolerance:3, scroll:true, scrollSensitivity:90, scrollSpeed:22, bubbleScroll:true};
+  const common={handle:".h", draggable:"li[data-id]", animation:160, ghostClass:"ghost", chosenClass:"chosen", fallbackOnBody:true, forceFallback:true, fallbackTolerance:3, scroll:true, scrollSensitivity:44, scrollSpeed:10, bubbleScroll:true};   // 반 화면 시트(436px)에서 90px이면 위아래 40%가 자동 스크롤이라 놓을 자리를 지나쳤다(2026-10-18)
   const undo=snap=>()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); };
-  // 놓을 때마다 그날 동선 최적화(2026-10-14 Henry가 골랐다): 고정·예약·여는 시각을 지키며 이동이 줄면 순서를 바꾼다. 되돌리기는 놓기 전으로.
-  const reflow=(dks,snap)=>{ let b=0,a=0,ch=false;
-    dks.forEach(dk=>{ const r=optimizeDay(dk); if(r && r.changed && r.after.score<r.before.score-0.5){ S.days[dk]=r.order; ch=true; b+=r.before.mv; a+=r.after.mv; } });
-    OPTRES=null; commit(); toastUndo(ch?`동선을 다시 짰어요 · 이동 ${b}분 → ${a}분`:"노선을 바꿨어요",undo(snap)); };
+  // 놓은 자리 그대로(2026-10-18 Henry: "목록에서 내 마음대로 이동이 안 되네" → 놓을 때마다 최적화하던 것을 껐다).
+  // 시각·번호는 다시 계산되고, 놓아서 빨간 경고가 늘면 토스트에 "동선 최적화"를 같이 띄운다(누를 때만 그날 순서를 바꾼다).
+  const bad=dks=>dks.reduce((n,dk)=>n+schedule(dk).rows.reduce((m,r)=>m+r.warn.filter(w=>w.lv==="bad").length,0),0);
+  const reflow=(dks,snap,b0)=>{ OPTRES=null; commit(); const b1=bad(dks);
+    if(b1>b0) toastUndo(`노선을 바꿨어요 · 경고 ${b1}곳`,undo(snap),{label:"동선 최적화", fn:()=>dks.forEach(dk=>runOptimize(dk))});
+    else toastUndo("노선을 바꿨어요",undo(snap)); };
   if(!MAPALL){
     const snap=daySnap();
     const dayDrop=e=>{ if(!e.to || e.to.id!=="rsl") return; if(e.from===e.to && e.oldIndex===e.newIndex) return;
-      const ids=$$(":scope > li[data-id]",e.to).map(x=>x.dataset.id); ids.forEach(id=>{ if(!S.days[CUR].includes(id)) removeEverywhere(id); }); S.days[CUR]=ids;
-      setTimeout(()=>reflow([CUR],snap),0); };
+      const b0=bad([CUR]), ids=$$(":scope > li[data-id]",e.to).map(x=>x.dataset.id); ids.forEach(id=>{ if(!S.days[CUR].includes(id)) removeEverywhere(id); }); S.days[CUR]=ids;
+      setTimeout(()=>reflow([CUR],snap,b0),0); };
     const rsl=$("#rsl",host), rc=$("#rcand",host);
     if(rsl) PSORTS.push(Sortable.create(rsl,Object.assign({},common,{group:{name:"rt",pull:false,put:true}, onEnd:dayDrop})));
     if(rc) PSORTS.push(Sortable.create(rc,Object.assign({},common,{group:{name:"rt",pull:true,put:false}, sort:false, onEnd:dayDrop})));
   } else {
     const snap=daySnap();
     const ovDrop=e=>{ if(!e.to || e.to.id==="ovpool") return; if(e.from===e.to && e.oldIndex===e.newIndex) return;
+      const dks=[...new Set([e.from,e.to].map(x=>x && x.dataset && x.dataset.day).filter(k=>EDIT.includes(k)))], b0=bad(dks);
       EDIT.forEach(dk=>{ const ol=$(`.ovday[data-day="${dk}"]`,host); if(ol) S.days[dk]=$$(":scope > li[data-id]",ol).map(x=>x.dataset.id); });
-      const dks=[...new Set([e.from,e.to].map(x=>x && x.dataset && x.dataset.day).filter(k=>EDIT.includes(k)))];
-      setTimeout(()=>reflow(dks,snap),0); };
+      setTimeout(()=>reflow(dks,snap,b0),0); };
     $$(".ovday",host).forEach(ol=>PSORTS.push(Sortable.create(ol,Object.assign({},common,{group:{name:"ov",pull:true,put:true}, onEnd:ovDrop}))));
     const pl=$("#ovpool",host); if(pl) PSORTS.push(Sortable.create(pl,Object.assign({},common,{group:{name:"ov",pull:true,put:false}, sort:false, onEnd:ovDrop})));
   }
