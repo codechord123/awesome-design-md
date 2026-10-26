@@ -1066,9 +1066,14 @@ function xBase(map){
   gSession(key).then(sess=>{
     if(XMAP!==map) return;
     const gl=L.tileLayer(`https://tile.googleapis.com/v1/2dtiles/{z}/{x}/{y}?session=${encodeURIComponent(sess)}&key=${encodeURIComponent(key)}`,{maxZoom:20, className:"gtiles", attribution:""});
-    let bad=0, ok=0, done=false;
-    gl.on("tileload",()=>{ ok++; if(!done && ok>=4){ done=true; (map._bases||[]).forEach(l=>{ if(map.hasLayer(l)) map.removeLayer(l); }); map._bases=[]; } });
-    gl.on("tileerror",()=>{ if(++bad>=6 && ok<3 && map.hasLayer(gl)){ map.removeLayer(gl); LS.del("tokyo-gtile"); if(!(map._bases||[]).some(l=>map.hasLayer(l))) gsiBase(map); if(ga) map.removeControl(ga); } });
+    let bad=0, ok=0, run=0, done=false;
+    gl.on("tileload",()=>{ ok++; run=0; if(!done && ok>=4){ done=true; (map._bases||[]).forEach(l=>{ if(map.hasLayer(l)) map.removeLayer(l); }); map._bases=[]; } });
+    // 처음부터 안 되거나, 잘 되다가 중간에 연달아 끊기면(하루 한도·세션 만료·오프라인) 바탕을 국토지리원 지도로 되돌린다(2026-10-26: 바탕을 치운 뒤라 지도가 비던 문제)
+    gl.on("tileerror",e=>{ bad++; run++; if(!((bad>=6 && ok<3) || run>=4) || !map.hasLayer(gl)) return;
+      map.removeLayer(gl); map.removeControl(ga); map.off("moveend",upd); LS.del("tokyo-gtile");
+      if(!(map._bases||[]).some(l=>map.hasLayer(l))) gsiBase(map);
+      LS.set("tokyo-gtile-err","구글 지도 타일이 끊겼어요."); LS.set("tokyo-gtile-try",String(Date.now()));
+      const src=e.tile && e.tile.src; if(src && navigator.onLine!==false) fetch(src).then(async r=>{ if(!r.ok){ const t=await r.text().catch(()=>""); LS.set("tokyo-gtile-err","구글 지도 타일 오류 "+r.status+(t?": "+t.slice(0,80):"")); } }).catch(()=>{}); });
     gl.addTo(map);
     const ga=L.control({position:"bottomright"});
     ga.onAdd=()=>{ const d=L.DomUtil.create("div","gattr"); d.innerHTML=`<b class="glogo">Google Maps</b><span class="gcopy"></span>`; return d; };
@@ -1710,7 +1715,7 @@ function renderTools(keep){
       ${tl("google","i-pin","구글 장소 정보",n?`${n}곳`:"키 없음",
         `<p>키를 넣고 받으면 모든 블록에 사진·평점·요일별 영업시간이 붙고, 영업시간 밖이면 일정에 경고가 떠요. 30일 동안 보관해요.</p>
          <label class="fld">Places API 키<input type="password" id="gkey" value="${esc(key)}" autocomplete="off" placeholder="AIza…"></label>
-         <div class="acts"><button class="btn ink" id="gfetch">장소 정보 받기</button>${n?`<button class="btn" id="gclear">지우기</button>`:""}</div><p id="gstat" style="margin-top:10px">${GBUSY?`받는 중 ${GPROG}`:n?`${n}곳 저장됨 · 사진 ${gPhotos()}곳 · ${Math.floor((Date.now()-PSTORE.at)/864e5)}일 전`:"아직 받지 않았어요."}</p>${LS.get("tokyo-gerr","")?`<p class="gerr">${esc(LS.get("tokyo-gerr",""))}</p>`:""}
+         <div class="acts"><button class="btn ink" id="gfetch">장소 정보 받기</button>${n?`<button class="btn" id="gclear">지우기</button>`:""}</div><p id="gstat" style="margin-top:10px">${GBUSY?`받는 중 ${GPROG}`:n?`${n}곳 저장됨 · 사진 ${gPhotos()}곳 · ${Math.floor((Date.now()-PSTORE.at)/864e5)}일 전`:"아직 받지 않았어요."}</p>${LS.get("tokyo-gerr","")?`<p class="gerr">${esc(LS.get("tokyo-gerr",""))}</p>`:""}${LS.get("tokyo-gtile-err","")?`<p class="gerr">지도: ${esc(LS.get("tokyo-gtile-err",""))} 그동안은 국토지리원 지도로 보여요.</p>`:""}
          <p>키 만들기: console.cloud.google.com → Places API (New) 사용 → 사용자 인증 정보에서 API 키 → 웹사이트 제한에 이 주소 추가.</p>`)}
       ${tl("backup","i-box","백업·캘린더","",
         `<p>노선을 파일로 저장해 두거나 불러와요. 다른 기기로 옮길 땐 맨 위 "다른 기기로 옮기기"가 더 쉬워요.</p>
