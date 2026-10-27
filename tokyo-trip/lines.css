@@ -239,6 +239,9 @@ dialog .x:focus:not(:focus-visible){outline:none}
 .side-h{position:sticky;top:0;background:var(--card);z-index:2;display:flex;align-items:baseline;gap:10px;padding:20px 0 12px}
 .side-h b{font-size:18px;font-weight:850;letter-spacing:-.04em}
 .side-h span{font-size:12.5px;color:var(--mute);font-weight:700}
+/* 버전 설명(2026-10-27): 처음 짠 그대로인 날만 그날 뜻을, 전체에선 버전 소개를 */
+.verday{margin:0 0 12px;font-size:13px;line-height:1.55;color:var(--mute);word-break:keep-all}
+.verday b{display:block;color:var(--ink);font-size:14px;font-weight:800;letter-spacing:-.03em;margin-bottom:2px}
 body.withside{padding-right:380px}
 body.withside nav.tabs{right:380px}
 body.withside .trash{right:392px}

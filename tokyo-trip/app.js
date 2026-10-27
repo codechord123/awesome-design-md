@@ -100,6 +100,26 @@ function fromTemplate(k, keep){
   });
   return s;
 }
+/* 버전(2026-10-27 Henry: "일정을 버전 여러 개로, 누르면 자동으로 바뀌게. 헨리 코스는 그대로, 내가 고칠게.")
+   일정 화면 맨 위 칩. 누르면 지금 노선(날·출발·고정·머무는 시간)을 S.alt[지금 버전]에 두고, 고른 버전의 마지막 상태를 꺼낸다.
+   처음 여는 버전은 템플릿대로 짠다(fresh면 늘 템플릿대로). 찜·직접 담은 곳은 버전과 상관없이 같이 쓴다. */
+const VERS=["henry","route","theme","easy","rain","special"];
+function switchVer(k, fresh){
+  const P=PLANS.find(p=>p.k===k); if(!P) return;
+  const same=k===S.tpl; S.alt=S.alt||{};
+  if(!same) S.alt[S.tpl]=JSON.parse(JSON.stringify({days:S.days, start:S.start, pins:S.pins, dur:S.dur}));
+  const sv=!fresh && S.alt[k] && S.alt[k].days ? S.alt[k] : fromTemplate(k,{star:S.star, added:S.added});
+  S.days={}; EDIT.forEach(dk=>{ S.days[dk]=(sv.days[dk]||[]).filter(id=>place(id)); });
+  S.start=sv.start||{}; S.pins=sv.pins||{}; S.dur=sv.dur||{}; S.tpl=k; delete S.alt[k];
+  OPTRES=null; MAPFIT=true; commit(`'${P.n}' 버전${!fresh?"으로 바꿨어요":same?"을 처음 짠 대로 다시 짰어요":"을 처음 짠 대로 열었어요"}`);
+}
+// 그 버전을 처음 짠 그대로 쓰고 있으면 그날 설명을 보여 준다(고쳤으면 설명이 틀릴 수 있어 숨긴다)
+function verDay(dk){
+  const P=PLANS.find(p=>p.k===S.tpl), pd=P && P.days && P.days[dk];
+  if(!pd || !pd.summary) return null;
+  const same=tplStops(P,dk).map(x=>x.q).filter(q=>place(q)).join("|")===(S.days[dk]||[]).join("|");
+  return same ? pd : null;
+}
 // 이전 화면에서 고친 "내 일정"(tokyo-myplan)과 추천 넣기(tokyo-mine)가 있으면 그걸로 시작한다
 function migrate(){
   let my=null; try{ my=JSON.parse(LS.get("tokyo-myplan","null")); }catch(e){}
@@ -721,6 +741,10 @@ function setMapDay(k){
   if(k==="all"){ MAPALL=true; } else { MAPALL=false; CUR=k; LS.set("tokyo-lines-day",k); }
   LS.set("tokyo-lines-mapall",MAPALL?"1":"0"); render();
 }
+function verRow(){
+  const ks=VERS.includes(S.tpl)?VERS:[...VERS,S.tpl];
+  return `<div class="chips xrow xver" role="group" aria-label="일정 버전">${ks.map(k=>{ const P=PLANS.find(p=>p.k===k); return P?`<button class="chip" data-ver="${k}" aria-pressed="${S.tpl===k}" title="${esc(P.tag||"")}">${esc(P.n)}</button>`:""; }).join("")}</div>`;
+}
 function mapTop(){
   const dk=CUR, day=!MAPALL;
   const dates=`<div class="chips xrow">${EDIT.map(k=>`<button class="chip line" data-mday="${k}" aria-pressed="${day&&k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}<button class="chip" data-mday="all" aria-pressed="${MAPALL}">${ico("i-network")}전체</button><button class="chip" data-mday="wed">${lsym("wed","sm")}수 도착</button></div>`;
@@ -731,7 +755,7 @@ function mapTop(){
   if(day){ const sc=schedule(dk), n=sc.rows.length, pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
     const st = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
     sum=`<div class="xsum"><b>${WDK[dk]} ${esc(REGION[dk].n)}</b><span>${n}역 · ${n?`${fmt(sc.depart)}–${fmt(sc.home)} · ${sc.dist.toFixed(1)}km · `:""}${st}</span><span class="xsl">${n?`<a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 동선</a>`:""}</span></div>`; }
-  return dates+cons+sum+gStatHTML();
+  return verRow()+dates+cons+sum+gStatHTML();
 }
 function renderBoard(){
   if(CUR==="wed"){ document.body.dataset.boardmap="0"; main.innerHTML=`${dswHTML()}<div class="wrap">${newsHTML()}${wedHTML()}</div>`;
@@ -790,7 +814,7 @@ function routeSideHTML(){
       ${f.off?`<span class="rs-off">휴무</span>`:`<button class="add" data-xput="${esc(p.id)}" data-day="${dk}">넣기</button>`}</li>`).join("");
   const last=n?sc.rows[n-1]:null, cn=(XCFS.find(x=>x[0]===XCF)||["","후보"])[1];
   return `${N.phase==="during"&&N.dk===dk?lcdHTML():""}${optHTML()}
-    <div class="side-h"><b>${WDK[dk]}요일 노선</b><span>⠿ 끌어서 순서 · × 빼기</span></div>
+    <div class="side-h"><b>${WDK[dk]}요일 노선</b><span>⠿ 끌어서 순서 · × 빼기</span></div>${(vd=>vd?`<p class="verday"><b>${esc(vd.title||"")}</b>${esc(vd.summary)}</p>`:"")(verDay(dk))}
     <div class="rtools"><label class="dep2">숙소 출발 <input type="time" id="depart2" value="${hhmm(fmt(sc.depart))}"></label>${n?`<button class="lk" id="optbtn2">${ico("i-route")}동선 최적화</button>`:""}<button class="lk" id="addst2">${ico("i-plus")}장소 추가</button></div>
     ${rainHTML(dk)}
     <ol class="rsl" id="rsl">${rows||`<li class="src empty">비어 있어요. 아래 후보를 끌어 오거나 넣어 보세요.</li>`}</ol>
@@ -808,7 +832,8 @@ function overviewHTML(){
   const prow=p=>{ const sp=spots(p)[0]; return `<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="날짜로 끌기">⠿</span><span class="pi" style="--k:${kcol(p)}">${ico((KIND[p.kc]||KIND.view).i)}</span>
       <button class="rb" data-xsel="${esc(p.id)}"><b>${S.star[p.id]?"★ ":""}${esc(p.n)}</b><small>${esc(AREANAME[areaOf(p)]||"")}${sp&&!sp.off&&addTxt(sp)?` · ${WDK[sp.dk]} ${esc(addTxt(sp))}`:""}</small></button>
       ${sp&&!sp.off?`<button class="add" data-xput="${esc(p.id)}" data-day="${sp.dk}">${WDK[sp.dk]}에 넣기</button>`:""}</li>`; };
-  return `<div class="side-h"><b>닷새 노선</b><span>⠿ 끌어서 날짜·순서 바꾸기</span></div>${days}
+  const VP=PLANS.find(p=>p.k===S.tpl);
+  return `<div class="side-h"><b>닷새 노선${VP?` · ${esc(VP.n)}`:""}</b><span>⠿ 끌어서 날짜·순서 바꾸기</span></div>${VP&&VP.intro?`<p class="verday">${esc(VP.intro)}</p>`:""}${days}
     <div class="side-h sub"><b>보관함${c.k==="all"?"":` · ${esc(c.n)}`}</b><span>⠿ 날짜로 끌거나 넣기</span></div><ul class="rsl" id="ovpool">${pool.map(prow).join("")||`<li class="src empty">남은 곳이 없어요.</li>`}</ul>`;
 }
 function renderPanel(){
@@ -1089,6 +1114,7 @@ let XL=[];
 function xUpdate(fit){
   $("#xtop").innerHTML=mapTop();
   $$("#xtop [data-mday]").forEach(b=>b.addEventListener("click",()=>setMapDay(b.dataset.mday)));
+  $$("#xtop [data-ver]").forEach(b=>b.addEventListener("click",()=>switchVer(b.dataset.ver)));
   $$("#xtop [data-mc]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.mc; MC=(MC===k&&k!=="")?"":k; LS.set("tokyo-lines-mc",MC); XSEL=null; render(); }));
   $$("#xtop .chip[aria-pressed=true]").forEach(c=>{ const row=c.parentElement; row.scrollLeft=Math.max(0,c.offsetLeft-row.clientWidth/2+c.offsetWidth/2); });
   const items=xItems(); XL=xInfo(items);
@@ -1711,7 +1737,7 @@ function renderTools(keep){
          <div class="acts"><button class="btn ink" data-hotel>${ico("i-zoom")}주소 크게 보기</button><a class="btn" href="${MAPS(HOTEL.q)}" target="_blank" rel="noopener">${ico("i-map")}지도</a></div>`)}
       ${tl("sos","i-help","긴급 연락처","",`<div class="sos">${SOS.map(x=>`<a href="tel:${x.tel.replace(/[^+\d]/g,"")}"><span><b>${esc(x.n)}</b><br><span style="font-size:13px">${esc(x.d)}</span></span><span class="num">${esc(x.tel)}</span></a>`).join("")}</div><p style="margin-top:10px">대사관 번호는 출발 전에 외교부 페이지에서 다시 확인하세요.</p>`)}
       ${tl("tpl","i-line","노선 템플릿",PLANS.find(p=>p.k===S.tpl)?.n||"",
-        `<p>정리해 둔 일정 중 하나로 노선을 다시 짭니다. 찜과 직접 담은 곳은 남아요.</p><div class="tpl">${PLANS.filter(p=>p.k!=="mine").map(p=>`<button data-tpl="${p.k}"><b>${esc(p.n)}${p.k===S.tpl?" · 지금":""}</b><span>${esc(p.intro)}</span></button>`).join("")}</div>`)}
+        `<p>정리해 둔 일정 중 하나를 처음 짠 대로 엽니다. 지금 버전에서 고친 건 그 버전에 남고, 일정 화면 맨 위 칩으로 오갈 수 있어요. 찜과 직접 담은 곳은 같이 써요.</p><div class="tpl">${PLANS.filter(p=>p.k!=="mine").map(p=>`<button data-tpl="${p.k}"><b>${esc(p.n)}${p.k===S.tpl?" · 지금":""}</b><span>${esc(p.intro)}</span></button>`).join("")}</div>`)}
       ${tl("google","i-pin","구글 장소 정보",n?`${n}곳`:"키 없음",
         `<p>키를 넣고 받으면 모든 블록에 사진·평점·요일별 영업시간이 붙고, 영업시간 밖이면 일정에 경고가 떠요. 30일 동안 보관해요.</p>
          <label class="fld">Places API 키<input type="password" id="gkey" value="${esc(key)}" autocomplete="off" placeholder="AIza…"></label>
@@ -1719,7 +1745,7 @@ function renderTools(keep){
          <p>키 만들기: console.cloud.google.com → Places API (New) 사용 → 사용자 인증 정보에서 API 키 → 웹사이트 제한에 이 주소 추가.</p>`)}
       ${tl("backup","i-box","백업·캘린더","",
         `<p>노선을 파일로 저장해 두거나 불러와요. 다른 기기로 옮길 땐 맨 위 "다른 기기로 옮기기"가 더 쉬워요.</p>
-         <div class="acts"><button class="btn" id="exp">파일로 저장</button><label class="btn" for="imp">불러오기</label><button class="btn" id="ics">${ico("i-cal")}캘린더 파일</button><button class="btn" id="reset">처음 노선으로</button></div><input type="file" id="imp" accept=".json,application/json" hidden>`)}
+         <div class="acts"><button class="btn" id="exp">파일로 저장</button><label class="btn" for="imp">불러오기</label><button class="btn" id="ics">${ico("i-cal")}캘린더 파일</button><button class="btn" id="reset">이 버전 처음대로</button></div><input type="file" id="imp" accept=".json,application/json" hidden>`)}
       <a class="tl" href="classic.html" style="display:flex;align-items:center;gap:12px;min-height:64px;padding:0 16px;font-weight:800;text-decoration:none"><span class="picto" style="width:30px;height:30px;border-radius:9px">${ico("i-more")}</span>이전 화면</a>
     </div><div style="height:28px"></div></div>`;
   $$(".tl").forEach(d=>d.addEventListener("toggle",()=>{ if(d.open){ TOOLS_OPEN=d.dataset.k; LS.set("tokyo-lines-open",TOOLS_OPEN); } }));
@@ -1733,8 +1759,9 @@ function renderTools(keep){
   $$("[data-phr]").forEach(b=>b.addEventListener("click",()=>{ const x=PHRASES[+b.dataset.phr]; bigJa({n:x.ko, ja:x.ja}); }));
   $$("[data-say]").forEach(b=>b.addEventListener("click",()=>speakJa(PHRASES[+b.dataset.say].ja)));
   const hb=$("[data-hotel]"); if(hb) hb.addEventListener("click",()=>bigJa({n:HOTEL.n, ja:HOTEL.ja, addr:HOTEL.addr}));
-  $$("[data-tpl]").forEach(b=>b.addEventListener("click",()=>{ const P=PLANS.find(p=>p.k===b.dataset.tpl); if(!confirm(`'${P.n}'로 노선을 다시 짤까요? 지금 순서와 고정 시각은 사라져요. 먼저 파일로 저장해 두면 되돌릴 수 있어요.`)) return;
-    S=fromTemplate(P.k,{star:S.star, added:S.added}); commit(`'${P.n}' 노선으로 다시 짰어요`); }));
+  $$("[data-tpl]").forEach(b=>b.addEventListener("click",()=>{ const P=PLANS.find(p=>p.k===b.dataset.tpl);
+    if(!confirm(P.k===S.tpl?`'${P.n}' 버전을 처음 짠 대로 다시 짤까요? 이 버전에서 고친 순서와 고정 시각은 사라져요.`:`'${P.n}' 버전을 처음부터 짤까요? 지금 버전에서 고친 건 그 버전에 남아요.`)) return;
+    switchVer(P.k,true); }));
   const gk=$("#gkey"); if(gk) gk.addEventListener("change",()=>{ LS.set("tokyo-gkey",gk.value.trim()); LS.del("tokyo-gkey-src"); LS.del("tokyo-gerr"); if(gk.value.trim()) autoPlaces(true); });
   const gf=$("#gfetch"); if(gf) gf.addEventListener("click",()=>{ const k=gk.value.trim(); if(!k){ $("#gstat").textContent="먼저 키를 넣어 주세요."; gk.focus(); return; }
     LS.set("tokyo-gkey",k); LS.del("tokyo-gkey-src"); LS.del("tokyo-gerr"); autoPlaces(true); });
@@ -1762,7 +1789,7 @@ function renderTools(keep){
   $("#exp").addEventListener("click",()=>download("tokyo-lines.json",JSON.stringify(S,null,1),"application/json"));
   $("#imp").addEventListener("change",async e=>{ const f=e.target.files[0]; if(!f) return; try{ const v=JSON.parse(await f.text()); if(!v||!v.days) throw 0; useLines(v); commit("노선을 불러왔어요"); }catch(err){ toast("이 파일은 읽을 수 없어요"); } });
   $("#ics").addEventListener("click",()=>download("tokyo-lines.ics",icsText(),"text/calendar;charset=utf-8"));
-  $("#reset").addEventListener("click",()=>{ if(!confirm(`처음 노선(${(PLANS.find(p=>p.k===DEFPLAN)||{}).n})으로 돌아갈까요? 찜과 직접 담은 곳은 남아요.`)) return; S=fromTemplate(DEFPLAN,{star:S.star, added:S.added}); commit("처음 노선으로 돌아갔어요"); });
+  $("#reset").addEventListener("click",()=>{ const P=PLANS.find(p=>p.k===S.tpl)||PLANS.find(p=>p.k===DEFPLAN); if(!confirm(`'${P.n}' 버전을 처음 짠 대로 되돌릴까요? 이 버전에서 고친 순서와 고정 시각은 사라져요. 찜과 직접 담은 곳, 다른 버전은 남아요.`)) return; switchVer(P.k,true); });
 }
 function download(name,text,type){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type})); a.download=name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000); }
 function icsText(){
