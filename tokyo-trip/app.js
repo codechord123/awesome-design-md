@@ -1594,23 +1594,27 @@ function infoWx(){
 }
 /* 오프라인 준비(2026-09-28): 노선이 지나는 곳의 국토지리원 타일(13~16단계)과 장소 사진을 미리 받아 서비스 워커에 둔다.
    구글 지도 타일은 캐시 금지라 받지 않는다(오프라인에선 국토지리원 지도로 떨어진다). OSM은 대량 받기 금지라 쓰지 않는다. */
+// 2026-11-01 Henry: 버전을 바꾸면 그 동네 지도가 없어 오프라인(지하철)에서 비었다 → 지금 노선 + 저장해 둔 다른 버전 + 아직 안 연 버전(처음 짠 대로)을 모두.
+// 지금 노선을 맨 앞에 두어 2,200장에서 잘려도 지금 것은 남는다(여섯 버전을 합쳐도 650장쯤, 2026-11-01).
+function preDays(){ const alt=S.alt||{}; return [S.days, ...Object.values(alt).map(v=>v&&v.days||{}), ...VERS.filter(k=>k!==S.tpl && !alt[k]).map(k=>fromTemplate(k).days)]; }
+function prePlaces(){ return [...new Set(preDays().flatMap(d=>EDIT.flatMap(dk=>d[dk]||[])))].map(place).filter(Boolean); }
 function preTiles(){
   const set=new Set(), t2=(lat,lng,z)=>{ const n=2**z, x=Math.floor((lng+180)/360*n), r=lat*Math.PI/180, y=Math.floor((1-Math.log(Math.tan(r)+1/Math.cos(r))/Math.PI)/2*n); return [x,y]; };
-  EDIT.forEach(dk=>{ const pts=[HOTEL,...S.days[dk].map(place).filter(p=>p&&p.lat)]; if(pts.length<2) return;
+  preDays().forEach(days=>EDIT.forEach(dk=>{ const pts=[HOTEL,...(days[dk]||[]).map(place).filter(p=>p&&p.lat)]; if(pts.length<2) return;
     const la=pts.map(p=>+p.lat), ln=pts.map(p=>+p.lng), pad=0.006, S0=Math.min(...la)-pad, N0=Math.max(...la)+pad, W0=Math.min(...ln)-pad, E0=Math.max(...ln)+pad;
-    for(let z=13;z<=16;z++){ const [x0,y0]=t2(N0,W0,z), [x1,y1]=t2(S0,E0,z); for(let x=x0;x<=x1;x++) for(let y=y0;y<=y1;y++) set.add(`${z}/${x}/${y}`); } });
+    for(let z=13;z<=16;z++){ const [x0,y0]=t2(N0,W0,z), [x1,y1]=t2(S0,E0,z); for(let x=x0;x<=x1;x++) for(let y=y0;y<=y1;y++) set.add(`${z}/${x}/${y}`); } }));
   return [...set].slice(0,2200);
 }
 function infoOffline(){
-  const n=preTiles().length, ph=EDIT.flatMap(dk=>S.days[dk]).map(place).filter(p=>p && placeOf(p) && placeOf(p).photo).length;
-  return `<p>와이파이에서 한 번 눌러 두면, 도쿄에서 데이터가 약해도 일정·지도·사진이 열려요. 지금 노선이 지나는 곳의 지도 ${n}장과 사진 ${ph}장이에요. 노선을 크게 바꿨으면 다시 눌러 주세요.</p>
+  const n=preTiles().length, ph=prePlaces().filter(p=>placeOf(p) && placeOf(p).photo).length;
+  return `<p>와이파이에서 한 번 눌러 두면, 도쿄에서 데이터가 약해도 일정·지도·사진이 열려요. 여섯 버전이 지나는 곳 모두의 지도 ${n}장과 사진 ${ph}장이라 버전을 바꿔도 지도가 열려요. 노선을 크게 고쳤으면 다시 눌러 주세요.</p>
     <div class="acts"><button class="btn ink" id="prefetch"${PREBUSY?" disabled":""}>${PREBUSY?`받는 중 ${PREBUSY}`:"지도·사진 미리 받기"}</button></div>
     <p class="src">구글 지도는 정책상 저장할 수 없어서, 인터넷이 없을 땐 국토지리원 지도로 보여요. 구간 교통(구글 경로)도 인터넷이 있어야 나와요.</p>`;
 }
 let PREBUSY="";
 async function prefetchAll(){
   if(PREBUSY) return; if(navigator.onLine===false){ toast("인터넷이 연결된 곳에서 눌러 주세요"); return; }
-  const tiles=preTiles(), photos=[...new Set(EDIT.flatMap(dk=>S.days[dk]).map(place).map(p=>p&&placeOf(p)&&placeOf(p).photo).filter(Boolean))];
+  const tiles=preTiles(), photos=[...new Set(prePlaces().map(p=>placeOf(p)&&placeOf(p).photo).filter(Boolean))];
   let done=0, ok=0; const all=tiles.length+photos.length, tick=()=>{ PREBUSY=`${done}/${all}`; const b=$("#prefetch"); if(b) b.textContent=`받는 중 ${PREBUSY}`; };
   PREBUSY="0/"+all; renderTools(true);
   const job=async u=>{ try{ const r=await fetch(u,{mode:"cors"}); if(r.ok) ok++; }catch(e){} done++; if(done%20===0) tick(); };
