@@ -214,19 +214,28 @@ function hopText(r,first){
 
 /* ─────────────── 구간 교통: 구글 Routes API(2026-09-28) ───────────────
    Henry: "다음 이정표로 교통안내가 잘 나왔으면." 전철 구간(1.2km 넘는 곳)마다 computeRoutes(TRANSIT)로 탈 노선·탈 역·내릴 역·정거장 수를 받는다.
+   2026-11-01: Henry 키에 Routes API를 켜고 보니 일본 TRANSIT은 늘 빈 답({})이다(런던·서울은 노선까지 나옴). 그래서 전철 요청은 끄고(RT_TRANSIT),
+   전철 구간엔 구글 지도 앱 길찾기 링크(DIR)를, 걷는 구간은 WALK로 구글 도보 시간·거리를 보여 준다(Henry가 셋 다 골랐다). 일정 계산은 그대로 앱 추정.
    키의 API 제한에 Routes API가 있어야 한다. 경로는 저장하지 않고 이 세션(sessionStorage)에만 둔다(구글 정책 — 좌표·place ID 말고는 캐시 조심).
    실패하면 2분 쉬고, 그동안은 앱의 추정(hopText)을 보여 준다. 화면 전체를 다시 그리지 않고 [data-leg] 자리만 바꾼다(끄는 중 흔들리지 않게). */
+const RT_TRANSIT=false;   // 구글이 일본 대중교통 경로를 주면 true로(그때까지 요청만 쌓인다)
 let RT=(()=>{ try{ return new Map(JSON.parse(sessionStorage.getItem("tokyo-rt")||"[]")); }catch(e){ return new Map(); } })();
 const LEGINFO=new Map(), RTWAIT=new Set();
 const legKey=(a,b)=>`${(+a.lat).toFixed(4)},${(+a.lng).toFixed(4)}>${(+b.lat).toFixed(4)},${(+b.lng).toFixed(4)}`;
 function legAttr(a,b,tr,big,dep){
-  if(!tr || tr.mode!=="train" || !a || !b || !a.lat || !b.lat) return "";
-  const k=legKey(a,b), I=LEGINFO.get(k)||{a,b,tr}; if(dep) I.dep=dep; LEGINFO.set(k,I);
+  if(!tr || !(tr.mode==="walk" || (RT_TRANSIT && tr.mode==="train")) || !a || !b || !a.lat || !b.lat) return "";
+  const k=legKey(a,b), I=LEGINFO.get(k)||{a,b,tr}; I.tr=tr; if(dep) I.dep=dep; LEGINFO.set(k,I);
   return ` data-leg="${k}"${big?' data-bigleg="1"':""}`;
 }
 function rlChip(t){ return `<span class="rl" style="--lc:${esc(t.color)};--lt:${esc(t.text)}">${esc(t.name||t.line||"전철")}</span>`; }
+// 전철 구간: 구글 지도 앱 대중교통 길찾기(공식 Maps URLs, DIR). 앱 안 경로 대신 이걸 누른다(일본은 API가 경로를 안 줌). text면 글자 링크, 아니면 둥근 아이콘
+function goLink(a,b,tr,text){
+  if(!tr || tr.mode!=="train" || !a || !b || !a.lat || !b.lat) return "";
+  return `<a class="${text?"lk lgo":"rgo"}" href="${DIR(a,b)}" target="_blank" rel="noopener" aria-label="${esc(b.n||"다음 역")}까지 구글 지도 길찾기">${ico("i-route")}${text?"길찾기":""}</a>`;
+}
 function legText(a,b,tr,first){
   const R=a&&b&&a.lat&&b.lat?RT.get(legKey(a,b)):null, pre=first?"숙소에서 ":"";
+  if(R && R.walk) return `<span class="lg rt">${ico("i-walk")}${pre}도보 ${R.min}분 · ${R.m<1000?R.m+"m":(R.m/1000).toFixed(1)+"km"} · 구글</span>`;
   if(!R || !R.steps) return `<span class="lg">${hopText({tr},first)}</span>`;
   const T=R.steps.filter(x=>!x.w);
   if(!T.length) return `<span class="lg">${ico("i-walk")}${pre}걸어서 약 ${R.min}분</span>`;
@@ -234,7 +243,8 @@ function legText(a,b,tr,first){
 }
 function legBig(a,b,tr){
   const R=a&&b&&a.lat&&b.lat?RT.get(legKey(a,b)):null;
-  if(!R || !R.steps) return `<p class="lgt">${tr&&tr.mode==="train"?`전철 약 ${tr.min}분(추정) · 길찾기로 경로를 보세요`:tr&&tr.mode==="walk"?`걸어서 약 ${tr.min}분`:tr&&tr.mode==="noloc"?"위치를 받기 전이에요 · 길찾기로 경로를 보세요":"바로 옆이에요"}</p>`;
+  if(R && R.walk) return `<p class="lgt">${ico("i-walk")}걸어서 약 ${R.min}분 · ${R.m<1000?R.m+"m":(R.m/1000).toFixed(1)+"km"} · 구글 도보 경로</p>`;
+  if(!R || !R.steps) return `<p class="lgt">${tr&&tr.mode==="train"?`전철 약 ${tr.min}분(추정) · 탈 노선은 구글 지도 길찾기로`:tr&&tr.mode==="walk"?`걸어서 약 ${tr.min}분`:tr&&tr.mode==="noloc"?"위치를 받기 전이에요 · 길찾기로 경로를 보세요":"바로 옆이에요"}</p>`;
   return `<ol class="lgb">${R.steps.map(t=>t.w?`<li class="w">${ico("i-walk")}걸어서 ${t.w}분</li>`
       :`<li>${rlChip(t)}<span><b>${esc(t.from)}</b> → <b>${esc(t.to)}</b><small>${[t.head?esc(t.head)+" 방면":"", t.n?t.n+"정거장":"", t.min?t.min+"분":""].filter(Boolean).join(" · ")}</small></span></li>`).join("")}</ol>
     <p class="lgt">약 ${R.min}분 · 구글 경로</p>`;
@@ -242,16 +252,19 @@ function legBig(a,b,tr){
 function rtOff(){ return !!LS.get("tokyo-rt-err","") && Date.now()-(+LS.get("tokyo-rt-try","0"))<2*60e3; }
 async function rtFetch(k){
   const I=LEGINFO.get(k), key=LS.get("tokyo-gkey",""); if(!I || !key) return;
-  const body={origin:{location:{latLng:{latitude:+I.a.lat,longitude:+I.a.lng}}}, destination:{location:{latLng:{latitude:+I.b.lat,longitude:+I.b.lng}}}, travelMode:"TRANSIT", languageCode:"ja", regionCode:"JP"};
-  if(I.dep && I.dep>Date.now()+60e3) body.departureTime=new Date(I.dep).toISOString();
+  const onFoot=!I.tr || I.tr.mode!=="train";
+  const body={origin:{location:{latLng:{latitude:+I.a.lat,longitude:+I.a.lng}}}, destination:{location:{latLng:{latitude:+I.b.lat,longitude:+I.b.lng}}}, travelMode:onFoot?"WALK":"TRANSIT", languageCode:"ja", regionCode:"JP"};
+  if(!onFoot && I.dep && I.dep>Date.now()+60e3) body.departureTime=new Date(I.dep).toISOString();
   const call=b=>fetch("https://routes.googleapis.com/directions/v2:computeRoutes",{method:"POST",headers:{"Content-Type":"application/json","X-Goog-Api-Key":key,
-    "X-Goog-FieldMask":"routes.duration,routes.travelAdvisory.transitFare,routes.legs.steps.travelMode,routes.legs.steps.staticDuration,routes.legs.steps.transitDetails"},body:JSON.stringify(b)});
+    "X-Goog-FieldMask":onFoot?"routes.duration,routes.distanceMeters":"routes.duration,routes.travelAdvisory.transitFare,routes.legs.steps.travelMode,routes.legs.steps.staticDuration,routes.legs.steps.transitDetails"},body:JSON.stringify(b)});
   let r=await call(body);
   if(r.status===400 && body.departureTime){ delete body.departureTime; r=await call(body); }
   if(!r.ok){ const t=await r.text().catch(()=>"");
     if(r.status===401||r.status===403){ LS.set("tokyo-rt-err",/SERVICE_BLOCKED|has not been used|is disabled|not enabled/i.test(t)?"Routes API가 꺼져 있거나 키의 API 제한에 없어요.":/referer|referrer/i.test(t)?"키의 웹사이트 제한에 지금 주소가 없어요.":"Routes API 오류 "+r.status); LS.set("tokyo-rt-try",String(Date.now())); throw new Error("off"); }
     return; }
   const j=await r.json(), R=j.routes&&j.routes[0]; if(!R){ RT.set(k,{steps:[],min:0,none:true}); return; }
+  if(onFoot){ RT.set(k,{walk:true, min:Math.max(1,Math.round((parseInt(R.duration)||0)/60)), m:R.distanceMeters||0}); LS.del("tokyo-rt-err");
+    try{ sessionStorage.setItem("tokyo-rt",JSON.stringify([...RT])); }catch(e){} return; }
   const out=[]; let walk=0;
   (R.legs||[]).forEach(L=>(L.steps||[]).forEach(st=>{ const sec=parseInt(st.staticDuration)||0;
     if(st.travelMode==="TRANSIT" && st.transitDetails){ if(walk>=60){ out.push({w:Math.round(walk/60)}); } walk=0;
@@ -604,7 +617,7 @@ function lcdHTML(){
     <p class="n">${esc(r.p.n)}</p>${r.p.ja?`<p class="j">${esc(r.p.ja)}</p>`:""}
     <p class="w">${cur?`${fmt(r.end)}까지 · ${r.end-N.min}분 남음`:`${fmt(r.start)} 도착 예정 · ${left}분 뒤`}</p>
     ${(()=>{ const nx=cur?next:r; if(!nx) return ""; const a=nx.from||HOTEL;   // 다음 이정표: 지금 있는 곳에서 다음 역까지 가는 법
-      return `<div class="lcdleg">${cur?`<p class="nx">다음 ${sta(N.dk,nx.i,"sm")} <b>${esc(nx.p.n)}</b> · ${fmt(nx.start)}</p>`:""}<div${legAttr(a,nx.p,nx.tr,true)}>${legBig(a,nx.p,nx.tr)}</div></div>`; })()}
+      return `<div class="lcdleg">${cur?`<p class="nx">다음 ${sta(N.dk,nx.i,"sm")} <b>${esc(nx.p.n)}</b> · ${fmt(nx.start)}</p>`:""}<div${legAttr(a,nx.p,nx.tr,true)}>${legBig(a,nx.p,nx.tr)}</div>${goLink(a,nx.p,nx.tr,true)}</div>`; })()}
     <div class="acts"><a class="btn go" href="${DIR(r.from||HOTEL,r.p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a><button class="btn" data-big="${esc(r.id)}">${ico("i-zoom")}크게 보기</button>${VIEW==="board"?"":`<button class="btn" data-go="board" data-day="${N.dk}">일정</button>`}</div>
   </section>`;
 }
@@ -624,7 +637,7 @@ function briefFare(){
   const el=$("#bfare"); if(!el) return; const dk=el.dataset.day, legs=briefLegs(dk);
   const R=legs.map(l=>l.a.lat&&l.b.lat?RT.get(legKey(l.a,l.b)):null), got=R.filter(r=>r&&r.fare!=null);
   if(!legs.length){ el.innerHTML="이날은 전철을 안 타요(1.6km 안쪽은 걸어서)."; return; }
-  if(!got.length){ el.innerHTML=LS.get("tokyo-rt-err","")?`교통비는 구글 Routes API를 켜면 계산돼요(도구 &gt; 교통).`:`교통비 계산 중…`; return; }
+  if(!got.length){ el.innerHTML=`전철 ${legs.length}번(앱 추정). 구글이 일본 전철 경로·요금을 앱에 주지 않아 교통비는 계산하지 못해요. 구간마다 <b>길찾기</b>를 누르면 구글 지도 앱이 탈 노선과 요금을 보여 줘요. 많이 타는 날은 도쿄 서브웨이 24시간권(${yen(SUBTIX.h24)})과 비교해 보세요.`; return; }
   const sum=got.reduce((a,r)=>a+r.fare,0), all=got.length===legs.length;
   const other=R.some(r=>r&&r.steps&&r.steps.some(t=>!t.w && !SUBLINE.test(t.name||t.line||"")));
   el.innerHTML=`전철 ${legs.length}번 · 교통비 ${all?"":"약 "}<b>${yen(sum)}</b>${all?"":` (${got.length}/${legs.length}구간)`} · ${sum>SUBTIX.h24?`도쿄 서브웨이 24시간권(${yen(SUBTIX.h24)})을 사면 <b>${yen(sum-SUBTIX.h24)} 아껴요</b>`:`낱장이 24시간권(${yen(SUBTIX.h24)})보다 ${yen(SUBTIX.h24-sum)} 싸요`}${other?" · JR·사철 구간은 서브웨이 티켓에 안 들어가요":""}`;
@@ -668,7 +681,7 @@ function renderHome(){
       ${logged.length?`<p class="src">이날 적은 지출 ${sumTxt(logSum)} · <a href="#" data-go="tools" data-open="spend">장부</a></p>`:`<p class="src">쓴 돈은 <a href="#" data-go="tools" data-open="spend">도구 &gt; 지출 장부</a>에 적어요. 예약 결제는 도구 &gt; 예약 체크의 "결제함".</p>`}</section>
     <section class="bcard"><h2>${ico("i-train")}지하철</h2>
       <p class="bf" id="bfare" data-day="${dk}"></p>
-      ${legs.length?`<ol class="bleg">${legs.map(l=>`<li><p class="bh2"><b>${esc(l.an)}</b> → <b>${esc(l.bn)}</b></p><p class="mv"${legAttr(l.a,l.b,l.tr)}>${legText(l.a,l.b,l.tr,false)}</p></li>`).join("")}</ol>`:""}
+      ${legs.length?`<ol class="bleg">${legs.map(l=>`<li><p class="bh2"><b>${esc(l.an)}</b> → <b>${esc(l.bn)}</b></p><p class="mv"${legAttr(l.a,l.b,l.tr)}>${legText(l.a,l.b,l.tr,false)}${goLink(l.a,l.b,l.tr,true)}</p></li>`).join("")}</ol>`:""}
       <p class="src">${lastFar==null?"":lastFar<=0.6?`밤엔 ${esc(lastR.p.n)}에서 숙소까지 걸어서 들어와요. 막차 걱정 없어요.`:`마지막 구간 ${esc(lastR.p.n)} → 숙소는 전철이에요. 막차 시각은 역에서 확인하세요.`} 걷는 거리 ${T.walk.toFixed(1)}km.</p></section>
     <section class="bcard"><h2>${ico("i-lock")}시간 약속</h2>
       <ul class="bl">${rows.length?`<li><span>숙소 출발</span><b>${fmt(sc.depart)}</b></li>`:""}
@@ -807,7 +820,7 @@ function routeSideHTML(){
   const rows=sc.rows.map(r=>`<li class="rs${XSEL===r.id?" on":""}" data-id="${esc(r.id)}"><span class="h" aria-label="끌어서 순서 바꾸기">⠿</span>${sta(dk,r.i,"sm")}
     <button class="rb" data-xsel="${esc(r.id)}"><b>${esc(r.p.n)}</b><small>${fmt(r.start)}–${fmt(r.end)} · ${r.dur}분${r.pin?` · 고정 ${esc(r.pin)}`:""}</small>
       <span class="mv2"${legAttr(r.from||HOTEL,r.p,r.tr)}>${legText(r.from||HOTEL,r.p,r.tr,r.i===0)}</span>${rowWarn(r)}</button>
-    <button class="rx" data-xout="${esc(r.id)}" aria-label="${esc(r.p.n)} 빼기">${ico("i-x")}</button></li>`).join("");
+    <span class="rbtn">${goLink(r.from||HOTEL,r.p,r.tr)}<button class="rx" data-xout="${esc(r.id)}" aria-label="${esc(r.p.n)} 빼기">${ico("i-x")}</button></span></li>`).join("");
   const C=planCands().map(p=>({p, f:Object.assign({dk}, fit(p,dk))})).sort((a,b)=>(a.f.off-b.f.off)||(a.f.cost-b.f.cost)).slice(0,25);
   const cands=C.map(({p,f})=>`<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="노선으로 끌기">⠿</span><span class="pi" style="--k:${kcol(p)}">${ico((KIND[p.kc]||KIND.view).i)}</span>
       <button class="rb" data-xsel="${esc(p.id)}"><b>${S.star[p.id]?"★ ":""}${esc(p.n)}</b><small>${esc(p.k||(KIND[p.kc]||KIND.view).n)}${addTxt(f)?` · ${esc(addTxt(f))}`:""}</small></button>
@@ -818,7 +831,7 @@ function routeSideHTML(){
     <div class="rtools"><label class="dep2">숙소 출발 <input type="time" id="depart2" value="${hhmm(fmt(sc.depart))}"></label>${n?`<button class="lk" id="optbtn2">${ico("i-route")}동선 최적화</button>`:""}<button class="lk" id="addst2">${ico("i-plus")}장소 추가</button></div>
     ${rainHTML(dk)}
     <ol class="rsl" id="rsl">${rows||`<li class="src empty">비어 있어요. 아래 후보를 끌어 오거나 넣어 보세요.</li>`}</ol>
-    ${last?`<p class="rsend"><span class="mv2"${legAttr(last.p,HOTEL,sc.back)}>${legText(last.p,HOTEL,sc.back,false)}</span><b>${fmt(sc.home)} 숙소 도착</b></p>`:""}
+    ${last?`<p class="rsend"><span class="mv2"${legAttr(last.p,HOTEL,sc.back)}>${legText(last.p,HOTEL,sc.back,false)}${goLink(last.p,HOTEL,sc.back,true)}</span><b>${fmt(sc.home)} 숙소 도착</b></p>`:""}
     ${XCF?`<div class="side-h sub"><b>${esc(cn)}</b><span>⠿ 노선으로 끌거나 넣기</span></div><ul class="rsl" id="rcand">${cands||`<li class="src empty">남은 곳이 없어요.</li>`}</ul>`:""}`;
 }
 function overviewHTML(){
@@ -1539,8 +1552,9 @@ function infoTransit(){
     return `<li>${lsym(t.dk,"sm")}<span><b>${WDK[t.dk]} ${esc(l.p.n)}</b> ${fmt(t.sc.home)} 숙소 · ${far==null?"거리 모름":far<=0.6?"걸어서 숙소":`숙소까지 ${far.toFixed(1)}km — 막차 확인`}</span></li>`; }).join("");
   const card=x=>`<div class="tc"><p class="th">${esc(x.t)}</p>${x.body.map(b=>`<p>${esc(b)}</p>`).join("")}${x.src?`<p class="src"><a href="${esc(x.src)}" target="_blank" rel="noopener">${esc(x.srcn||"출처")}</a></p>`:""}</div>`;
   const rte=LS.get("tokyo-rt-err","");
-  return `<p>${rte?`<span class="bad">구간 교통: ${esc(rte)}</span> 구글 콘솔에서 <a href="https://console.cloud.google.com/apis/library/routes.googleapis.com" target="_blank" rel="noopener">Routes API</a>를 켜고 키의 API 제한에 더하면, 일정의 전철 구간마다 탈 노선·역이 나와요.`
-      :LS.get("tokyo-gkey","")?"일정의 전철 구간마다 구글 경로(탈 노선·탈 역·내릴 역)가 붙어요. 여행 중엔 오늘 탭의 다음 역 판에도.":"구글 키가 있으면 일정의 전철 구간마다 탈 노선·역이 붙어요."}</p>
+  return `<p>전철 구간마다 <b>길찾기</b>를 누르면 구글 지도 앱이 탈 노선·역·요금을 보여 줘요. 구글이 일본 대중교통 경로는 앱에 주지 않아서(2026-11-01 확인), 앱 안의 전철 시간은 추정이에요.
+      ${rte?`<br><span class="bad">걷는 구간 구글 시간: ${esc(rte)}</span> 구글 콘솔에서 <a href="https://console.cloud.google.com/apis/library/routes.googleapis.com" target="_blank" rel="noopener">Routes API</a>를 켜고 키의 API 제한에 더해 주세요.`
+      :LS.get("tokyo-gkey","")?"걷는 구간은 구글 도보 경로의 시간·거리로 보여요.":"구글 키가 있으면 걷는 구간이 구글 도보 시간으로 보여요."}</p>
     ${T.map(t=>`<div class="bd"><p class="bh">${lsym(t.dk,"sm")}<b>${WDK[t.dk]}요일 전철 ${t.n}번</b><span>걸어서 ${t.walk.toFixed(1)}km${t.unknown?` · 모름 ${t.unknown}`:""}</span></p>
       ${t.legs.length?`<ul>${t.legs.map(l=>`<li><span>${esc(l.from)} → ${esc(l.to)}</span><b>약 ${l.min}분</b></li>`).join("")}</ul>`:""}</div>`).join("")}
     <p class="src" style="margin:-4px 0 12px">1.6km 안쪽은 걸어서(분속 72m)로 셌어요. 전철 분은 앱의 추정(역까지 걷기·기다림 10분 + km당 2.6분)이라 실제 노선은 운행표의 길찾기로.</p>
