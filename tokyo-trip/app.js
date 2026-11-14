@@ -756,19 +756,24 @@ function setMapDay(k){
 }
 function verRow(){
   const ks=VERS.includes(S.tpl)?VERS:[...VERS,S.tpl];
-  return `<div class="chips xrow xver" role="group" aria-label="일정 버전">${ks.map(k=>{ const P=PLANS.find(p=>p.k===k); return P?`<button class="chip" data-ver="${k}" aria-pressed="${S.tpl===k}" title="${esc(P.tag||"")}">${esc(P.n)}</button>`:""; }).join("")}</div>`;
+  return `<div class="chips xpop xver" role="group" aria-label="일정 버전">${ks.map(k=>{ const P=PLANS.find(p=>p.k===k); return P?`<button class="chip" data-ver="${k}" aria-pressed="${S.tpl===k}" title="${esc(P.tag||"")}">${esc(P.n)}</button>`:""; }).join("")}</div>`;
 }
+/* 폰에서 위가 화면 절반을 덮었다(2026-11-14 Henry: "위에 탭이 정리가 안 돼서 폰으로 보기 불편, 지도는 너무 작아") → 한 줄로 접기를 골랐다.
+   날짜 칩 한 줄 양옆에 버전 버튼(누르면 버전 목록)과 필터 버튼(누르면 컨셉 칩), 요약은 그 아래 글자 한 줄. 펼친 판은 XPOP. */
+let XPOP="";
 function mapTop(){
-  const dk=CUR, day=!MAPALL;
-  const dates=`<div class="chips xrow">${EDIT.map(k=>`<button class="chip line" data-mday="${k}" aria-pressed="${day&&k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}<button class="chip" data-mday="all" aria-pressed="${MAPALL}">${ico("i-network")}전체</button><button class="chip" data-mday="wed">${lsym("wed","sm")}수 도착</button></div>`;
+  const dk=CUR, day=!MAPALL, VP=PLANS.find(p=>p.k===S.tpl);
+  const dates=`<div class="chips xrow xdays">${EDIT.map(k=>`<button class="chip line" data-mday="${k}" aria-pressed="${day&&k===dk}" style="--c:${LINE[k].c}" aria-label="${WDK[k]}요일 ${DAY[k].dt}">${lsym(k,"sm")}${WDK[k]}<span class="dd"> ${DAY[k].dt.split(".")[1]}</span></button>`).join("")}<button class="chip" data-mday="all" aria-pressed="${MAPALL}">${ico("i-network")}전체</button><button class="chip" data-mday="wed">${lsym("wed","sm")}수<span class="dd"> 도착</span></button></div>`;
   const cnt=k=>{ if(day){ const s0=XCF; XCF=k===""?"near":k; const v=planCands().length; XCF=s0; return v; }
     const s0=XF.c; XF.c=k===""?"all":k; const v=xItems().length; XF.c=s0; return v; };
-  const cons=`<div class="chips xrow">${[["",day?"근처 후보":"모든 곳","i-map"],...XCFS.slice(1)].map(([k,n,i])=>`<button class="chip" data-mc="${k}" aria-pressed="${MC===k}"${XCOL[k]?` style="--k:${XCOL[k]}"`:""}>${ico(i)}${n} <b>${cnt(k)}</b></button>`).join("")}${day?`<button class="chip" data-mc="none" aria-pressed="${MC==="none"}">후보 끄기</button>`:""}<button class="chip" data-go="pool">${ico("i-line")}목록·검색</button></div>`;
+  const cons=`<div class="chips xpop">${[["",day?"근처 후보":"모든 곳","i-map"],...XCFS.slice(1)].map(([k,n,i])=>`<button class="chip" data-mc="${k}" aria-pressed="${MC===k}"${XCOL[k]?` style="--k:${XCOL[k]}"`:""}>${ico(i)}${n} <b>${cnt(k)}</b></button>`).join("")}${day?`<button class="chip" data-mc="none" aria-pressed="${MC==="none"}">후보 끄기</button>`:""}<button class="chip" data-go="pool">${ico("i-line")}목록·검색</button></div>`;
   let sum="";
   if(day){ const sc=schedule(dk), n=sc.rows.length, pts=[HOTEL,...sc.rows.map(r=>r.p),HOTEL];
     const st = sc.bad ? `<span class="bad">확인 ${sc.bad}</span>` : sc.warns ? `<span class="warn">주의 ${sc.warns}</span>` : n ? `<span class="ok">문제 없음</span>` : "";
     sum=`<div class="xsum"><b>${WDK[dk]} ${esc(REGION[dk].n)}</b><span>${n}역 · ${n?`${fmt(sc.depart)}–${fmt(sc.home)} · ${sc.dist.toFixed(1)}km · `:""}${st}</span><span class="xsl">${n?`<a class="lk" href="${DAYDIR(pts)}" target="_blank" rel="noopener">${ico("i-route")}구글 동선</a>`:""}</span></div>`; }
-  return verRow()+dates+cons+sum+gStatHTML();
+  const mcn=MC==="none"?"후보 끔":MC?((XCFS.find(x=>x[0]===MC)||[])[1]||""):"";
+  const bar=`<div class="xbar"><button class="chip xvb" data-xpop="ver" aria-expanded="${XPOP==="ver"}">${esc(VP?VP.n:"버전")}<span class="car">▾</span></button>${dates}<button class="chip xfb" data-xpop="filter" aria-expanded="${XPOP==="filter"}" aria-pressed="${!!mcn}" aria-label="필터${mcn?": "+esc(mcn):""}">${ico("i-map")}${mcn?`<span class="fl">${esc(mcn)}</span>`:""}</button></div>`;
+  return bar+(XPOP==="ver"?verRow():XPOP==="filter"?cons:"")+sum+gStatHTML();
 }
 function renderBoard(){
   if(CUR==="wed"){ document.body.dataset.boardmap="0"; main.innerHTML=`${dswHTML()}<div class="wrap">${newsHTML()}${wedHTML()}</div>`;
@@ -1024,7 +1029,7 @@ function xCard(x){
                             : `<span class="xa off">${sp?WDK[sp.dk]+"요일 휴무":""}</span>`;
   const act = (XMODE==="route"||XMODE==="plan") ? (x.cand ? put : `<span class="xas"><a class="xa soft" href="${DIR(r&&r.from||HOTEL,p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a>${out}</span>`)
             : dk ? `<span class="xas"><button class="xa soft" data-xboard="${dk}">일정</button>${out}</span>` : put;
-  return `<li class="xc${XSEL===p.id?" on":""}" data-x="${esc(p.id)}" style="--t:${tint}">
+  return `<li class="xc${XSEL===p.id?" on":""}${warn?" bad":""}" data-x="${esc(p.id)}" style="--t:${tint}">
     <button class="xb" data-open="${esc(p.id)}" aria-label="${esc(p.n)} 자세히">
       <span class="xph">${P&&P.photo?`<img src="${esc(P.photo)}" data-pid="${esc(p.id)}" alt="" loading="lazy">`:`<span class="big">${ico(kind.i)}</span>`}${S.star[p.id]?`<span class="xst">${ico("i-star")}</span>`:""}</span>
       <span class="xt"><span class="xk">${where}</span><b class="xn">${esc(p.n)}</b><span class="xm">${meta}</span>${XMODE==="route"&&r?`<span class="xh">${hopText(r,r.i===0)}${r.wait>=10?` · ${r.wait}분 여유`:""}</span>`:""}${warn}</span>
@@ -1068,6 +1073,7 @@ function renderMapView(mode){
     $("#xprev").addEventListener("click",()=>xStep(-1)); $("#xnext").addEventListener("click",()=>xStep(1));
     if(window.L){
       XMAP=L.map($("#xmap"),{zoomControl:false, attributionControl:true});
+      XMAP.on("click",()=>{ let ch=false; if(XCBIG){ XCBIG=false; xCardsMode(); ch=true; } if(XPOP){ XPOP=""; xUpdate(false); ch=true; } return ch; });
       xBase(XMAP);
       XLAY=L.layerGroup().addTo(XMAP);
       requestAnimationFrame(()=>{ if(XMAP){ XMAP.invalidateSize(); xFit(); } });
@@ -1124,19 +1130,23 @@ function xBase(map){
   }).catch(err=>{ LS.set("tokyo-gtile-err",err.message||"구글 지도 타일을 쓸 수 없어요."); LS.set("tokyo-gtile-try",String(Date.now())); });
 }
 let XL=[];
+/* 아래 카드는 평소 한 줄(번호·시각·이름), 고른 카드를 한 번 더 누르면 사진·길찾기까지 펼친다. 지도를 누르면 다시 접힌다(2026-11-14 Henry). */
+let XCBIG=false;
+function xCardsMode(){ const c=$("#xcards"), xp=$("#xp"); if(!c || !xp) return; c.classList.toggle("mini",!XCBIG); xp.style.setProperty("--xch",(c.offsetHeight+10)+"px"); }
 function xUpdate(fit){
   $("#xtop").innerHTML=mapTop();
   $$("#xtop [data-mday]").forEach(b=>b.addEventListener("click",()=>setMapDay(b.dataset.mday)));
-  $$("#xtop [data-ver]").forEach(b=>b.addEventListener("click",()=>switchVer(b.dataset.ver)));
-  $$("#xtop [data-mc]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.mc; MC=(MC===k&&k!=="")?"":k; LS.set("tokyo-lines-mc",MC); XSEL=null; render(); }));
-  $$("#xtop .chip[aria-pressed=true]").forEach(c=>{ const row=c.parentElement; row.scrollLeft=Math.max(0,c.offsetLeft-row.clientWidth/2+c.offsetWidth/2); });
+  $$("#xtop [data-ver]").forEach(b=>b.addEventListener("click",()=>{ XPOP=""; if(b.dataset.ver===S.tpl) render(); else switchVer(b.dataset.ver); }));
+  $$("#xtop [data-mc]").forEach(b=>b.addEventListener("click",()=>{ const k=b.dataset.mc; MC=(MC===k&&k!=="")?"":k; LS.set("tokyo-lines-mc",MC); XSEL=null; XPOP=""; render(); }));
+  $$("#xtop [data-xpop]").forEach(b=>b.addEventListener("click",()=>{ XPOP=XPOP===b.dataset.xpop?"":b.dataset.xpop; xUpdate(false); }));
+  $$("#xtop .xdays .chip[aria-pressed=true]").forEach(c=>{ const row=c.parentElement; row.scrollLeft=Math.max(0,c.offsetLeft-row.offsetLeft-row.clientWidth/2+c.offsetWidth/2); });
   const items=xItems(); XL=xInfo(items);
   if(XSEL && !XL.some(x=>x.p.id===XSEL)) XSEL=null;
   const nc=XL.filter(x=>x.cand).length;
   $("#xcount").textContent=XMODE==="route"?`${XL.length-nc}역${nc?` · 후보 ${nc}`:""}`:`${XL.length}곳`;
   const cards=$("#xcards");
   cards.innerHTML=XL.length ? XL.map(xCard).join("") : `<li class="xc empty"><p>${XMODE==="route"?"이날은 아직 비어 있어요.<br>목록에서 장소를 넣어 주세요.":"이 조건엔 장소가 없어요.<br>칩을 한 번 더 누르면 풀려요."}</p></li>`;
-  $("#xp").style.setProperty("--xch",(cards.offsetHeight+10)+"px");
+  xCardsMode();
   $$("[data-xput]",cards).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); mapPut(b.dataset.xput,b.dataset.day); }));
   $$("[data-xout]",cards).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); mapOut(b.dataset.xout); }));
   $$("[data-xboard]",cards).forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); setMapDay(b.dataset.xboard); }));
@@ -1831,7 +1841,8 @@ document.addEventListener("click",e=>{
   if(e.target.closest("[data-gkey]")){ askKey(); return; }
   const op=e.target.closest("[data-opt]"); if(op){ if(op.dataset.opt==="undo" && OPTRES){ S.days[OPTRES.dk]=OPTRES.prev; OPTRES=null; commit("원래 순서로 돌아갔어요"); } else { OPTRES=null; render(); } return; }
   if(e.target.closest("[data-gretry]")){ LS.del("tokyo-gerr"); autoPlaces(true); return; }
-  const xc=e.target.closest("#xcards .xc[data-x]"); if(xc && !xc.classList.contains("on")){ xSelect(xc.dataset.x,false); return; }   // 지도 카드는 처음 누르면 고르고, 한 번 더 누르면 자세히
+  const xc=e.target.closest("#xcards .xc[data-x]"); if(xc && !xc.classList.contains("on")){ xSelect(xc.dataset.x,false); return; }
+  if(xc && !XCBIG && !e.target.closest(".xa")){ XCBIG=true; xCardsMode(); return; }   // 접힌 카드는 한 번 더 누르면 펼치고, 펼친 뒤에 누르면 자세히   // 지도 카드는 처음 누르면 고르고, 한 번 더 누르면 자세히
   if(e.target.closest(".st .row") && e.target.closest("[data-open]")){ openSheet(e.target.closest("[data-open]").dataset.open); return; }
   const b=e.target.closest("[data-big]"); if(b){ const p=place(b.dataset.big); if(p && p.ja) bigJa(p); return; }
   const o=e.target.closest("[data-open]"); if(o && !e.target.closest(".tl")){ openSheet(o.dataset.open); return; }
