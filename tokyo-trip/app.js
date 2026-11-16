@@ -1042,7 +1042,7 @@ function renderMapView(mode){
   const fresh=!$("#xp");
   if(fresh){
     killXMap();
-    const fab=`<span class="xcount" id="xcount"></span><button class="fab" id="xme" aria-label="내 위치에서 가까운 순">${ico("i-locate")}</button><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button><button class="fab txt" id="xlist">목록</button>`;
+    const fab=`<span class="xcount" id="xcount"></span><button class="fab" id="xme" aria-label="내 위치에서 가까운 순">${ico("i-locate")}</button><button class="fab" id="xfit" aria-label="다 보이게">${ico("i-fit")}</button><button class="fab" id="xadd" aria-label="장소 추가">${ico("i-plus")}</button><button class="fab txt" id="xlist">목록</button>`;
     main.innerHTML=`<section class="xp" id="xp" data-mode="map">
       <div class="xtop" id="xtop"></div>
       <div id="xmap" class="xmap" role="application" aria-label="${mode==="route"?"그날 노선 지도":"장소 지도"}"></div>
@@ -1050,6 +1050,7 @@ function renderMapView(mode){
       <ul class="xcards" id="xcards"></ul>
       <button class="xnav prev" id="xprev" aria-label="이전 장소">‹</button><button class="xnav next" id="xnext" aria-label="다음 장소">›</button>
       <div class="xsheet" id="xsheet" hidden></div></section>`;
+    $("#xadd").addEventListener("click",()=>openPicker());   // 지도 화면에서 바로 장소 추가(2026-11-16, 카드를 한 줄로 줄이며 넣는 길이 안 보였다)
     $("#xlist").addEventListener("click",()=>{ XSHEET=!XSHEET; renderPanel(); if(XMAP) setTimeout(()=>{ XMAP.invalidateSize(); if(XSEL) xSelect(XSEL,false,false); },60); });
     $$("button[data-pm]",main).forEach(b=>b.addEventListener("click",()=>setPM(b.dataset.pm)));
     $("#xfit").addEventListener("click",()=>xFit());
