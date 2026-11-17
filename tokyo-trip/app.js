@@ -626,7 +626,51 @@ function lcdHTML(){
    여행 중엔 오늘, 여행 전엔 위 날짜 칩으로 아무 날이나(tokyo-brief). 여행 중 오늘이면 맨 위에 지금/다음(LCD). */
 const SUBTIX={h24:1000, h48:1500, h72:2000};   // TRANSIT[1] 도쿄메트로 공식(도쿄 서브웨이 티켓)
 const SUBLINE=/東京メトロ|都営|銀座線|丸ノ内線|日比谷線|東西線|千代田線|有楽町線|半蔵門線|南北線|副都心線|浅草線|三田線|新宿線|大江戸線/;
-function briefDay(){ const N=tripNow(); if(N.phase==="during" && EDIT.includes(N.dk)) return N.dk; const b=LS.get("tokyo-brief","thu"); return EDIT.includes(b)?b:"thu"; }
+function briefDay(){ const N=tripNow(); if(N.phase==="during" && (EDIT.includes(N.dk)||N.dk==="wed")) return N.dk; const b=LS.get("tokyo-brief","thu"); return EDIT.includes(b)||b==="wed"?b:"thu"; }
+// 수요일 도착 · 일요일 출국 안내(2026-11-17 Henry: "수요일 어떻게 갈지 안내사항이 없어") — 내용은 data.js(DAYS 수요일·AIRPORTS·ARRIVE·HOTEL·CHECKS)에 있는 것만
+function briefChips(dk){ return `<div class="chips bchips">${["wed",...EDIT].map(k=>`<button class="chip line" data-brief="${k}" aria-pressed="${k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}</div>`; }
+function routeCard(r){ return `<div class="tc${r.best?" best":""}"><p class="th">${esc(r.n)}${r.best?" · 추천":""}</p><p><b>${esc(r.d||"")}</b>${r.fare?` · ${esc(r.fare)}`:""}</p><p>${esc(r.note)}</p>${r.steps?`<ol class="tsteps">${r.steps.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:""}${r.url?`<p><a class="lk" href="${esc(r.url)}" target="_blank" rel="noopener">${ico("i-train")}${esc(r.urln||"공식 사이트")}</a></p>`:""}${r.src?`<p class="src" style="margin:4px 0 0">${esc(r.src)}</p>`:""}</div>`; }
+const airDir=(from,to)=>`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(from)}&destination=${encodeURIComponent(to)}&travelmode=transit`;
+function renderArrive(){
+  const N=tripNow(), dd=dday(), ai=LS.get("tokyo-air-in","nrt"), A=AIRPORTS[ai]||AIRPORTS.nrt, R=A.routes.find(x=>x.best)||A.routes[0];
+  if(typeof applyArrival==="function") applyArrival(ai);
+  const d=DAY.wed, W=wxDays().find(x=>x.k==="wed"), hc=(typeof PREP!=="undefined"?PREP:[]).find(c=>c.id==="hotel");
+  main.innerHTML=`<div class="wrap">${newsHTML()}
+    <section class="hero bh0"><p class="hero-date num">${N.phase==="before"?`D-${dd}`:N.phase==="during"?"1일차":"11.18—22"}</p>
+      <h1 class="hero-t">수요일 ${d.dt} ${N.phase==="during"&&N.dk==="wed"?"오늘":"도착"}</h1>
+      <p class="hero-s">${esc(d.summary)}</p></section>
+    ${N.phase==="during"?"":briefChips("wed")}
+    <section class="bcard"><h2>${ico("i-lock")}오늘 순서</h2>
+      <ul class="bl">${d.stops.map(x=>`<li><span>${esc(x.n)}${x.note?` <em>${esc(x.note)}</em>`:""}</span><b>${esc(x.t)}</b></li>`).join("")}</ul></section>
+    <section class="bcard"><h2>${ico("i-train")}${esc(A.n)} → 숙소</h2>
+      ${routeCard(R)}
+      <p class="warnline">${ico("i-check")}${esc(A.last)}</p>
+      <div class="acts"><a class="btn go" href="${airDir(A.q,HOTEL.q||HOTEL.addr)}" target="_blank" rel="noopener">${ico("i-route")}${esc(A.n)} → 숙소 길찾기</a></div>
+      <p class="src">다른 방법(${A.routes.filter(x=>x!==R).map(x=>esc(x.n)).join(", ")})과 도착 공항 바꾸기는 <a href="#" data-go="tools" data-open="air">도구 &gt; 공항</a>.</p></section>
+    <section class="bcard"><h2>${ico("i-pin")}숙소</h2>
+      <p><b>${esc(HOTEL.n)}</b><br><span lang="ja">${esc(HOTEL.addr)}</span><br>가장 가까운 역 ${esc(HOTEL.stn)}</p>
+      ${hc?`<p>${esc(hc.d)}</p>`:""}
+      <div class="acts"><button class="btn" data-bighotel>${ico("i-zoom")}주소 크게 보기</button></div></section>
+    <section class="bcard"><h2>${ico("i-sun")}날씨·옷차림</h2><p>${clothes(W&&W.f)}</p></section>
+    ${N.phase==="before"?`<section class="bcard"><h2>${ico("i-check")}출발 전 할 일</h2><ul class="bl">${checksNow().filter(c=>!CHECKED[c.id]).map(c=>`<li><span>${esc(c.t)} <em>${esc(c.d)}</em></span><b>예약 전</b></li>`).join("")||`<li><span>예약 모두 끝</span><b>✓</b></li>`}
+      ${LS.get("tokyo-pre-at","")?"":`<li><span>오프라인 준비(지도·사진 미리 받기)</span><b>전</b></li>`}</ul><p class="src"><a href="#" data-go="tools" data-open="resv">도구 &gt; 예약 체크</a></p></section>`:""}
+    <p class="src" style="margin:22px 0 20px">예산·교통·공항·날씨 전체는 도구에 있어요.</p></div>`;
+  $$("[data-brief]").forEach(b=>b.addEventListener("click",()=>{ LS.set("tokyo-brief",b.dataset.brief); render(); window.scrollTo({top:0}); }));
+  wxFetch();
+}
+function leaveHTML(sc){
+  const ao=airOut(), A=AIRPORTS[ao]||AIRPORTS.nrt, R=A.routes.find(x=>x.best)||A.routes[0], ft=LS.get("tokyo-flight","18:00")||"18:00", lv=sunLeaveMin();
+  const back=sc.rows.length?sc.home:null, slack=back!=null?lv-back:null;
+  const ret=(R.steps||[]).filter(x=>/돌아오는|일요일/.test(x));
+  return `<section class="bcard"><h2>${ico("i-move")}출국 · ${esc(A.n)}</h2>
+    <ul class="bl">${back!=null?`<li><span>숙소 도착 · 짐 찾기</span><b>${fmt(back)}</b></li>`:""}
+      <li${slack!=null&&slack<0?' class="bad"':""}><span>숙소에서 공항으로${slack!=null?` <em>${slack>=0?`${slack}분 여유`:`${-slack}분 늦어요 — 일정에서 역을 빼 주세요`}</em>`:""}</span><b>${fmt(lv)}</b></li>
+      <li><span>비행기 출발</span><b>${esc(ft)}</b></li></ul>
+    <p>${esc(R.n)} · ${esc(R.d||"")}${R.fare?` · ${esc(R.fare)}`:""}</p>
+    ${ret.length?`<ol class="tsteps">${ret.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>`:""}
+    <div class="acts"><a class="btn go" href="${airDir(HOTEL.q||HOTEL.addr,A.q)}" target="_blank" rel="noopener">${ico("i-route")}숙소 → ${esc(A.n)} 길찾기</a></div>
+    <p class="src">숙소 → 공항 이동 분은 추정이에요. 비행기 시각·여유는 <a href="#" data-go="tools" data-open="air">도구 &gt; 공항</a>에서 바꿔요.</p></section>`;
+}
 function briefLegs(dk){
   const sc=schedule(dk), out=[];
   sc.rows.forEach(r=>{ if(r.tr.mode==="train" && r.tr.d>1.6) out.push({a:r.from||HOTEL, b:r.p, tr:r.tr, an:r.i?r.from.n:"숙소", bn:r.p.n}); });
@@ -649,6 +693,7 @@ function clothes(f){
   return `${esc(WMO(f.c))} ${Math.round(f.hi)}°/${Math.round(f.lo)}° · ${t}${f.rain>=50?` · 비 ${f.rain}% — 우산 챙기기`:""}`;
 }
 function renderHome(){
+  if(briefDay()==="wed") return renderArrive();
   const dd=dday(), N=tripNow(), dk=briefDay(), sc=schedule(dk), today=N.phase==="during" && N.dk===dk;
   const rows=sc.rows, V=spendGet(), W=wxDays().find(x=>x.k===dk), T=dayTrains(dk);
   // 돈: 이 날 역의 예약 결제(이미 냄) / 현장에서 낼 입장료·식사(출처 있는 fee) / 값 모름 / 현금
@@ -669,7 +714,7 @@ function renderHome(){
     <section class="hero bh0"><p class="hero-date num">${N.phase==="before"?`D-${dd}`:N.phase==="during"?`${DAYKEYS.indexOf(N.dk)+1}일차`:"11.18—22"}</p>
       <h1 class="hero-t">${WDK[dk]}요일 ${DAY[dk].dt} ${today?"오늘":"브리핑"}</h1>
       <p class="hero-s">${esc(REGION[dk].n)} · ${esc(REGION[dk].sub)}${rows.length?` · ${rows.length}역 ${fmt(sc.depart)}–${fmt(sc.home)}`:""}</p></section>
-    ${N.phase==="during"?"":`<div class="chips bchips">${EDIT.map(k=>`<button class="chip line" data-brief="${k}" aria-pressed="${k===dk}" style="--c:${LINE[k].c}">${lsym(k,"sm")}${WDK[k]} ${DAY[k].dt.split(".")[1]}</button>`).join("")}</div>`}
+    ${N.phase==="during"?"":briefChips(dk)}
     ${today?lcdHTML():""}
     <section class="bcard"><h2>${ico("i-tool")}오늘의 돈</h2>
       <div class="bm"><div><span>이미 낸 돈</span><b>${yen(paid.reduce((a,x)=>a+x.amt,0))}</b><small>예약 결제 ${paid.length}곳</small></div>
@@ -690,6 +735,7 @@ function renderHome(){
         ${rows.length?`<li><span>숙소 도착</span><b>${fmt(sc.home)}</b></li>`:""}</ul></section>
     <section class="bcard"><h2>${ico("i-sun")}날씨·옷차림</h2>
       <p>${clothes(W&&W.f)}</p>${rainHTML(dk)?`<p class="warnline">${ico("i-rain")}비 대안이 있어요 · <a href="#" data-go="board" data-day="${dk}">일정에서 보기</a></p>`:""}</section>
+    ${dk==="sun"?leaveHTML(sc):""}
     ${N.phase==="before"?`<section class="bcard"><h2>${ico("i-check")}출발 전 할 일</h2><ul class="bl">${checksNow().filter(c=>!CHECKED[c.id]).map(c=>`<li><span>${esc(c.t)} <em>${esc(c.d)}</em></span><b>예약 전</b></li>`).join("")||`<li><span>예약 모두 끝</span><b>✓</b></li>`}
       ${LS.get("tokyo-pre-at","")?"":`<li><span>오프라인 준비(지도·사진 미리 받기)</span><b>전</b></li>`}</ul><p class="src"><a href="#" data-go="tools" data-open="resv">도구 &gt; 예약 체크</a></p></section>`:""}
     <p class="src" style="margin:22px 0 20px">예산·교통·공항·날씨 전체는 도구에 있어요.</p>
@@ -1856,6 +1902,7 @@ document.addEventListener("click",e=>{
   const xc=e.target.closest("#xcards .xc[data-x]"); if(xc && !xc.classList.contains("on")){ xSelect(xc.dataset.x,false); return; }
   if(xc && !XCBIG && !e.target.closest(".xa")){ XCBIG=true; xCardsMode(); return; }   // 접힌 카드는 한 번 더 누르면 펼치고, 펼친 뒤에 누르면 자세히   // 지도 카드는 처음 누르면 고르고, 한 번 더 누르면 자세히
   if(e.target.closest(".st .row") && e.target.closest("[data-open]")){ openSheet(e.target.closest("[data-open]").dataset.open); return; }
+  if(e.target.closest("[data-bighotel]")){ bigJa(HOTEL); return; }
   const b=e.target.closest("[data-big]"); if(b){ const p=place(b.dataset.big); if(p && p.ja) bigJa(p); return; }
   const o=e.target.closest("[data-open]"); if(o && !e.target.closest(".tl")){ openSheet(o.dataset.open); return; }
 });
