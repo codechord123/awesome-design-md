@@ -43,10 +43,13 @@ const WDK={wed:"수",thu:"목",fri:"금",sat:"토",sun:"일"};
 // 일요일: 나리타 18:00편 기준으로 긴자를 떠날 시각(숙소에서 짐 찾기 포함, 이동 시간은 추정). 이전 화면의 계산과 같다.
 // 일요일 나리타 출발 18:50(2026-11-17 Henry: "6시 50분일걸?" — 예전엔 18:00). 예전 기본값 18:00이 저장된 기기는 한 번 18:50으로
 const FLIGHT="18:50";
+// 공항 도착은 항상 3시간 전(2026-11-17 Henry). 기기에 저장된 여유는 한 번 3시간으로, 그 뒤 도구에서 바꾸면 그대로
+const BUFFER="180";
+if(!LS.get("tokyo-buffer-m1","")){ LS.set("tokyo-buffer",BUFFER); LS.set("tokyo-buffer-m1","1"); }
 if(LS.get("tokyo-flight","")==="18:00" && !LS.get("tokyo-flight-m1","")){ LS.set("tokyo-flight",FLIGHT); LS.set("tokyo-flight-m1","1"); }
 // 일요일: 숙소에서 공항으로 떠날 시각 = 비행기 − 공항 여유 − 이동 − 15분(도구 > 공항에서 바꿈, 이전 화면과 같은 저장 키)
 function airOut(){ const a=LS.get("tokyo-air",LS.get("tokyo-air-in","nrt")); return AIRPORTS[a]?a:"nrt"; }
-function sunLeaveMin(){ const ap=airOut(), ft=LS.get("tokyo-flight",FLIGHT)||FLIGHT, buf=+LS.get("tokyo-buffer","150")||150, mv=+LS.get("tokyo-move",String(AIRPORTS[ap].mins))||AIRPORTS[ap].mins;
+function sunLeaveMin(){ const ap=airOut(), ft=LS.get("tokyo-flight",FLIGHT)||FLIGHT, buf=+LS.get("tokyo-buffer",BUFFER)||+BUFFER, mv=+LS.get("tokyo-move",String(AIRPORTS[ap].mins))||AIRPORTS[ap].mins;
   return toMin(ft)-buf-mv-15; }
 
 /* ─────────────── 장소 목록(블록) ───────────────
@@ -1633,7 +1636,7 @@ function infoTransit(){
     ${TRANSIT.map(card).join("")}`;
 }
 function infoAir(){
-  const ai=LS.get("tokyo-air-in","nrt"), A=AIRPORTS[ai]||AIRPORTS.nrt, ao=airOut(), ft=LS.get("tokyo-flight",FLIGHT), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ao].mins));
+  const ai=LS.get("tokyo-air-in","nrt"), A=AIRPORTS[ai]||AIRPORTS.nrt, ao=airOut(), ft=LS.get("tokyo-flight",FLIGHT), buf=LS.get("tokyo-buffer",BUFFER), mv=LS.get("tokyo-move",String(AIRPORTS[ao].mins));
   const sc=schedule("sun"), lv=sunLeaveMin(), back=sc.rows.length?sc.home:null, slack=back!=null?lv-back:null;
   const opt=(v,cur)=>Object.entries(AIRPORTS).map(([k,x])=>`<option value="${k}"${k===cur?" selected":""}>${x.n}</option>`).join("");
   return `<p class="th">수요일 도착 · 공항에서 숙소까지</p>

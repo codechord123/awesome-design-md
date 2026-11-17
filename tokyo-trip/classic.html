@@ -1764,7 +1764,7 @@ function wireArrival(){
 }
 
 function sundayHTML(){
-  const ap=LS.get("tokyo-air", LS.get("tokyo-air-in","nrt")), ft=LS.get("tokyo-flight","18:50"), buf=LS.get("tokyo-buffer","150"), mv=LS.get("tokyo-move",String(AIRPORTS[ap].mins));
+  const ap=LS.get("tokyo-air", LS.get("tokyo-air-in","nrt")), ft=LS.get("tokyo-flight","18:50"), buf=LS.get("tokyo-buffer","180"), mv=LS.get("tokyo-move",String(AIRPORTS[ap].mins));
   return `<section class="block" aria-labelledby="fly-h">
     <h2 id="fly-h">긴자에서 언제 나설까</h2>
     <p class="sub">비행기 시간을 넣으면 거꾸로 계산합니다. 이동 시간은 추정값이니 출발 전에 실제 경로로 한 번 확인하세요.</p>
