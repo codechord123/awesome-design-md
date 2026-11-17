@@ -906,7 +906,10 @@ const picker=$("#picker");
 function openPicker(){
   if(CUR==="wed") return;
   const draw=()=>{ picker.innerHTML=`<div class="sh-top"><span class="lsym sm" style="--c:${LINE[CUR].c}">${LINE[CUR].code}</span><b tabindex="-1" autofocus>${WDK[CUR]}요일에 넣기</b>
-      <button class="x" data-close aria-label="닫기">${ico("i-x")}</button></div><div class="sh-body">${pickerBody()}</div>`;
+      <button class="x" data-close aria-label="닫기">${ico("i-x")}</button></div><div class="sh-body">
+      <form class="search" id="psearch" style="margin:0 0 6px"><label class="sr" for="pq">새 장소 찾기</label><input id="pq" name="q" type="search" placeholder="${LS.get("tokyo-gkey","")?"새 장소 찾기 (구글)":"새 장소 이름"}" autocomplete="off"><button class="btn ink" type="submit">찾기</button></form><ul class="res" id="pres" hidden></ul>
+      ${pickerBody()}</div>`;
+    $("#psearch",picker).addEventListener("submit",onPickSearch);
     $$("[data-df]",picker).forEach(b=>b.addEventListener("click",()=>{ DF=b.dataset.df; LS.set("tokyo-lines-df",DF); draw(); })); };
   draw(); if(!picker.open) picker.showModal();
   picker._redraw=draw;
@@ -1220,7 +1223,16 @@ function tileHTML(p,placed){
 }
 async function onSearch(e){
   e.preventDefault(); const q=e.target.elements.q.value.trim(); if(!q) return;
-  const key=LS.get("tokyo-gkey",""), res=$("#res");
+  gFind(q, $("#res"), (id,x)=>{ S.added[id]=Object.assign({id, q:x.n, note:x.addr, dig:"직접 추가"}, x); S.star[id]=true; commit(`${x.n} — 보관함에 담고 찜했어요`); });
+}
+// "+" 시트의 새 장소 찾기(2026-11-17 Henry: "새 장소 추가하기") — 찾은 곳을 보관함에 담고 지금 날의 가장 덜 돌아가는 자리에 넣는다
+async function onPickSearch(e){
+  e.preventDefault(); const q=e.target.elements.q.value.trim(); if(!q) return;
+  gFind(q, $("#pres",picker), (id,x)=>{ S.added[id]=Object.assign({id, q:x.n, note:x.addr, dig:"직접 추가"}, x); S.star[id]=true;
+    if(x.lat && EDIT.includes(CUR)){ picker.close(); moveTo(id,CUR); } else commit(`${x.n} — 보관함에 담고 찜했어요`); }, "넣기");
+}
+async function gFind(q,res,pick,label="담기"){
+  const key=LS.get("tokyo-gkey","");
   if(!key){ const id="u:"+q; S.added[id]={id, n:q, q, kc:"view", k:"직접 추가", note:"", dig:"직접 추가"}; S.star[id]=true; commit(`${q} — 담았어요(지도 핀 없음)`); return; }
   res.hidden=false; res.innerHTML=`<li class="src">찾는 중…</li>`;
   try{
@@ -1231,9 +1243,8 @@ async function onSearch(e){
       kc:/book/.test(x.primaryType||"")?"book":/cafe|coffee|bakery|restaurant|food|sushi|ramen/.test(x.primaryType||"")?"food":/bar|night_club|pub|wine/.test(x.primaryType||"")?"bar":/museum|gallery/.test(x.primaryType||"")?"art":/park|garden/.test(x.primaryType||"")?"leaf":"view",
       k:(x.primaryTypeDisplayName&&x.primaryTypeDisplayName.text)||"장소"}));
     if(!list.length){ res.innerHTML=`<li class="src">못 찾았어요. 일본어 이름으로도 찾아보세요.</li>`; return; }
-    res.innerHTML=list.map((x,i)=>`<li class="blk mini"><div class="card" style="cursor:default"><span class="picto">${ico((KIND[x.kc]||KIND.view).i)}</span><div style="min-width:0"><p class="nm">${esc(x.n)}</p><p class="sub">${esc(x.addr)}</p></div><span></span><button class="add" data-res="${i}" aria-label="${esc(x.n)} 담기">${ico("i-plus")}</button></div></li>`).join("");
-    $$("[data-res]",res).forEach(b=>b.addEventListener("click",()=>{ const x=list[+b.dataset.res], id="g:"+x.gid;
-      S.added[id]=Object.assign({id, q:x.n, note:x.addr, dig:"직접 추가"}, x); S.star[id]=true; commit(`${x.n} — 보관함에 담고 찜했어요`); }));
+    res.innerHTML=list.map((x,i)=>`<li class="pk"><span class="pi">${ico((KIND[x.kc]||KIND.view).i)}</span><span class="pb" style="cursor:default"><span class="n">${esc(x.n)}</span><span class="m">${esc(x.k)} · ${esc(x.addr)}</span></span><button class="add" data-res="${i}" aria-label="${esc(x.n)} ${label}">${label}</button></li>`).join("");
+    $$("[data-res]",res).forEach(b=>b.addEventListener("click",()=>{ const x=list[+b.dataset.res]; pick("g:"+x.gid, x); }));
   }catch(err){ res.innerHTML=`<li class="src">${esc(err.message||"검색이 안 돼요")}</li>`; }
 }
 
