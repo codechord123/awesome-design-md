@@ -474,6 +474,9 @@ function toastUndo(msg,fn,act){ const el=$("#toast"); el.innerHTML=`<span>${esc(
   const close=()=>{ clearTimeout(el._t); el.classList.remove("on","act"); };
   el.querySelector(".tu").onclick=()=>{ close(); fn(); }; if(act) el.querySelector(".tu2").onclick=()=>{ close(); act.fn(); };
   el._t=setTimeout(()=>el.classList.remove("on","act"),act?8000:5000); }
+// 시각 고정 풀기(2026-11-18 Henry: "시간고정 풀 수 있게 해줘") — 지도 목록 줄·펼친 카드에서 바로, 되돌리기 토스트
+function unpin(id){ const p=place(id); if(!p || !S.pins[id]) return; const snap=daySnap(); delete S.pins[id]; commit();
+  toastUndo(`${p.n} — 고정을 풀었어요`,()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); }); }
 function daySnap(){ return {days:JSON.parse(JSON.stringify(S.days)), pins:Object.assign({},S.pins)}; }
 function mapPut(id,dk){ const p=place(id); if(!p) return; const snap=daySnap(); XSEL=id; const f=placeInto(id,dk,true); commit();
   toastUndo(placeMsg(p,dk,f),()=>{ S.days=snap.days; S.pins=snap.pins; commit("되돌렸어요"); }); }
@@ -875,9 +878,9 @@ const rowWarn=r=>r.warn.length?`<small class="${r.warn.some(w=>w.lv==="bad")?"ba
 function routeSideHTML(){
   const dk=CUR, sc=schedule(dk), n=sc.rows.length, N=tripNow();
   const rows=sc.rows.map(r=>`<li class="rs${XSEL===r.id?" on":""}" data-id="${esc(r.id)}"><span class="h" aria-label="끌어서 순서 바꾸기">⠿</span>${sta(dk,r.i,"sm")}
-    <button class="rb" data-xsel="${esc(r.id)}"><b>${esc(r.p.n)}</b><small>${fmt(r.start)}–${fmt(r.end)} · ${r.dur}분${r.pin?` · 고정 ${esc(r.pin)}`:""}</small>
+    <button class="rb" data-xsel="${esc(r.id)}"><b>${esc(r.p.n)}</b><small>${fmt(r.start)}–${fmt(r.end)} · ${r.dur}분</small>
       <span class="mv2"${legAttr(r.from||HOTEL,r.p,r.tr)}>${legText(r.from||HOTEL,r.p,r.tr,r.i===0)}</span>${rowWarn(r)}</button>
-    <span class="rbtn">${goLink(r.from||HOTEL,r.p,r.tr)}<button class="rx" data-xout="${esc(r.id)}" aria-label="${esc(r.p.n)} 빼기">${ico("i-x")}</button></span></li>`).join("");
+    <span class="rbtn">${r.pin?`<button class="rpin" data-unpin="${esc(r.id)}" aria-label="${esc(r.pin)} 고정 풀기" title="고정 풀기">${ico("i-lock","ki mi")}${esc(r.pin)}</button>`:""}${goLink(r.from||HOTEL,r.p,r.tr)}<button class="rx" data-xout="${esc(r.id)}" aria-label="${esc(r.p.n)} 빼기">${ico("i-x")}</button></span></li>`).join("");
   const C=planCands().map(p=>({p, f:Object.assign({dk}, fit(p,dk))})).sort((a,b)=>(a.f.off-b.f.off)||(a.f.cost-b.f.cost)).slice(0,25);
   const cands=C.map(({p,f})=>`<li class="rs cand${XSEL===p.id?" on":""}" data-id="${esc(p.id)}"><span class="h" aria-label="노선으로 끌기">⠿</span><span class="pi" style="--k:${kcol(p)}">${ico((KIND[p.kc]||KIND.view).i)}</span>
       <button class="rb" data-xsel="${esc(p.id)}"><b>${S.star[p.id]?"★ ":""}${esc(p.n)}</b><small>${esc(p.k||(KIND[p.kc]||KIND.view).n)}${addTxt(f)?` · ${esc(addTxt(f))}`:""}</small></button>
@@ -1082,7 +1085,7 @@ function xCard(x){
   const out=`<button class="xa soft" data-xout="${esc(p.id)}" aria-label="${esc(p.n)} 빼기">빼기</button>`;
   const put = sp && !sp.off ? `<button class="xa" data-xput="${esc(p.id)}" data-day="${sp.dk}">${lsym(sp.dk,"sm")}${WDK[sp.dk]}에 넣기${sp.add!=null||sp.tight?` <small>${esc(addTxt(sp))}</small>`:""}</button>`
                             : `<span class="xa off">${sp?WDK[sp.dk]+"요일 휴무":""}</span>`;
-  const act = (XMODE==="route"||XMODE==="plan") ? (x.cand ? put : `<span class="xas"><a class="xa soft" href="${DIR(r&&r.from||HOTEL,p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a>${out}</span>`)
+  const act = (XMODE==="route"||XMODE==="plan") ? (x.cand ? put : `<span class="xas"><a class="xa soft" href="${DIR(r&&r.from||HOTEL,p)}" target="_blank" rel="noopener">${ico("i-route")}길찾기</a>${S.pins[p.id]?`<button class="xa soft" data-unpin="${esc(p.id)}">${ico("i-lock")}${esc(S.pins[p.id])} 풀기</button>`:""}${out}</span>`)
             : dk ? `<span class="xas"><button class="xa soft" data-xboard="${dk}">일정</button>${out}</span>` : put;
   return `<li class="xc${XSEL===p.id?" on":""}${warn?" bad":""}" data-x="${esc(p.id)}" style="--t:${tint}">
     <button class="xb" data-open="${esc(p.id)}" aria-label="${esc(p.n)} 자세히">
@@ -1899,6 +1902,7 @@ function icsText(){
 
 /* ─────────────── 공통 이벤트 ─────────────── */
 document.addEventListener("click",e=>{
+  const up=e.target.closest("[data-unpin]"); if(up){ e.preventDefault(); e.stopPropagation(); unpin(up.dataset.unpin); return; }
   const g=e.target.closest("[data-go]"); if(g && !e.target.closest(".drop")){ e.preventDefault(); if(g.dataset.open){ TOOLS_OPEN=g.dataset.open; LS.set("tokyo-lines-open",TOOLS_OPEN); } go(g.dataset.go, g.dataset.day); return; }
   const a=e.target.closest("[data-add]"); if(a){ e.stopPropagation(); moveTo(a.dataset.add, CUR==="wed"?"thu":CUR); return; }
   const nw=e.target.closest("[data-news]"); if(nw){ newsAct(nw.dataset.news); return; }

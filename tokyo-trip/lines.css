@@ -541,6 +541,8 @@ body.withside .xp{right:380px}
 .rs .rx:hover{background:var(--red);color:#fff}
 /* 전철 구간 길찾기(2026-11-01): 빼기 단추 옆 둥근 아이콘, 글자 링크는 이동 줄 끝에 */
 .rs .rbtn{display:flex;align-items:center;gap:6px}
+.rs .rpin{border:0;background:var(--soft);color:var(--ink);border-radius:999px;height:34px;padding:0 10px 0 8px;display:inline-flex;align-items:center;gap:3px;font:700 13px/1 var(--num,inherit);cursor:pointer;white-space:nowrap}
+.rs .rpin .ki{width:13px;height:13px}
 .rs .rgo{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;background:var(--soft);color:var(--ink)}
 .rs .rgo .ki{width:16px;height:16px}
 .lgo{display:inline-flex;align-items:center;gap:3px;margin-left:6px;font-weight:800}
