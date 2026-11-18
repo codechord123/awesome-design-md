@@ -659,7 +659,7 @@ function renderArrive(){
     <section class="bcard"><h2>${ico("i-pin")}숙소</h2>
       <p><b>${esc(HOTEL.n)}</b><br><span lang="ja">${esc(HOTEL.addr)}</span><br>가장 가까운 역 ${esc(HOTEL.stn)}</p>
       ${hc?`<p>${esc(hc.d)}</p>`:""}
-      <div class="acts"><button class="btn" data-bighotel>${ico("i-zoom")}주소 크게 보기</button></div></section>
+      <div class="acts"><button class="btn" data-bighotel>${ico("i-zoom")}주소 크게 보기</button><a class="btn" href="${MAPS(HOTEL.q,HOTEL.gid)}" target="_blank" rel="noopener">${ico("i-map")}구글 지도</a></div></section>
     <section class="bcard"><h2>${ico("i-sun")}날씨·옷차림</h2><p>${clothes(W&&W.f)}</p></section>
     ${N.phase==="before"?`<section class="bcard"><h2>${ico("i-check")}출발 전 할 일</h2><ul class="bl">${checksNow().filter(c=>!CHECKED[c.id]).map(c=>`<li><span>${esc(c.t)} <em>${esc(c.d)}</em></span><b>예약 전</b></li>`).join("")||`<li><span>예약 모두 끝</span><b>✓</b></li>`}
       ${LS.get("tokyo-pre-at","")?"":`<li><span>오프라인 준비(지도·사진 미리 받기)</span><b>전</b></li>`}</ul><p class="src"><a href="#" data-go="tools" data-open="resv">도구 &gt; 예약 체크</a></p></section>`:""}
@@ -891,7 +891,7 @@ function routeSideHTML(){
     <div class="rtools"><label class="dep2">숙소 출발 <input type="time" id="depart2" value="${hhmm(fmt(sc.depart))}"></label>${n?`<button class="lk" id="optbtn2">${ico("i-route")}동선 최적화</button>`:""}<button class="lk" id="addst2">${ico("i-plus")}장소 추가</button></div>
     ${rainHTML(dk)}
     <ol class="rsl" id="rsl">${rows||`<li class="src empty">비어 있어요. 아래 후보를 끌어 오거나 넣어 보세요.</li>`}</ol>
-    ${last?`<p class="rsend"><span class="mv2"${legAttr(last.p,HOTEL,sc.back)}>${legText(last.p,HOTEL,sc.back,false)}${goLink(last.p,HOTEL,sc.back,true)}</span><b>${fmt(sc.home)} 숙소 도착</b></p>`:""}
+    ${last?`<p class="rsend"><span class="mv2"${legAttr(last.p,HOTEL,sc.back)}>${legText(last.p,HOTEL,sc.back,false)}${goLink(last.p,HOTEL,sc.back,true)}</span><button class="lk rhotel" data-hotelinfo><b>${fmt(sc.home)} 숙소 도착</b></button></p>`:""}
     ${XCF?`<div class="side-h sub"><b>${esc(cn)}</b><span>⠿ 노선으로 끌거나 넣기</span></div><ul class="rsl" id="rcand">${cands||`<li class="src empty">남은 곳이 없어요.</li>`}</ul>`:""}`;
 }
 function overviewHTML(){
@@ -1218,7 +1218,7 @@ function xUpdate(fit){
     L.polyline(pts,{color:"#101010", weight:one?12:10, opacity:.16, interactive:false}).addTo(XLAY);
     L.polyline(pts,{color:"#fff", weight:one?10:8, opacity:.95, interactive:false}).addTo(XLAY);
     L.polyline(pts,{color:LINE[dk].hex, weight:one?6:5, opacity:1, interactive:false}).addTo(XLAY); });
-  L.marker([HOTEL.lat,HOTEL.lng],{icon:L.divIcon({className:"xpw",html:`<span class="xhub" title="숙소"></span>`,iconSize:[24,24],iconAnchor:[12,12]}),keyboard:false}).addTo(XLAY);
+  L.marker([HOTEL.lat,HOTEL.lng],{icon:L.divIcon({className:"xpw",html:`<span class="xhub" title="숙소"></span>`,iconSize:[24,24],iconAnchor:[12,12]}),title:"숙소",alt:"숙소",zIndexOffset:500}).on("click",openHotel).addTo(XLAY);
   XL.forEach(x=>{ const m=L.marker([x.p.lat,x.p.lng],{icon:xPin(x,XSEL===x.p.id), title:x.p.n, riseOnHover:true}).addTo(XLAY);
     m.on("click",()=>xSelect(x.p.id,true)); XMK.set(x.p.id,{m,x}); });
   if(XME) xMeMarker();
@@ -1305,6 +1305,26 @@ async function gFind(q,res,pick,label="담기"){
 
 /* ── 상세 시트 ── */
 const sheet=$("#sheet");
+// 숙소 시트(2026-11-18 Henry: "숙소도 클릭해서 볼 수 있게, 구글 지도 바로 연동") — 지도 숙소 핀·목록의 숙소 도착·도구·수요일 브리핑에서
+const hotelDir=()=>"https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(HOTEL.q)+(HOTEL.gid?"&destination_place_id="+encodeURIComponent(HOTEL.gid):"")+"&travelmode=transit"+HL;
+function openHotel(){
+  const hc=(typeof PREP!=="undefined"?PREP:[]).find(c=>c.id==="hotel");
+  sheet.innerHTML=`<div class="sh-top"><span class="picto">${ico("i-hotel")}</span><span class="num" style="font-weight:700;color:var(--sub)">숙소 · ${esc(HOTEL.stn)}역 1분</span>
+      <button class="x" data-close aria-label="닫기">${ico("i-x")}</button></div>
+    <div class="sh-body">
+      <h2 id="sh-title" tabindex="-1" autofocus>${esc(HOTEL.n)}</h2>
+      <button class="jp" data-bighotel><u lang="ja">${esc(HOTEL.ja)}</u> · 크게 보기</button>
+      <div class="facts">
+        <div class="fact"><b>Address</b><span lang="ja">${esc(HOTEL.addr)}</span></div>
+        <div class="fact"><b>Stay</b>체크인 ${esc(HOTEL.checkin)} · 체크아웃 ${esc(HOTEL.checkout)}</div>
+        ${hc?`<div class="fact"><b>Bring</b>${esc(hc.d)}</div>`:""}
+      </div>
+      <div class="acts" style="margin-top:16px"><a class="btn ink" href="${MAPS(HOTEL.q,HOTEL.gid)}" target="_blank" rel="noopener">${ico("i-map")}구글 지도</a>
+        <a class="btn" href="${hotelDir()}" target="_blank" rel="noopener">${ico("i-route")}지금 여기서 숙소로</a></div>
+      ${HOTEL.src?`<p class="src">출처: <a href="${esc(HOTEL.src)}" target="_blank" rel="noopener">${esc(HOTEL.srcn||"링크")}</a></p>`:""}
+    </div>`;
+  if(!sheet.open) sheet.showModal();
+}
 function openSheet(id){
   const p=place(id); if(!p) return;
   const dk=dayOf(id), P=placeOf(p), H=hoursOf(p);
@@ -1829,7 +1849,7 @@ function renderTools(keep){
         PHRASES.map((x,i)=>`<div class="phr"><button data-phr="${i}"><b>${esc(x.ko)}</b><span lang="ja">${esc(x.ja)}</span></button>${canSpeak()?`<button class="say" data-say="${i}" aria-label="일본어로 듣기">${ico("i-sound")}</button>`:"<span></span>"}</div>`).join(""))}
       ${tl("hotel","i-hotel","숙소",HOTEL.stn,
         `<p><b style="color:var(--ink);font-size:17px">${esc(HOTEL.n)}</b><br><span lang="ja">${esc(HOTEL.ja)}</span><br><span lang="ja">${esc(HOTEL.addr)}</span></p><p>체크인 ${HOTEL.checkin} · 체크아웃 ${HOTEL.checkout} · 赤坂見附역 1분</p>
-         <div class="acts"><button class="btn ink" data-hotel>${ico("i-zoom")}주소 크게 보기</button><a class="btn" href="${MAPS(HOTEL.q)}" target="_blank" rel="noopener">${ico("i-map")}지도</a></div>`)}
+         <div class="acts"><button class="btn ink" data-hotel>${ico("i-zoom")}주소 크게 보기</button><a class="btn" href="${MAPS(HOTEL.q,HOTEL.gid)}" target="_blank" rel="noopener">${ico("i-map")}구글 지도</a></div>`)}
       ${tl("sos","i-help","긴급 연락처","",`<div class="sos">${SOS.map(x=>`<a href="tel:${x.tel.replace(/[^+\d]/g,"")}"><span><b>${esc(x.n)}</b><br><span style="font-size:13px">${esc(x.d)}</span></span><span class="num">${esc(x.tel)}</span></a>`).join("")}</div><p style="margin-top:10px">대사관 번호는 출발 전에 외교부 페이지에서 다시 확인하세요.</p>`)}
       ${tl("tpl","i-line","노선 템플릿",PLANS.find(p=>p.k===S.tpl)?.n||"",
         `<p>정리해 둔 일정 중 하나를 처음 짠 대로 엽니다. 지금 버전에서 고친 건 그 버전에 남고, 일정 화면 맨 위 칩으로 오갈 수 있어요. 찜과 직접 담은 곳은 같이 써요.</p><div class="tpl">${PLANS.filter(p=>p.k!=="mine").map(p=>`<button data-tpl="${p.k}"><b>${esc(p.n)}${p.k===S.tpl?" · 지금":""}</b><span>${esc(p.intro)}</span></button>`).join("")}</div>`)}
@@ -1902,6 +1922,7 @@ function icsText(){
 
 /* ─────────────── 공통 이벤트 ─────────────── */
 document.addEventListener("click",e=>{
+  if(e.target.closest("[data-hotelinfo]")){ e.preventDefault(); openHotel(); return; }
   const up=e.target.closest("[data-unpin]"); if(up){ e.preventDefault(); e.stopPropagation(); unpin(up.dataset.unpin); return; }
   const g=e.target.closest("[data-go]"); if(g && !e.target.closest(".drop")){ e.preventDefault(); if(g.dataset.open){ TOOLS_OPEN=g.dataset.open; LS.set("tokyo-lines-open",TOOLS_OPEN); } go(g.dataset.go, g.dataset.day); return; }
   const a=e.target.closest("[data-add]"); if(a){ e.stopPropagation(); moveTo(a.dataset.add, CUR==="wed"?"thu":CUR); return; }

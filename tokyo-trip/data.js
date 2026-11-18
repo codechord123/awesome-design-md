@@ -3,7 +3,7 @@
 /* DATA:START — tools/make-csv.mjs 가 이 블록을 읽어 data/places.csv 를 만듭니다 */
 // 숙소: SPABLIC INN かぷせる旅籠赤坂 (캡슐호텔). 주소·좌표·규정은 2026-09-24 검색으로 확인.
 const HOTEL = {lat:35.676047, lng:139.736752, n:"SPABLIC INN 아카사카", ja:"かぷせる旅籠赤坂 SPABLIC INN",
-  addr:"東京都港区赤坂3-10-4 赤坂月世界ビル 3F", q:"かぷせる旅籠赤坂 SPABLIC INN", stn:"赤坂見附",
+  addr:"東京都港区赤坂3-10-4 赤坂月世界ビル 3F", q:"かぷせる旅籠赤坂 SPABLIC INN", gid:"ChIJDY871ESNGGARBhdzB_sN4Vc", stn:"赤坂見附",
   checkin:"15:00", checkout:"11:00",
   src:"https://www.hotels.com/ho2980682240/spablic-inn-tokyo-japan/", srcn:"Hotels.com"};
 
